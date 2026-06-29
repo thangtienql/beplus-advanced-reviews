@@ -20,19 +20,19 @@ Standards: [`Document Plugin.md`](../../../Document%20Plugin.md). Keep block str
 - `category`: use the plugin's custom block category if one is registered
 - `name`: `beplus-advanced-reviews/{slug}`
 - Prefer dynamic rendering for review-related blocks when the content depends on product context or live review data.
-- Keep attributes descriptive and camelCase, such as `showMedia`, `itemsPerPage`, `showFilterBar`, and `enableCriteriaBreakdown`.
+- Keep attributes descriptive and camelCase, such as `showDistribution`, `showFilterBar`, `showSubmitForm`, `showImages`, `showAvatar`, `reviewsPerLoad`, `enableLazyLoad`.
 
 ## Planned / primary blocks
 
 | Block | Purpose |
 |-------|---------|
-| `advanced-review` | Primary review block for WooCommerce single product templates; renders review list, media, criteria, filters, and submit form |
+| `advanced-review` | Primary review block for WooCommerce single product templates; renders review list, star distribution, image gallery, filters, sort controls, and submit form |
 
 ## Editor and render
 
 - In `render.php`, escape all output and use `get_block_wrapper_attributes()` when rendering block markup.
 - Use `edit.tsx` for Inspector controls and preview states; keep labels and help text aligned with review terminology.
-- Use `view.ts` for client-side enhancements such as filter interactivity, media lightboxes, and pagination hooks.
+- Use `view.ts` for client-side enhancements such as filter interactivity, image lightboxes, load more pagination, and paste-to-upload support.
 - Do not embed large amounts of review logic in `render.php` if the same behavior belongs in the view script or REST layer.
 
 ## Styling
@@ -44,9 +44,9 @@ Standards: [`Document Plugin.md`](../../../Document%20Plugin.md). Keep block str
 ## Accessibility
 
 - **Review list:** Use lists and article/section structure so review items remain readable by assistive technology.
-- **Filter controls:** Use real form controls for rating filters, media-only toggles, and sort selectors.
-- **Submit form:** Provide labels, helper text, and clear validation feedback for rating fields, text areas, media uploads, and consent fields.
-- **Media previews:** Ensure thumbnails and video previews have accessible names or captions when they convey important information.
+- **Filter controls:** Use real form controls for rating filters, images-only toggle, and sort selectors.
+- **Submit form:** Provide labels, helper text, and clear validation feedback for rating fields, text areas, and image uploads.
+- **Image previews:** Ensure thumbnails have accessible names or captions when they convey important information.
 - **Live updates:** Use an `aria-live="polite"` region for review count changes, filter results, and submission status messages.
 - **Keyboard:** Every control must be reachable and usable by keyboard alone. Modals trap focus while open and restore it on close. Escape should close any overlay or modal.
 - **Motion:** Disable or simplify transitions when `prefers-reduced-motion: reduce` is active.
@@ -59,7 +59,7 @@ Standards: [`Document Plugin.md`](../../../Document%20Plugin.md). Keep block str
 ❌ Inline script blobs in render.php for filtering reviews
 ✅ view.ts + REST + localized data from the asset loader
 
-❌ <div onclick="openMedia()">Review image</div>
+❌ <div onclick="openImage()">Review image</div>
 ✅ <button type="button">View review image</button>
 ```
 
@@ -67,4 +67,4 @@ Standards: [`Document Plugin.md`](../../../Document%20Plugin.md). Keep block str
 
 1. `npm run build` from plugin root.
 2. Block inserter: block appears under **BePlus Advanced Reviews** category.
-3. Front-end: filters work, media opens correctly, review submission states are visible, and layout remains stable.
+3. Front-end: filters work, images open correctly, review submission states are visible, and layout remains stable.

@@ -23,7 +23,7 @@ Run `npm run build` or the plugin's preferred watch/build command after source c
 
 ## Front-end JavaScript
 
-- Use the view script to hydrate review filters, media toggles, lazy loading, and any progressive enhancement.
+- Use the view script to hydrate review filters, image toggles, lazy loading, load more pagination, star distribution chart, and paste-to-upload support.
 - Keep interactions resilient when JavaScript is unavailable so reviews still render as static content.
 - Use the plugin REST namespace consistently for client-side fetching and form submission.
 
@@ -31,20 +31,21 @@ Run `npm run build` or the plugin's preferred watch/build command after source c
 
 - Scope styles to the plugin with `beplus-advanced-reviews` BEM-style class names.
 - Avoid global resets or theme-wide overrides.
-- Keep review cards, media, filter bars, and forms visually distinct but accessible.
+- Keep review cards, images, filter bars, and forms visually distinct but accessible.
+- Style the star distribution bar chart with responsive, accessible color and sizing.
 
 ## Accessibility (JavaScript)
 
 - Keep review filter controls, upload helpers, and any admin forms keyboard-friendly.
 - Announce review list updates, submit success, and errors through a polite live region when the UI changes dynamically.
 - Link form errors to inputs with `aria-describedby` and keep validation messages concise.
-- If a modal, drawer, or lightbox is introduced, restore focus to the triggering control after close.
+- If a modal, lightbox, or drawer is introduced, restore focus to the triggering control after close.
 
 ## Accessibility (CSS)
 
 - Use `:focus-visible` for interactive elements and preserve a strong visible focus indicator.
 - Respect `@media (prefers-reduced-motion: reduce)` for transitions, overlays, and loader animations.
-- Keep touch targets reasonably sized for review actions such as expanding media or submitting forms.
+- Keep touch targets reasonably sized for review actions such as expanding images or submitting forms.
 
 ```text
 ❌ Hard-code /wp-json/ paths in front-end requests

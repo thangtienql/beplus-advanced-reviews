@@ -14,11 +14,11 @@ description: Use when creating or editing REST API controllers, routes, endpoint
 
 | Route | Methods | Permission | Notes |
 |-------|---------|------------|-------|
-| `/reviews` | GET | public read | Return product review data with filters and pagination |
-| `/reviews` | POST | logged-in or nonce | Submit a new review, including criteria scores and media |
+| `/reviews` | GET | public read | Return product review data with filters, pagination, and sort |
+| `/reviews` | POST | logged-in or nonce | Submit a new review with rating and optional images |
 | `/reviews/{id}` | DELETE | `manage_woocommerce` | Remove a review |
+| `/reviews/distribution` | GET | public read | Star distribution counts for a product |
 | `/settings` | GET, POST | `manage_options` | Retrieve and update plugin settings |
-| `/criteria` | GET | public or privileged as needed | Expose criteria configuration if the feature uses it |
 
 Register routes on `rest_api_init` inside the plugin boot flow or a dedicated module.
 
@@ -58,9 +58,27 @@ array(
 	'rating'      => (int) $rating,
 	'author'      => (string) $author_name,
 	'content'     => (string) $content,
-	'has_media'   => (bool) $has_media,
-	'criteria'    => array(),
+	'avatar'      => (string) $avatar_url,
+	'has_images'  => (bool) $has_images,
+	'images'      => array(),
 	'created_at'  => (string) $created_at,
+)
+```
+
+Star distribution response:
+
+```php
+array(
+	'product_id' => (int) $product_id,
+	'total'      => (int) $total_reviews,
+	'average'    => (float) $average_rating,
+	'stars'      => array(
+		'5' => (int) $count_5,
+		'4' => (int) $count_4,
+		'3' => (int) $count_3,
+		'2' => (int) $count_2,
+		'1' => (int) $count_1,
+	),
 )
 ```
 
@@ -78,6 +96,6 @@ Apply plugin filters before returning results so third-party code can extend que
 
 | File | Purpose |
 |------|---------|
-| `src/REST/ReviewController.php` | Public reviews REST (list, submit, filter) |
+| `src/REST/ReviewController.php` | Public reviews REST (list, submit, filter, distribution) |
 | `src/REST/SettingsController.php` | Admin settings REST |
 | `src/Core/HookManager.php` | Documented hooks and filters |

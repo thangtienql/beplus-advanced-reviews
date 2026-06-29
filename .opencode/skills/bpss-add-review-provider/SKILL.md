@@ -8,7 +8,7 @@ description: Adds a new review provider or review data source to BePlus Advanced
 ## Before you edit
 
 - Read [`AGENTS.md`](../../../AGENTS.md) and [`Document Plugin.md`](../../../Document%20Plugin.md).
-- Review `src/Reviews/`, `src/REST/ReviewController.php`, `src/Media/MediaHandler.php`, and `src/Settings/CriteriaRegistry.php` for the existing review flow.
+- Review `src/Reviews/`, `src/REST/ReviewController.php`, `src/Media/MediaHandler.php`, and `src/Settings/SettingsRegistry.php` for the existing review flow.
 
 ## Provider contract
 
@@ -23,9 +23,9 @@ array(
   'author'         => (string),
   'content'        => (string),
   'rating'         => (int),
-  'criteria_scores' => array(),
-  'has_media'      => (bool),
-  'media'          => array(),
+  'avatar'         => (string),
+  'has_images'     => (bool),
+  'images'         => array(),
   'created_at'     => (string),
 )
 ```
@@ -50,8 +50,7 @@ array(
 |----------|--------------------|
 | Import historical reviews | `src/Reviews/ReviewImporter.php` |
 | Enrich review metadata | `src/Reviews/ReviewEnricher.php` |
-| Sync media or attachments | `src/Media/MediaHandler.php` |
-| Alter criteria definitions | `src/Settings/CriteriaRegistry.php` |
+| Sync images or attachments | `src/Media/MediaHandler.php` |
 | Add custom review REST output | `src/REST/ReviewController.php` |
 
 ## Checklist
@@ -59,5 +58,5 @@ array(
 - [ ] Provider is in a dedicated class or module under `src/`.
 - [ ] Input is sanitized and output is normalized.
 - [ ] Capability and nonce checks are explicit for admin or write paths.
-- [ ] Media handling follows the plugin's validation and storage rules.
+- [ ] Image handling follows the plugin's validation and storage rules.
 - [ ] REST output and front-end rendering consume the same normalized shape.

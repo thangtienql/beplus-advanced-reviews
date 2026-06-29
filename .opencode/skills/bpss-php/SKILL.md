@@ -20,22 +20,23 @@ Before finishing PHP work:
 - **Bootstrap:** Constants and boot functions live in `beplus-advanced-reviews.php`; business logic lives in `src/`.
 - **Modules:** Extend `AbstractModule`; constructors receive dependencies from the container; implement `register(): void`.
 - **Services:** Resolve shared services from `Container::get()` rather than instantiating repeated singletons in random files.
-- **Settings:** Centralize option defaults and migration logic in a settings registry instead of scattering `get_option()` calls.
+- **Settings:** Centralize option defaults and migration logic in `SettingsRegistry`. Display mode settings control placement (keep / replace / custom hook).
 - **Templates:** Escape all dynamic output in PHP templates; use contextual escaping for URLs, attributes, and HTML.
 - **Script data:** Localize front-end and editor data through the asset loader with a dedicated object for the plugin.
+- **Display mode:** Placement logic lives in `src/Core/Placement.php` — handles keep / replace / custom hook modes.
 
 ## Naming
 
 | Type | Pattern | Example |
 |------|---------|---------|
 | Class | PascalCase | `ReviewController`, `SettingsRegistry` |
-| Abstract | `Abstract` + name | `AbstractModule`, `AbstractProvider` |
+| Abstract | `Abstract` + name | `AbstractModule` |
 | Global helper | `beplus_advanced_reviews_*` | `beplus_advanced_reviews_get_settings()` |
-| Hook constant | `HookManager::CONST` | `FILTER_SERVICES` |
+| Hook constant | `HookManager::CONST` | `CUSTOM_POSITION` |
 
 ## Infrastructure patterns
 
-Follow existing classes in `src/Core/Plugin.php`, `src/Core/Container.php`, `src/Settings/SettingsRegistry.php`, and `src/REST/*Controller.php` when adding new infrastructure.
+Follow existing classes in `src/Core/Plugin.php`, `src/Core/Container.php`, `src/Core/Placement.php`, `src/Settings/SettingsRegistry.php`, and `src/REST/*Controller.php` when adding new infrastructure.
 
 ```text
 ❌ function get_review_settings() without prefix in includes/common.php
@@ -53,5 +54,6 @@ Follow existing classes in `src/Core/Plugin.php`, `src/Core/Container.php`, `src
 | `src/Core/Plugin.php` | Boot flow, activate/deactivate |
 | `src/Core/AbstractModule.php` | Module base |
 | `src/Core/Container.php` | DI container |
+| `src/Core/Placement.php` | Display mode logic |
 | `src/Settings/SettingsRegistry.php` | Settings pattern |
 | `includes/common.php` | Global helpers |

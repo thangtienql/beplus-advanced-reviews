@@ -25,7 +25,57 @@
 
 ---
 
-## 2. Architecture Overview
+## 2. Features Overview
+
+The plugin upgrades WooCommerce product reviews with a modern, AJAX-driven interface.
+
+### 2.1 Primary Block — `advanced-review`
+
+A drag-and-drop Gutenberg block that renders the full review experience. **Automatically applied to all Single Product pages** on activation. Users can also manually place the block in any template.
+
+### 2.2 Block Output (Frontend)
+
+| Feature | Description |
+|---------|-------------|
+| **Average rating score** | Aggregated star rating for the product |
+| **Total review count** | Total number of approved reviews |
+| **Star distribution chart** | Bar chart showing count per star rating (1★–5★) |
+| **Review list** | Paginated list of review cards |
+| **Review card** | Avatar, reviewer name, rating score, content, date, images |
+| **Review images** | Uploaded or copy/pasted images attached to a review |
+| **Review submission form** | Inline form to write and submit a review with rating and images |
+| **Load More button** | AJAX "Load More" to fetch the next page of reviews |
+| **Filter & Sort** | Filter by star rating, show only reviews with images, sort by date/rating |
+
+### 2.3 Review Card
+
+Each review card displays:
+
+- **Avatar** (Gravatar or user profile image, if logged in)
+- **Reviewer name**
+- **Rating score** (star rating)
+- **Content** (review text)
+- **Review date**
+- **Images** (clickable thumbnails, opens lightbox)
+
+### 2.4 Image Support
+
+- Upload via file input (multi-select)
+- **Copy/paste from clipboard** into the review form
+- Uses WordPress Media Library for storage
+- Linked via `{wpdb->prefix}bpar_review_media` table
+
+### 2.5 Plugin Settings — Display Mode
+
+| Mode | Behavior |
+|------|----------|
+| **Keep default** | WooCommerce's built-in reviews remain as-is; the block can be placed manually |
+| **Replace default** | Completely replaces the standard WooCommerce reviews tab/area with the Advanced Reviews block |
+| **Custom hook position** | Inserts Advanced Reviews at a developer-specified hook (`beplus_advanced_reviews_custom_position`) |
+
+---
+
+## 3. Architecture Overview
 
 This plugin uses a **container-based architecture** — every module registers hooks inside `register()`, with no side effects when files are `require`d.
 
@@ -39,12 +89,11 @@ BePlusAdvancedReviews\Core\Plugin    ← Entry point: boot(), activate(), deacti
         ├── AbstractModule           ← Base class for all modules
         │
         ├── AssetLoader              ← Enqueue JS/CSS
-        ├── SettingsRegistry         ← Options + defaults
-        ├── CriteriaRegistry         ← Rating criteria definitions + weights
+        ├── SettingsRegistry         ← Options + defaults + display mode
         ├── BlockRegistry            ← Auto-discover blocks/
         ├── ReviewController         ← REST API for review listing/submission
-        ├── MediaHandler             ← Media validation + storage
-        └── Services                 ← Schema, filters, formatting, notifications
+        ├── MediaHandler             ← Image validation + storage (upload & paste)
+        └── Services                 ← Schema, filters, formatting
 ```
 
 **Core principles:**
@@ -57,7 +106,7 @@ BePlusAdvancedReviews\Core\Plugin    ← Entry point: boot(), activate(), deacti
 
 ---
 
-## 3. Recommended Directory Structure
+## 4. Recommended Directory Structure
 
 ```
 beplus-advanced-reviews/
@@ -74,10 +123,10 @@ beplus-advanced-reviews/
 │   │   ├── AbstractModule.php    # Base module
 │   │   ├── AssetLoader.php       # Enqueue scripts/styles
 │   │   ├── HookManager.php       # Constants for hooks/filters
+│   │   ├── Placement.php         # Display mode logic (keep/replace/hook)
 │   │   └── Compat.php            # Backward compatibility helpers
 │   │
 │   ├── Reviews/                  # Domain: review storage / formatting
-│   │   ├── ReviewController.php
 │   │   ├── ReviewRepository.php
 │   │   ├── ReviewQuery.php
 │   │   ├── ReviewFormatter.php
@@ -87,8 +136,7 @@ beplus-advanced-reviews/
 │   │   └── MediaHandler.php
 │   │
 │   ├── Settings/
-│   │   ├── SettingsRegistry.php
-│   │   └── CriteriaRegistry.php
+│   │   └── SettingsRegistry.php  # Options + defaults (display mode, etc.)
 │   │
 │   ├── REST/
 │   │   ├── ReviewController.php
@@ -117,11 +165,16 @@ beplus-advanced-reviews/
 │
 ├── assets/                       # Source assets (before build)
 │   ├── js/
+│   │   ├── review-list.ts        # Review list, load more, lazy load
+│   │   ├── review-form.ts        # Submission form, image paste handler
+│   │   ├── review-filter.ts      # Filter bar & sort logic
+│   │   └── star-distribution.ts  # Star distribution chart
 │   └── css/
+│       ├── reviews.scss
+│       └── components/
 │
 ├── build/                        # esbuild output (DO NOT edit by hand)
 │   ├── admin.js
-│   ├── admin.css
 │   ├── admin.asset.php
 │   └── blocks/
 │
@@ -136,7 +189,9 @@ beplus-advanced-reviews/
 │
 ├── templates/                    # Frontend PHP templates
 │   ├── review-card.php
+│   ├── review-list.php
 │   ├── review-form.php
+│   ├── star-distribution.php
 │   └── partials/
 │       └── media-item.php
 │
@@ -150,14 +205,14 @@ beplus-advanced-reviews/
 
 ---
 
-## 4. Bootstrap File — `beplus-advanced-reviews.php`
+## 5. Bootstrap File — `beplus-advanced-reviews.php`
 
 ```php
 <?php
 /**
  * Plugin Name: BePlus Advanced Reviews
  * Plugin URI:  https://beplusthemes.com/
- * Description: Advanced WooCommerce product reviews with media attachments, multi-criteria ratings, and smart filtering.
+ * Description: Modern WooCommerce product reviews with image support, star distribution, AJAX filtering, and load more.
  * Version:     1.0.0
  * Author:      Beplus
  * Author URI:  https://beplusthemes.com/
@@ -263,9 +318,9 @@ function beplus_advanced_reviews_deactivate() {
 
 ---
 
-## 5. Naming Conventions
+## 6. Naming Conventions
 
-### 5.1 Constants
+### 6.1 Constants
 
 | Constant | Purpose |
 |----------|---------|
@@ -276,7 +331,7 @@ function beplus_advanced_reviews_deactivate() {
 
 - Always **UPPER_SNAKE_CASE** with the plugin prefix.
 
-### 5.2 Global functions (procedural)
+### 6.2 Global functions (procedural)
 
 **Pattern:** `{prefix}_{module}_{action}`
 
@@ -288,8 +343,8 @@ function beplus_advanced_reviews_deactivate() {
 | `beplus_advanced_reviews_init()` | Late init hook |
 | `beplus_advanced_reviews_activate()` | Activation handler |
 | `beplus_advanced_reviews_get_settings()` | Read merged settings |
-| `beplus_advanced_reviews_sanitize_array()` | Recursive array sanitize |
 | `beplus_advanced_reviews_render_review_card()` | Render a review card |
+| `beplus_advanced_reviews_get_star_distribution()` | Get star distribution data |
 
 **Rules:**
 
@@ -298,9 +353,7 @@ function beplus_advanced_reviews_deactivate() {
 - Include module name when needed: `beplus_advanced_reviews_rebuild_review_cache()`.
 - Every public function must have full **PHPDoc** with `@param` and `@return`.
 
-### 5.3 Namespaced functions (`src/Functions/`)
-
-Optional namespaced wrappers live in `src/Functions/`:
+### 6.3 Namespaced functions (`src/Functions/`)
 
 ```php
 namespace BePlusAdvancedReviews\Functions;
@@ -315,41 +368,39 @@ function get_settings(): array {
 - **camelCase** inside namespaces (PSR-1).
 - Global functions remain **snake_case** with prefix.
 
-### 5.4 Class naming
+### 6.4 Class naming
 
 | Type | Convention | Example |
 |------|------------|---------|
 | Core | PascalCase | `Plugin`, `Container` |
-| Abstract base | `Abstract` + name | `AbstractModule`, `AbstractProvider` |
+| Abstract base | `Abstract` + name | `AbstractModule` |
 | Interface | name + `Interface` | `ReviewRepositoryInterface` |
-| Registry | name + `Registry` | `SettingsRegistry`, `CriteriaRegistry` |
+| Registry | name + `Registry` | `SettingsRegistry`, `BlockRegistry` |
 | REST controller | name + `Controller` | `ReviewController` |
-| Service | name + `Service` | `MediaHandler`, `SchemaManager` |
+| Service | PascalCase | `MediaHandler`, `SchemaManager` |
 | Trait | `Has` + name + `Trait` | `HasSettingsTrait` |
 
 **Namespace mapping (PSR-4):**
 
 ```
 BePlusAdvancedReviews\Core\Plugin           → src/Core/Plugin.php
-BePlusAdvancedReviews\Reviews\ReviewController → src/Reviews/ReviewController.php
+BePlusAdvancedReviews\Reviews\ReviewRepository → src/Reviews/ReviewRepository.php
 BePlusAdvancedReviews\REST\ReviewController  → src/REST/ReviewController.php
 ```
 
-### 5.5 File naming
+### 6.5 File naming
 
 | Location | Convention | Example |
 |----------|------------|---------|
 | `src/` | PascalCase matching class name | `ReviewController.php` |
-| `includes/` legacy | `class-{name}.php` or `{name}.php` | `hooks.php`, `common.php` |
+| `includes/` | `{name}.php` or `class-{name}.php` | `hooks.php`, `common.php` |
 | Templates | descriptive kebab-case | `review-card.php` |
 | Blocks folder | kebab-case | `advanced-review/block.json` |
 | SCSS partial | `_component-name.scss` | `_review-card.scss` |
 | TS component | PascalCase.tsx | `ReviewForm.tsx` |
 | TS module | kebab-case.ts | `review-filter.ts` |
 
-### 5.6 Hooks, Filters, and Actions
-
-The plugin uses **two hook naming styles** — prefer modern namespaced-style constants for new code:
+### 6.6 Hooks, Filters, and Actions
 
 **Modern style (recommended) — dot/slash notation:**
 
@@ -357,11 +408,11 @@ The plugin uses **two hook naming styles** — prefer modern namespaced-style co
 // HookManager.php
 public const SERVICES           = 'beplus_advanced_reviews.services';
 public const BLOCKS             = 'beplus_advanced_reviews.blocks';
-public const CRITERIA           = 'beplus-advanced-reviews/criteria';
 public const REVIEW_QUERY       = 'beplus-advanced-reviews/review.query';
 public const REVIEW_RESULTS     = 'beplus-advanced-reviews/review.results';
 public const REVIEW_SUBMITTED   = 'beplus-advanced-reviews/review.submitted';
 public const MEDIA_UPLOADED     = 'beplus-advanced-reviews/media.uploaded';
+public const CUSTOM_POSITION    = 'beplus_advanced_reviews_custom_position';
 ```
 
 **Legacy WordPress style (still used for compatibility hooks):**
@@ -371,37 +422,29 @@ do_action( 'beplus_advanced_reviews_before_review_list', $args );
 apply_filters( 'beplus_advanced_reviews_review_card_html', $html, $review );
 ```
 
-**Custom action hooks (domain events):**
-
-```php
-do_action( HookManager::REVIEW_SUBMITTED, $review_id, $comment_id );
-```
-
-### 5.7 Options and transients
+### 6.7 Options and transients
 
 ```php
 // Options
-'beplus_advanced_reviews_settings'        // main settings
+'beplus_advanced_reviews_settings'        // main settings (display mode, etc.)
 'beplus_advanced_reviews_schema_version'  // schema version tracker
-'beplus_advanced_reviews_criteria'        // criteria registry override
 
 // Transients
 'beplus_advanced_reviews_review_counts'
 'beplus_advanced_reviews_media_cache'
 ```
 
-### 5.8 Database tables
+### 6.8 Database tables
 
 ```php
 // Prefix: {wpdb->prefix}bpar_
-$wpdb->prefix . 'bpar_criteria_scores'
 $wpdb->prefix . 'bpar_review_media'
 ```
 
 - Short table prefix `bpar_` (BePlus Advanced Reviews).
 - Create / migrate tables in `activate()` or via `SchemaManager`.
 
-### 5.9 Script and style handles
+### 6.9 Script and style handles
 
 ```php
 'beplus-advanced-reviews-admin'
@@ -409,7 +452,7 @@ $wpdb->prefix . 'bpar_review_media'
 'beplus-advanced-reviews-block-advanced-review'
 ```
 
-### 5.10 CSS class prefix
+### 6.10 CSS class prefix
 
 ```html
 <div class="beplus-advanced-reviews beplus-advanced-reviews__review-card">
@@ -419,9 +462,27 @@ $wpdb->prefix . 'bpar_review_media'
 
 ---
 
-## 6. Writing Classes — Standard Patterns
+## 7. Database Schema
 
-### 6.1 Required PHP file header
+```sql
+-- Links uploaded images to a review (WooCommerce comment)
+CREATE TABLE {prefix}bpar_review_media (
+  id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  comment_id    BIGINT UNSIGNED NOT NULL,          -- wp_comments.comment_ID
+  attachment_id BIGINT UNSIGNED NOT NULL,          -- wp_posts (attachment)
+  sort_order    TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_comment (comment_id)
+);
+```
+
+`SchemaManager::create_tables()` is called on plugin activation and on `plugins_loaded` when the stored schema version is outdated.
+
+---
+
+## 8. Writing Classes — Standard Patterns
+
+### 8.1 Required PHP file header
 
 ```php
 <?php
@@ -439,9 +500,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ```
 
-### 6.2 AbstractModule — base for all modules
-
-Standard module base:
+### 8.2 AbstractModule — base for all modules
 
 ```php
 namespace BePlusAdvancedReviews\Core;
@@ -473,7 +532,7 @@ abstract class AbstractModule {
 - All `add_action()` / `add_filter()` calls live inside `register()`.
 - Do not call WordPress APIs at file top level (outside `register()`).
 
-### 6.3 Plugin class — boot flow
+### 8.3 Plugin class — boot flow
 
 ```php
 namespace BePlusAdvancedReviews\Core;
@@ -494,11 +553,32 @@ class Plugin {
 		add_action( 'init', array( $this, 'on_init' ) );
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
+
+		// Apply display mode (keep / replace / custom hook)
+		add_action( 'init', array( $this, 'apply_display_mode' ) );
 	}
 
 	public function on_init(): void {
-		$this->init_frontend();
 		$this->init_rest_controllers();
+	}
+
+	public function apply_display_mode(): void {
+		$mode = $this->container->get( SettingsRegistry::class )->get_display_mode();
+
+		switch ( $mode ) {
+			case 'replace':
+				// Remove default WooCommerce reviews tab
+				add_filter( 'woocommerce_product_tabs', array( Core\Placement::class, 'replace_reviews_tab' ) );
+				break;
+			case 'custom_hook':
+				// Let developer hook into beplus_advanced_reviews_custom_position
+				add_action( HookManager::CUSTOM_POSITION, array( Core\Placement::class, 'render_at_custom_hook' ) );
+				break;
+			case 'keep':
+			default:
+				// Block is available but no automatic replacement
+				break;
+		}
 	}
 
 	public function activate(): void {
@@ -513,7 +593,7 @@ class Plugin {
 }
 ```
 
-### 6.4 Container — dependency injection
+### 8.4 Container — dependency injection
 
 The `Container` supports:
 
@@ -529,20 +609,38 @@ $services = apply_filters( HookManager::SERVICES, array() );
 $this->container->register( $services );
 ```
 
-### 6.5 Review repository / query pattern
+### 8.5 SettingsRegistry — Display Mode
 
 ```php
-namespace BePlusAdvancedReviews\Reviews;
+namespace BePlusAdvancedReviews\Settings;
 
-abstract class ReviewRepository {
+class SettingsRegistry extends AbstractModule {
 
-	abstract public function find_by_product_id( int $product_id, array $args = array() ): array;
-	abstract public function save_criteria_scores( int $comment_id, array $scores ): void;
-	abstract public function attach_media( int $comment_id, array $attachment_ids ): void;
+	private const OPTION_KEY = 'beplus_advanced_reviews_settings';
+
+	private const DEFAULTS = array(
+		'display_mode'      => 'replace',   // 'keep' | 'replace' | 'custom_hook'
+		'enable_images'     => true,
+		'enable_paste'      => true,        // clipboard paste support
+		'enable_filter'     => true,
+		'enable_sort'       => true,
+		'load_more_count'   => 10,          // reviews per "load more"
+		'rating_threshold'  => 0,           // minimum rating to display (0 = show all)
+	);
+
+	public function register(): void {
+		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+	}
+
+	public function get_all(): array { /* merge defaults + stored */ }
+	public function get_display_mode(): string { /* return display_mode */ }
+	public function update( array $settings ): bool { /* ... */ }
 }
 ```
 
-### 6.6 REST Controller
+### 8.6 REST Controller — Reviews
 
 ```php
 namespace BePlusAdvancedReviews\REST;
@@ -572,70 +670,76 @@ class ReviewController extends \WP_REST_Controller {
 				),
 			)
 		);
-	}
-}
-```
 
-### 6.7 SettingsRegistry
-
-```php
-namespace BePlusAdvancedReviews\Settings;
-
-class SettingsRegistry extends AbstractModule {
-
-	private const OPTION_KEY = 'beplus_advanced_reviews_settings';
-
-	private const DEFAULTS = array(
-		'general' => array(
-			'enable_media_uploads' => true,
-			'enable_filters'       => true,
-		),
-		'criteria' => array(
-			'material_quality'    => 1,
-			'matches_description' => 1,
-			'delivery_speed'      => 1,
-		),
-	);
-
-	public function register(): void {
-		add_action( 'admin_init', array( $this, 'maybe_migrate_settings' ) );
-	}
-
-	public function get_all(): array { /* merge defaults + stored */ }
-	public function get_group( string $group ): array { /* ... */ }
-	public function update( array $settings ): bool { /* ... */ }
-}
-```
-
-### 6.8 CriteriaRegistry
-
-```php
-namespace BePlusAdvancedReviews\Settings;
-
-class CriteriaRegistry extends AbstractModule {
-
-	public function get_default_criteria(): array {
-		return array(
-			'material_quality' => array(
-				'label'  => __( 'Material Quality', 'beplus-advanced-reviews' ),
-				'weight' => 1,
-			),
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/distribution',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_star_distribution' ),
+					'permission_callback' => '__return_true',
+					'args'                => array(
+						'product_id' => array(
+							'required'          => true,
+							'validate_callback' => function ( $param ) {
+								return absint( $param ) > 0;
+							},
+						),
+					),
+				),
+			)
 		);
 	}
 }
 ```
 
+### 8.7 MediaHandler — Upload & Paste Support
+
+```php
+namespace BePlusAdvancedReviews\Media;
+
+class MediaHandler extends AbstractModule {
+
+	/**
+	 * Handle uploaded files from form $_FILES.
+	 *
+	 * @param int   $comment_id
+	 * @param array $files  $_FILES array
+	 * @return array attachment IDs
+	 */
+	public function upload_files( int $comment_id, array $files ): array { /* ... */ }
+
+	/**
+	 * Handle a pasted/base64 image from clipboard.
+	 *
+	 * @param int    $comment_id
+	 * @param string $base64_data  Data URL from clipboard paste
+	 * @return int|null  attachment ID or null on failure
+	 */
+	public function upload_pasted_image( int $comment_id, string $base64_data ): ?int { /* ... */ }
+
+	/**
+	 * Get media attached to a review.
+	 *
+	 * @param int $comment_id
+	 * @return array List of attachment data (id, url, thumbnail_url)
+	 */
+	public function get_review_media( int $comment_id ): array { /* ... */ }
+}
+```
+
 ---
 
-## 7. Gutenberg Blocks
+## 9. Gutenberg Block — `advanced-review`
 
 Block structure:
 
 ```
 blocks/advanced-review/
 ├── block.json      # metadata, attributes, render callback
-├── edit.tsx        # editor UI
-├── view.ts         # front-end enhancements
+├── edit.tsx        # editor UI (placeholder preview)
+├── view.ts         # front-end enhancements (AJAX, load more, filter, paste)
 ├── render.php      # server-side render
 └── style.css       # frontend + editor styles
 ```
@@ -647,13 +751,18 @@ blocks/advanced-review/
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "beplus-advanced-reviews/advanced-review",
-	"title": "Advanced Review",
+	"title": "Advanced Reviews",
 	"category": "beplus-advanced-reviews",
 	"icon": "star-filled",
-	"description": "Advanced WooCommerce product reviews with media, criteria, and filtering.",
+	"description": "Modern WooCommerce product reviews with images, star distribution, filtering, and load more.",
 	"attributes": {
-		"showFilterBar": { "type": "boolean", "default": true },
-		"showSubmitForm": { "type": "boolean", "default": true }
+		"showDistribution": { "type": "boolean", "default": true },
+		"showFilterBar":    { "type": "boolean", "default": true },
+		"showSubmitForm":   { "type": "boolean", "default": true },
+		"showImages":       { "type": "boolean", "default": true },
+		"showAvatar":       { "type": "boolean", "default": true },
+		"reviewsPerLoad":   { "type": "number",  "default": 10 },
+		"enableLazyLoad":   { "type": "boolean", "default": true }
 	},
 	"render": "file:./render.php",
 	"editorScript": "beplus-advanced-reviews-block-advanced-review",
@@ -672,14 +781,59 @@ apply_filters( 'beplus_advanced_reviews.blocks', array() );
 
 ---
 
-## 8. Assets (JS/CSS)
+## 10. Front-End Data Flow
+
+```
+Page load
+  └── REST GET /reviews?product_id=…        →  ReviewController::get_items()
+  ├── REST GET /reviews/distribution?product_id=… → ReviewController::get_star_distribution()
+  │     Returns initial review page + star distribution
+  │
+  └── view.ts hydrates the block:
+        ├── Renders star distribution bar chart
+        ├── Renders review list cards
+        └── Binds filter bar + sort controls
+
+User clicks "Load More"
+  └── REST GET /reviews?product_id=…&page=2  →  Appends next page
+
+User applies filter (star rating / has images)
+  └── REST GET /reviews?product_id=…&rating=5&has_images=1 →  Replaces list
+
+User submits review
+  └── REST POST /reviews  →  ReviewController::create_item()
+        ├── Validates nonce
+        ├── Creates wp_comment via wp_insert_comment()
+        ├── Handles image uploads → MediaHandler
+        └── Handles pasted images → MediaHandler::upload_pasted_image()
+```
+
+---
+
+## 11. REST API
+
+- **Namespace:** `beplus-advanced-reviews/v1`
+
+| Method | Route | Auth | Description |
+|--------|-------|------|-------------|
+| `GET` | `/reviews` | public | List reviews; supports `product_id`, `rating`, `has_images`, `page`, `per_page`, `sort` |
+| `GET` | `/reviews/distribution` | public | Star distribution counts for a product |
+| `POST` | `/reviews` | logged-in or nonce | Submit a new review with rating and optional images |
+| `DELETE` | `/reviews/{id}` | `manage_woocommerce` | Remove a review |
+| `GET` | `/settings` | `manage_options` | Retrieve plugin settings |
+| `POST` | `/settings` | `manage_options` | Save plugin settings |
+
+- Localize REST URL + nonce via `wp_localize_script` (`bparData` object).
+
+---
+
+## 12. Assets (JS/CSS)
 
 **AssetLoader** pattern:
 
 - Admin: `admin/js/settings.ts` → compiled assets
-- Frontend: block `view.ts` and plugin front-end assets
+- Frontend: `assets/js/review-list.ts`, `review-form.ts`, `review-filter.ts`, `star-distribution.ts`
 - Blocks: `enqueue_block_assets` hook or block metadata asset handles
-- Legacy fallback: `assets/js/*.js` if the plugin supports it
 
 **Localized data:**
 
@@ -688,8 +842,17 @@ wp_localize_script(
 	'beplus-advanced-reviews-frontend',
 	'bparData',
 	array(
-		'restUrl' => rest_url( 'beplus-advanced-reviews/v1/' ),
-		'nonce'   => wp_create_nonce( 'wp_rest' ),
+		'restUrl'         => rest_url( 'beplus-advanced-reviews/v1/' ),
+		'nonce'           => wp_create_nonce( 'wp_rest' ),
+		'maxUploadSize'   => wp_max_upload_size(),
+		'allowedTypes'    => array( 'image/jpeg', 'image/png', 'image/webp' ),
+		'pasteEnabled'    => true,
+		'i18n'            => array(
+			'noReviews'        => __( 'No reviews yet.', 'beplus-advanced-reviews' ),
+			'loadMore'         => __( 'Load More', 'beplus-advanced-reviews' ),
+			'submitSuccess'    => __( 'Review submitted!', 'beplus-advanced-reviews' ),
+			'submitError'      => __( 'Something went wrong.', 'beplus-advanced-reviews' ),
+		),
 	)
 );
 ```
@@ -709,12 +872,14 @@ wp_localize_script(
 
 ---
 
-## 9. Templates
+## 13. Templates
 
 ```
 templates/
 ├── review-card.php
+├── review-list.php
 ├── review-form.php
+├── star-distribution.php
 └── partials/
     └── media-item.php
 ```
@@ -738,12 +903,12 @@ Theme override: copy a template to `{theme}/beplus-advanced-reviews/review-card.
 
 ---
 
-## 10. composer.json
+## 14. composer.json
 
 ```json
 {
 	"name": "beplus/beplus-advanced-reviews",
-	"description": "BePlus Advanced Reviews for WordPress and WooCommerce",
+	"description": "Modern WooCommerce product reviews with image support, AJAX filtering, and load more.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"autoload": {
@@ -763,7 +928,7 @@ Theme override: copy a template to `{theme}/beplus-advanced-reviews/review-card.
 
 ---
 
-## 11. Security and WordPress Coding Standards
+## 15. Security and WordPress Coding Standards
 
 Every file must follow:
 
@@ -780,7 +945,7 @@ Every file must follow:
 
 ---
 
-## 12. Internationalization (i18n)
+## 16. Internationalization (i18n)
 
 - Text domain: `beplus-advanced-reviews`
 - Domain Path: `/languages`
@@ -798,28 +963,38 @@ load_plugin_textdomain(
 
 ---
 
-## 13. Cron Jobs
+## 17. Accessibility Baseline
 
-Use cron sparingly for cache refresh, cleanup, or scheduled review tasks.
+Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submission form, star distribution chart, lightbox, and settings screens.
 
-```php
-// Register
-if ( ! wp_next_scheduled( HookManager::REVIEW_CACHE_REFRESH ) ) {
-	wp_schedule_event( time(), 'hourly', HookManager::REVIEW_CACHE_REFRESH );
-}
-
-// Handler
-add_action( HookManager::REVIEW_CACHE_REFRESH, array( $review_service, 'refresh_cache' ) );
-
-// Deactivate: wp_clear_scheduled_hook( HookManager::REVIEW_CACHE_REFRESH );
-```
+- **i18n:** All visible and assistive copy uses the `beplus-advanced-reviews` text domain.
+- **Icon-only controls:** Add `aria-label`; mark decorative SVGs `aria-hidden="true"`.
+- **Focus:** Never remove outlines without a visible `:focus-visible` replacement. Use real buttons, links, headings, lists, and form controls.
+- **Reduced motion:** Respect `prefers-reduced-motion: reduce` for transitions, lightboxes, and load-more animations.
+- **Forms:** Associate labels with inputs, connect validation errors with `aria-describedby`.
+- **Live updates:** Use `aria-live="polite"` for review count changes, filter results, and submission status.
+- **Keyboard:** Every control must be reachable and usable by keyboard alone.
 
 ---
 
-## 14. New Plugin Build Checklist
+## 18. Extensibility Hooks
+
+| Hook | Type | Purpose |
+|------|------|---------|
+| `beplus_advanced_reviews.services` | filter | Register container services |
+| `beplus_advanced_reviews.blocks` | filter | Register third-party blocks |
+| `beplus-advanced-reviews/review.query` | filter | Modify review query args |
+| `beplus-advanced-reviews/review.results` | filter | Modify review result set |
+| `beplus-advanced-reviews/review.submitted` | action | Fires after a review is saved |
+| `beplus-advanced-reviews/media.uploaded` | action | Fires after review image is attached |
+| `beplus_advanced_reviews_custom_position` | action | Custom hook position for display mode |
+| `beplus_advanced_reviews_template_paths` | filter | Override template paths |
+
+---
+
+## 19. New Plugin Build Checklist
 
 ### Phase 1 — Scaffold
-
 - [ ] Create `beplus-advanced-reviews/` directory
 - [ ] Write `beplus-advanced-reviews.php` with plugin header
 - [ ] Define `BEPLUS_ADVANCED_REVIEWS_*` constants
@@ -828,36 +1003,36 @@ add_action( HookManager::REVIEW_CACHE_REFRESH, array( $review_service, 'refresh_
 - [ ] Create `readme.txt`
 
 ### Phase 2 — Core modules
-
 - [ ] `AssetLoader` — enqueue admin + frontend
-- [ ] `SettingsRegistry` — options + defaults
-- [ ] `CriteriaRegistry` — rating criteria definitions
+- [ ] `SettingsRegistry` — options + defaults (display mode)
 - [ ] `HookManager` — document all hooks
+- [ ] `Placement` — display mode logic (keep/replace/custom hook)
 - [ ] `includes/common.php` — global helpers
 - [ ] `includes/hooks.php` — wire custom actions
 
-### Phase 3 — Domain (Advanced Reviews)
-
-- [ ] `ReviewController` — list / submit / delete reviews
-- [ ] `ReviewRepository` + query helpers
-- [ ] `MediaHandler` — upload validation and attachment linking
-- [ ] `SchemaManager` — DB tables and migrations
+### Phase 3 — Domain (Reviews)
+- [ ] `ReviewRepository` + `ReviewQuery` — query WooCommerce comments
+- [ ] `ReviewFormatter` — shape review data for API responses
+- [ ] `ReviewSubmission` — validate + insert reviews
+- [ ] `MediaHandler` — upload validation, paste handler, attachment linking
+- [ ] `SchemaManager` — `bpar_review_media` table
 - [ ] REST: `ReviewController`, `SettingsController`
-- [ ] Filter and criteria result formatting
 
 ### Phase 4 — UI
-
-- [ ] Admin settings (TypeScript + REST)
-- [ ] Block `advanced-review`
-- [ ] Review submission form and review list templates
-- [ ] Frontend filter bar + media preview behavior
+- [ ] Admin settings page (TypeScript + REST)
+- [ ] Block `advanced-review` (block.json, render.php, edit.tsx, view.ts)
+- [ ] Review list template + Load More
+- [ ] Review card template (avatar, name, rating, content, date, images)
+- [ ] Star distribution chart (bar chart)
+- [ ] Review submission form + image paste handler
+- [ ] Filter bar + sort controls
+- [ ] Lightbox for review images
 - [ ] `package.json` + esbuild build
 
 ### Phase 5 — Polish
-
-- [ ] Activation: DB tables, default settings, flush rewrites if needed
-- [ ] Deactivation: clear cron
-- [ ] `uninstall.php`: remove options/tables (if user opts in)
+- [ ] Activation: DB tables, default settings
+- [ ] Deactivation: clean up
+- [ ] `uninstall.php`: remove options/tables (opt-in)
 - [ ] PHPCS / WPCS lint
 - [ ] i18n POT file
 - [ ] Admin notices (first activation)
@@ -865,25 +1040,27 @@ add_action( HookManager::REVIEW_CACHE_REFRESH, array( $review_service, 'refresh_
 
 ---
 
-## 15. Core class map
+## 20. Core Class Map
 
 | Class | Path | Role |
 |-------|------|------|
 | `BePlusAdvancedReviews\Core\Plugin` | `src/Core/Plugin.php` | Boot, activate, deactivate |
+| `BePlusAdvancedReviews\Core\Placement` | `src/Core/Placement.php` | Display mode logic |
 | `ReviewController` | `src/REST/ReviewController.php` | Review REST API |
+| `SettingsController` | `src/REST/SettingsController.php` | Settings REST API |
 | `SettingsRegistry` | `src/Settings/SettingsRegistry.php` | Options + defaults |
-| `CriteriaRegistry` | `src/Settings/CriteriaRegistry.php` | Criteria definitions |
-| `MediaHandler` | `src/Media/MediaHandler.php` | Media uploads and validation |
+| `MediaHandler` | `src/Media/MediaHandler.php` | Image uploads, paste, validation |
 | `SchemaManager` | `src/DB/SchemaManager.php` | Database schema |
 | `BlockRegistry` | `src/Blocks/BlockRegistry.php` | Auto-discover blocks |
+| `ReviewRepository` | `src/Reviews/ReviewRepository.php` | Review data access |
+| `ReviewFormatter` | `src/Reviews/ReviewFormatter.php` | API response formatting |
+| `ReviewSubmission` | `src/Reviews/ReviewSubmission.php` | Review creation logic |
 | REST namespace | `beplus-advanced-reviews/v1` | Public API |
-| Services filter | `beplus_advanced_reviews.services` | Container extensions |
-| Review submitted action | `beplus-advanced-reviews/review.submitted` | After review save |
 | Primary block | `blocks/advanced-review/` | Advanced Review block |
 
 ---
 
-## 16. Third-Party Extension Example
+## 21. Third-Party Extension Example
 
 ```php
 add_filter( 'beplus_advanced_reviews.services', function ( $services ) {
@@ -902,47 +1079,4 @@ add_filter( 'beplus_advanced_reviews.blocks', function ( $blocks ) {
 
 ---
 
-## 17. Advanced Review Block (primary feature)
-
-Before building the main plugin feature, read:
-
-**[`docs/advanced-review-block.md`](./docs/advanced-review-block.md)**
-
-That document specifies the `beplus-advanced-reviews/advanced-review` block: review list, filter bar, media attachments, criteria breakdown, and submit form within WooCommerce single product contexts.
-
----
-
-## 18. Review Media and Criteria docs
-
-Before implementing media uploads or rating calculations, read:
-
-- **[`docs/review-media.md`](./docs/review-media.md)**
-- **[`docs/multi-criteria-rating.md`](./docs/multi-criteria-rating.md)**
-- **[`docs/review-filter-ux.md`](./docs/review-filter-ux.md)**
-
-These documents cover media validation, storage, criteria weights, result shaping, and accessible filter behavior.
-
----
-
-## 19. Internal reference files
-
-When implementing, read these plugin files directly:
-
-| File | Purpose |
-|------|---------|
-| `beplus-advanced-reviews.php` | Bootstrap pattern |
-| `src/Core/Plugin.php` | Boot flow, activate/deactivate |
-| `src/Core/Container.php` | DI container |
-| `src/Core/AbstractModule.php` | Module base |
-| `src/Core/AssetLoader.php` | Asset enqueue |
-| `src/Settings/SettingsRegistry.php` | Settings pattern |
-| `src/Settings/CriteriaRegistry.php` | Criteria definitions |
-| `src/REST/ReviewController.php` | Review REST API |
-| `src/Media/MediaHandler.php` | Media validation and storage |
-| `src/DB/SchemaManager.php` | Schema migrations |
-| `blocks/advanced-review/block.json` | Primary block metadata |
-| `blocks/advanced-review/view.ts` | Front-end review enhancement JS |
-
----
-
-*This document is the initial blueprint. Update it as the plugin grows with new modules.*
+*This document is the blueprint. Update it as the plugin grows with new modules.*

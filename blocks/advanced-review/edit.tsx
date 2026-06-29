@@ -1,0 +1,84 @@
+/**
+ * Editor script for the Advanced Reviews block.
+ *
+ * @package BePlusAdvancedReviews
+ */
+
+import { registerBlockType } from '@wordpress/blocks';
+import { InspectorControls } from '@wordpress/block-editor';
+import {
+	PanelBody,
+	ToggleControl,
+	RangeControl,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import blockJson from './block.json';
+
+registerBlockType( blockJson.name, {
+	...blockJson,
+	edit: ( { attributes, setAttributes } ) => {
+		const {
+			showDistribution,
+			showFilterBar,
+			showSubmitForm,
+			showImages,
+			showAvatar,
+			reviewsPerLoad,
+			enableLazyLoad,
+		} = attributes;
+
+		return (
+			<>
+				<InspectorControls>
+					<PanelBody title={ __( 'Display Options', 'beplus-advanced-reviews' ) }>
+						<ToggleControl
+							label={ __( 'Show star distribution', 'beplus-advanced-reviews' ) }
+							checked={ showDistribution }
+							onChange={ ( val ) => setAttributes( { showDistribution: val } ) }
+						/>
+						<ToggleControl
+							label={ __( 'Show filter bar', 'beplus-advanced-reviews' ) }
+							checked={ showFilterBar }
+							onChange={ ( val ) => setAttributes( { showFilterBar: val } ) }
+						/>
+						<ToggleControl
+							label={ __( 'Show submit form', 'beplus-advanced-reviews' ) }
+							checked={ showSubmitForm }
+							onChange={ ( val ) => setAttributes( { showSubmitForm: val } ) }
+						/>
+						<ToggleControl
+							label={ __( 'Show images in reviews', 'beplus-advanced-reviews' ) }
+							checked={ showImages }
+							onChange={ ( val ) => setAttributes( { showImages: val } ) }
+						/>
+						<ToggleControl
+							label={ __( 'Show reviewer avatar', 'beplus-advanced-reviews' ) }
+							checked={ showAvatar }
+							onChange={ ( val ) => setAttributes( { showAvatar: val } ) }
+						/>
+						<RangeControl
+							label={ __( 'Reviews per load', 'beplus-advanced-reviews' ) }
+							value={ reviewsPerLoad }
+							onChange={ ( val ) => setAttributes( { reviewsPerLoad: val } ) }
+							min={ 1 }
+							max={ 50 }
+						/>
+						<ToggleControl
+							label={ __( 'Enable lazy load', 'beplus-advanced-reviews' ) }
+							checked={ enableLazyLoad }
+							onChange={ ( val ) => setAttributes( { enableLazyLoad: val } ) }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<div className="beplus-advanced-reviews beplus-advanced-reviews--editor-preview">
+					<div className="beplus-advanced-reviews__editor-placeholder">
+						<span className="dashicons dashicons-star-filled"></span>
+						<h3>{ __( 'Advanced Reviews', 'beplus-advanced-reviews' ) }</h3>
+						<p>{ __( 'Reviews will display here on the product page.', 'beplus-advanced-reviews' ) }</p>
+					</div>
+				</div>
+			</>
+		);
+	},
+	save: () => null,
+} );

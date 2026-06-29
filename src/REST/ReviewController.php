@@ -1,0 +1,304 @@
+<?php
+/**
+ * ReviewController — REST API for review listing, submission, and distribution.
+ *
+ * @package BePlusAdvancedReviews
+ * @subpackage REST
+ */
+
+namespace BePlusAdvancedReviews\REST;
+
+use BePlusAdvancedReviews\Reviews\ReviewRepository;
+use BePlusAdvancedReviews\Reviews\ReviewFormatter;
+use BePlusAdvancedReviews\Reviews\ReviewQuery;
+use BePlusAdvancedReviews\Reviews\ReviewSubmission;
+use BePlusAdvancedReviews\Media\MediaHandler;
+use BePlusAdvancedReviews\Core\HookManager;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class ReviewController extends \WP_REST_Controller {
+
+	private ReviewRepository $repository;
+	private ReviewFormatter $formatter;
+	private ReviewQuery $review_query;
+	private ReviewSubmission $submission;
+
+	public function __construct() {
+		$this->namespace  = 'beplus-advanced-reviews/v1';
+		$this->rest_base  = 'reviews';
+
+		$media_handler  = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
+		$this->repository  = new ReviewRepository();
+		$this->formatter   = new ReviewFormatter( $media_handler );
+		$this->review_query = new ReviewQuery();
+		$this->submission  = new ReviewSubmission();
+	}
+
+	public function register_routes(): void {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => '__return_true',
+					'args'                => $this->get_collection_params(),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'can_create_item' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>\d+)',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'can_manage_reviews' ),
+					'args'                => array(
+						'id' => array(
+							'required'          => true,
+							'validate_callback' => function ( $param ) {
+								return absint( $param ) > 0;
+							},
+						),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/distribution',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_star_distribution' ),
+					'permission_callback' => '__return_true',
+					'args'                => array(
+						'product_id' => array(
+							'required'          => true,
+							'validate_callback' => function ( $param ) {
+								return absint( $param ) > 0;
+							},
+						),
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Get paginated reviews.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function get_items( $request ) {
+		$product_id = absint( $request->get_param( 'product_id' ) );
+		if ( $product_id < 1 ) {
+			return new \WP_Error(
+				'missing_product_id',
+				__( 'Product ID is required.', 'beplus-advanced-reviews' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		$params = array(
+			'product_id'  => $product_id,
+			'page'        => $request->get_param( 'page' ),
+			'per_page'    => $request->get_param( 'per_page' ),
+			'rating'      => $request->get_param( 'rating' ),
+			'has_images'  => $request->get_param( 'has_images' ),
+			'sort'        => $request->get_param( 'sort' ),
+		);
+
+		$args    = $this->review_query->build_args( $params );
+		$result  = $this->repository->get_reviews( $product_id, $args );
+
+		$reviews = $this->formatter->format_list( $result['reviews'] );
+		$reviews = apply_filters( HookManager::REVIEW_RESULTS, $reviews, $product_id );
+
+		$response = array(
+			'reviews'      => $reviews,
+			'total'        => $result['total'],
+			'pages'        => $result['pages'],
+			'page'         => $result['page'],
+			'has_more'     => $result['page'] < $result['pages'],
+		);
+
+		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Create a new review.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function create_item( $request ) {
+		$params = array(
+			'product_id' => absint( $request->get_param( 'product_id' ) ),
+			'rating'     => absint( $request->get_param( 'rating' ) ),
+			'content'    => sanitize_textarea_field( $request->get_param( 'content' ) ),
+			'author'     => sanitize_text_field( $request->get_param( 'author' ) ),
+			'email'      => sanitize_email( $request->get_param( 'email' ) ),
+		);
+
+		$valid = $this->submission->validate_submission( $params );
+		if ( is_wp_error( $valid ) ) {
+			return $valid;
+		}
+
+		$comment_id = $this->submission->create_review( $params['product_id'], $params );
+		if ( is_wp_error( $comment_id ) ) {
+			return $comment_id;
+		}
+
+		$media_handler = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
+
+		$file_params = $request->get_file_params();
+		if ( ! empty( $file_params ) ) {
+			foreach ( $file_params as $input_name => $file_data ) {
+				if ( ! empty( $file_data['name'] ) ) {
+					$media_handler->upload_files( $comment_id, $file_data );
+				}
+			}
+		}
+
+		$base64_data = $request->get_param( 'paste_image' );
+		if ( ! empty( $base64_data ) ) {
+			$media_handler->upload_pasted_image( $comment_id, $base64_data );
+		}
+
+		do_action( HookManager::REVIEW_SUBMITTED, $comment_id, $params['product_id'] );
+
+		$review = $this->repository->get_review_by_id( $comment_id );
+		$data   = $review ? $this->formatter->format( $review ) : null;
+
+		return rest_ensure_response( array(
+			'success'   => true,
+			'message'   => __( 'Review submitted successfully!', 'beplus-advanced-reviews' ),
+			'review'    => $data,
+		) );
+	}
+
+	/**
+	 * Delete a review.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function delete_item( $request ) {
+		$comment_id = absint( $request->get_param( 'id' ) );
+
+		$deleted = wp_delete_comment( $comment_id, true );
+
+		if ( ! $deleted ) {
+			return new \WP_Error(
+				'delete_failed',
+				__( 'Failed to delete review.', 'beplus-advanced-reviews' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		return rest_ensure_response( array(
+			'success' => true,
+			'message' => __( 'Review deleted.', 'beplus-advanced-reviews' ),
+		) );
+	}
+
+	/**
+	 * Get star distribution for a product.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function get_star_distribution( $request ) {
+		$product_id = absint( $request->get_param( 'product_id' ) );
+		$data       = $this->repository->get_star_distribution( $product_id );
+
+		return rest_ensure_response( $data );
+	}
+
+	/**
+	 * Permission callback for creating reviews.
+	 *
+	 * @return bool
+	 */
+	public function can_create_item(): bool {
+		if ( is_user_logged_in() ) {
+			return true;
+		}
+
+		$nonce = isset( $_SERVER['HTTP_X_WP_NONCE'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_WP_NONCE'] ) )
+			: '';
+
+		return (bool) wp_verify_nonce( $nonce, 'wp_rest' );
+	}
+
+	/**
+	 * Permission callback for managing reviews.
+	 *
+	 * @return bool
+	 */
+	public function can_manage_reviews(): bool {
+		return current_user_can( 'manage_woocommerce' );
+	}
+
+	/**
+	 * Get collection params for the reviews endpoint.
+	 *
+	 * @return array
+	 */
+	public function get_collection_params(): array {
+		return array(
+			'product_id' => array(
+				'description'       => __( 'Product ID.', 'beplus-advanced-reviews' ),
+				'type'              => 'integer',
+				'required'          => true,
+				'sanitize_callback' => 'absint',
+			),
+			'page'       => array(
+				'description'       => __( 'Page number.', 'beplus-advanced-reviews' ),
+				'type'              => 'integer',
+				'default'           => 1,
+				'sanitize_callback' => 'absint',
+			),
+			'per_page'   => array(
+				'description'       => __( 'Items per page.', 'beplus-advanced-reviews' ),
+				'type'              => 'integer',
+				'default'           => 10,
+				'maximum'           => 50,
+				'sanitize_callback' => 'absint',
+			),
+			'rating'     => array(
+				'description'       => __( 'Filter by star rating (1-5).', 'beplus-advanced-reviews' ),
+				'type'              => 'integer',
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+			),
+			'has_images' => array(
+				'description'       => __( 'Show only reviews with images.', 'beplus-advanced-reviews' ),
+				'type'              => 'boolean',
+				'default'           => false,
+			),
+			'sort'       => array(
+				'description'       => __( 'Sort order: newest, oldest, highest, lowest.', 'beplus-advanced-reviews' ),
+				'type'              => 'string',
+				'default'           => 'newest',
+				'enum'              => array( 'newest', 'oldest', 'highest', 'lowest' ),
+			),
+		);
+	}
+}

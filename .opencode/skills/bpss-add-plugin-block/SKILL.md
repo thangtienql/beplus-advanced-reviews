@@ -7,9 +7,9 @@ description: Adds or extends a BePlus Advanced Reviews Gutenberg block under blo
 
 ## Before you edit
 
-- Read [`AGENTS.md`](../../../AGENTS.md) § **Gutenberg blocks** and [`Document Plugin.md`](../../../Document%20Plugin.md) § **Gutenberg Blocks**.
+- Read [`AGENTS.md`](../../../AGENTS.md) § **Gutenberg blocks** and [`Document Plugin.md`](../../../Document%20Plugin.md) § **Gutenberg Block — advanced-review**.
 - Read `docs/advanced-review-block.md` when building or changing the primary `advanced-review` block.
-- Read `docs/review-filter-ux.md`, `docs/review-media.md`, and `docs/multi-criteria-rating.md` for block behavior, accessibility, media, and criteria breakdowns.
+- Read `docs/review-filter-ux.md` and `docs/review-media.md` for block behavior, accessibility, image handling, and filter UX.
 - Registration: `src/Blocks/BlockRegistry.php` — auto-discovers `blocks/*/block.json`.
 
 ## Scaffold
@@ -24,11 +24,11 @@ description: Adds or extends a BePlus Advanced Reviews Gutenberg block under blo
 
 ## Implement — advanced review block
 
-1. **Attributes:** `showFilterBar`, `showSubmitForm`, `showMediaGallery`, `itemsPerPage`, `enableCriteriaBreakdown`, `defaultSort`.
-2. **render.php:** wrap with `get_block_wrapper_attributes()`; render review list, filter controls, submit form shell, and media/criteria placeholders; escape all output.
+1. **Attributes:** `showDistribution`, `showFilterBar`, `showSubmitForm`, `showImages`, `showAvatar`, `reviewsPerLoad`, `enableLazyLoad`.
+2. **render.php:** wrap with `get_block_wrapper_attributes()`; render review list, star distribution chart, filter controls, sort controls, submit form shell, and image placeholders; escape all output.
 3. **edit.tsx:** provide Inspector controls for review display and filtering options.
-4. **view.ts:** hydrate client-side filter interactions, media lightbox behavior, and pagination enhancements.
-5. **REST:** use `beplus-advanced-reviews/v1/reviews` for live data and submission flows; do not embed ad-hoc SQL in the block.
+4. **view.ts:** hydrate client-side filter interactions, image lightbox behavior, load more pagination, star distribution chart, and paste-to-upload support.
+5. **REST:** use `beplus-advanced-reviews/v1/reviews` and `beplus-advanced-reviews/v1/reviews/distribution` for live data and submission flows; do not embed ad-hoc SQL in the block.
 
 ## Styling
 
@@ -40,7 +40,7 @@ description: Adds or extends a BePlus Advanced Reviews Gutenberg block under blo
 
 1. `npm run build` from plugin root.
 2. Block inserter: block appears under **BePlus Advanced Reviews** category.
-3. Front-end: filters work, media opens correctly, review submission states are visible, and layout remains stable.
+3. Front-end: filters work, images open correctly, star distribution renders, review submission states are visible, and layout remains stable.
 
 ## Reference
 
@@ -48,10 +48,10 @@ description: Adds or extends a BePlus Advanced Reviews Gutenberg block under blo
 |--------|---------|
 | `blocks/advanced-review/block.json` | Primary block metadata, attributes, render callback |
 | `src/Blocks/BlockRegistry.php` | Auto-discovery |
+| `src/Core/Placement.php` | Display mode logic |
 | `docs/advanced-review-block.md` | Block spec, UX, and review flow |
 | `docs/review-filter-ux.md` | Filter UX, DOM contract, accessibility |
-| `docs/review-media.md` | Media previews, uploads, and lightbox behavior |
-| `docs/multi-criteria-rating.md` | Criteria labels, weights, and score breakdown |
+| `docs/review-media.md` | Image previews, uploads, paste, and lightbox behavior |
 
 ## Checklist
 

@@ -1,0 +1,52 @@
+/* Load More component styles */
+.beplus-advanced-reviews__load-more-wrapper {
+	text-align: center;
+	padding: 1.5rem 0;
+}
+
+.beplus-advanced-reviews__load-more {
+	padding: 10px 24px;
+	border: 1px solid #2271b1;
+	border-radius: 4px;
+	background: #2271b1;
+	color: #fff;
+	cursor: pointer;
+	font-size: 0.9rem;
+	transition: background 0.2s;
+}
+
+.beplus-advanced-reviews__load-more:hover {
+	background: #135e96;
+}
+
+.beplus-advanced-reviews__load-more:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+
+.beplus-advanced-reviews__load-more:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.beplus-advanced-reviews__load-more-spinner {
+	display: none;
+	margin-left: 8px;
+	width: 14px;
+	height: 14px;
+	border: 2px solid rgba(255,255,255,0.3);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: bpar-spin 0.6s linear infinite;
+	vertical-align: middle;
+}
+
+.beplus-advanced-reviews__load-more--loading .beplus-advanced-reviews__load-more-spinner {
+	display: inline-block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.beplus-advanced-reviews__load-more-spinner {
+		animation: none;
+	}
+}

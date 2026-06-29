@@ -17,8 +17,8 @@ Long-form context stays in this file and in `Document Plugin.md`; avoid duplicat
 
 ## What this plugin is
 
-- **WordPress plugin:** Advanced WooCommerce product reviews with media attachments, multi-criteria ratings, and smart filtering.
-- **Primary block:** `advanced-review` — a Gutenberg block designed to be dropped into the WooCommerce single product template (FSE / Site Editor).
+- **WordPress plugin:** Advanced WooCommerce product reviews with image support, star distribution, AJAX filtering, and load more.
+- **Primary block:** `advanced-review` — a Gutenberg block designed to be dropped into the WooCommerce single product template (FSE / Site Editor). Automatically applied to all Single Product pages on activation.
 - **Architecture:** Container-based boot via `BePlusAdvancedReviews\Core\Plugin`; modules extend `AbstractModule` and register hooks in `register()`.
 - **Stack:** PHP 7.4+ (8.0+ recommended), PSR-4 autoload under `src/`, **esbuild + TypeScript** for admin/blocks, procedural helpers in `includes/` when needed.
 - **Target:** WordPress 6.0+, WooCommerce 7.0+.
@@ -39,29 +39,38 @@ Long-form context stays in this file and in `Document Plugin.md`; avoid duplicat
 
 ## Core features
 
-### 1. Reviews with Media Attachments
-- Customers can upload **images and/or videos** alongside their written review.
-- Accepted image formats: JPEG, PNG, WebP. Accepted video formats: MP4, MOV (max configurable via settings).
-- Media is stored in the standard WordPress media library, linked to the review via a custom meta table (`{wpdb->prefix}bpar_review_media`).
-- A lightbox or inline player renders media within the review card on the front end.
+### 1. Enhanced Review Display
+- **Average rating score** — aggregated star rating for the product.
+- **Total review count** — number of approved reviews.
+- **Star distribution chart** — bar chart showing count per star rating (1★–5★).
+- **Review list** — paginated list of review cards rendered via a Gutenberg block.
+- **Review card** — avatar, reviewer name, rating score, content, date, and images.
 
-### 2. Multi-Criteria Rating
-- Instead of a single 5-star score, customers rate across **multiple named criteria**.
-- Default criteria (configurable per product category in settings):
-  - **Material Quality** — how well the product is made
-  - **Matches Description** — accuracy of product listing
-  - **Delivery Speed** — shipping and fulfilment experience
-- Each criterion is rated 1–5 stars independently.
-- An **overall score** is auto-calculated as the weighted or simple average of all criteria scores.
-- Criteria labels and weights are managed via `src/Settings/CriteriaRegistry.php`.
+### 2. Reviews with Image Attachments
+- Customers can upload **images** alongside their written review.
+- **Copy/paste from clipboard** into the review form is supported.
+- Accepted image formats: JPEG, PNG, WebP.
+- Images are stored in the standard WordPress media library, linked to the review via a custom meta table (`{wpdb->prefix}bpar_review_media`).
+- A lightbox renders images within the review card on the front end.
 
-### 3. Smart Review Filter
+### 3. Review Submission Form
+- Inline form to write and submit a review with a star rating and optional images.
+- Supports file input (multi-select) and clipboard paste.
+- Load More button for AJAX pagination.
+
+### 4. Smart Review Filter & Sort
 - A front-end filter bar lets visitors narrow the review list without a page reload.
 - **Filter options:**
   - By star rating (1 ★ through 5 ★, multi-select)
-  - **Media only** — show only reviews that include at least one image or video
-  - Per-criterion score range (optional, toggled by setting)
+  - **Images only** — show only reviews that include at least one image
+  - Sort by date (newest/oldest) or rating (highest/lowest)
 - Filtering is handled client-side via the block's TypeScript view script; for large datasets a REST endpoint supports server-side pagination with filter params.
+
+### 5. Plugin Settings — Display Mode
+- **Keep default** — WooCommerce's built-in reviews remain as-is; the block can be placed manually.
+- **Replace default** — completely replaces the standard WooCommerce reviews tab/area with the Advanced Reviews block.
+- **Custom hook position** — inserts Advanced Reviews at a developer-specified hook (`beplus_advanced_reviews_custom_position`).
+- Display mode logic lives in `src/Core/Placement.php`.
 
 ## Files you usually touch
 
@@ -74,9 +83,9 @@ Long-form context stays in this file and in `Document Plugin.md`; avoid duplicat
 | Advanced Review block | `blocks/advanced-review/index.tsx`, `edit.tsx`, `view.ts` | `blocks/advanced-review/index.js`, `index.asset.php`, `view.js` |
 | PHP templates | `templates/**` | — |
 | Settings / options | `src/Settings/SettingsRegistry.php` | — |
-| Criteria config | `src/Settings/CriteriaRegistry.php` | — |
 | REST API | `src/REST/*Controller.php` | — |
 | Media handling | `src/Media/MediaHandler.php` | — |
+| Display mode / placement | `src/Core/Placement.php` | — |
 
 After changing JS/TS or block sources, run **`npm run build`** (or **`npm run watch`**) from the plugin root.
 
@@ -97,41 +106,29 @@ beplus-advanced-reviews.php
 1. `register_core_services()` — container bindings, REST routes, DB schema check
 2. `register_services_from_filter()` — `beplus_advanced_reviews.services`
 3. `boot_registered_modules()` — call `register()` on each `AbstractModule`
-4. `init` — post types, frontend, block category, textdomain
+4. `init` — post types, frontend, block category, textdomain, display mode
 
 ## Module registry
 
 | Module | Path | Role |
 |--------|------|------|
 | `AssetLoader` | `src/Core/AssetLoader.php` | Enqueue admin + frontend + block assets |
-| `SettingsRegistry` | `src/Settings/SettingsRegistry.php` | Options, defaults, migration |
-| `CriteriaRegistry` | `src/Settings/CriteriaRegistry.php` | Manage rating criteria labels and weights |
+| `SettingsRegistry` | `src/Settings/SettingsRegistry.php` | Options, defaults, display mode |
 | `BlockRegistry` | `src/Blocks/BlockRegistry.php` | Auto-discover `blocks/*/block.json` |
 | `ReviewController` | `src/REST/ReviewController.php` | Public reviews REST (list, submit, filter) |
-| `MediaHandler` | `src/Media/MediaHandler.php` | Upload validation, storage, retrieval |
+| `MediaHandler` | `src/Media/MediaHandler.php` | Upload validation, paste support, storage, retrieval |
 | `SettingsController` | `src/REST/SettingsController.php` | Admin settings REST |
 | `SchemaManager` | `src/DB/SchemaManager.php` | Create / migrate custom DB tables on activation |
+| `Placement` | `src/Core/Placement.php` | Display mode logic (keep/replace/custom hook) |
 
 ## Database schema
 
 ```sql
--- Stores per-criterion scores for each WooCommerce comment/review
-CREATE TABLE {prefix}bpar_criteria_scores (
-  id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  comment_id    BIGINT UNSIGNED NOT NULL,          -- wp_comments.comment_ID
-  criterion_key VARCHAR(64)     NOT NULL,           -- e.g. 'material_quality'
-  score         TINYINT UNSIGNED NOT NULL,          -- 1–5
-  created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_comment  (comment_id),
-  INDEX idx_criterion (criterion_key)
-);
-
--- Links uploaded media to a review
+-- Links uploaded images to a review
 CREATE TABLE {prefix}bpar_review_media (
   id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   comment_id    BIGINT UNSIGNED NOT NULL,
   attachment_id BIGINT UNSIGNED NOT NULL,          -- wp_posts (attachment)
-  media_type    ENUM('image','video') NOT NULL,
   sort_order    TINYINT UNSIGNED NOT NULL DEFAULT 0,
   created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_comment (comment_id)
@@ -146,7 +143,7 @@ CREATE TABLE {prefix}bpar_review_media (
 - **Category:** `beplus-advanced-reviews` (registered in `Plugin::register_block_category()`).
 - **Build:** esbuild → `blocks/*/index.js`, `admin/js/settings.js` (see [`README.md`](./README.md)).
 - **Blocks:**
-  - `advanced-review` — primary block; full review list with media gallery, multi-criteria breakdown, filter bar, and submit form. Intended for WooCommerce single product templates.
+  - `advanced-review` — primary block; full review list with image gallery, star distribution, filter bar, sort controls, and submit form. Intended for WooCommerce single product templates.
 - **Extension filter:** `beplus_advanced_reviews.blocks`.
 
 ### `advanced-review` block — front-end data flow
@@ -154,19 +151,23 @@ CREATE TABLE {prefix}bpar_review_media (
 ```
 Page load
   └── REST GET /reviews?product_id=…  →  ReviewController::get_reviews()
-        ├── Returns paginated review list with criteria_scores[] and media[]
-        └── view.ts hydrates the block DOM
+  ├── REST GET /reviews/distribution?product_id=… → ReviewController::get_star_distribution()
+  │     Returns paginated review list + star distribution
+  │
+  └── view.ts hydrates the block DOM:
+        ├── Renders star distribution bar chart
+        ├── Renders review list cards
+        └── Binds filter bar + sort controls
 
-User applies filter (star / media-only)
+User applies filter (star / images-only)
   └── Client-side filter in view.ts (no reload for first page)
-        └── If next page needed → REST GET /reviews?product_id=…&rating=…&has_media=1&page=…
+        └── If next page needed → REST GET /reviews?product_id=…&rating=…&has_images=1&page=…
 
 User submits review
   └── REST POST /reviews  →  ReviewController::create_review()
         ├── Validates nonce + WooCommerce verified purchase (optional setting)
         ├── Creates wp_comment via wp_insert_comment()
-        ├── Saves criteria scores → bpar_criteria_scores
-        └── Handles media upload → MediaHandler → bpar_review_media
+        └── Handles image uploads → MediaHandler → bpar_review_media
 ```
 
 ## REST API
@@ -175,8 +176,9 @@ User submits review
 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
-| `GET` | `/reviews` | public | List reviews; supports `product_id`, `rating`, `has_media`, `page`, `per_page` |
-| `POST` | `/reviews` | logged-in or nonce | Submit a new review with criteria scores and optional media |
+| `GET` | `/reviews` | public | List reviews; supports `product_id`, `rating`, `has_images`, `page`, `per_page`, `sort` |
+| `GET` | `/reviews/distribution` | public | Star distribution counts for a product |
+| `POST` | `/reviews` | logged-in or nonce | Submit a new review with rating and optional images |
 | `DELETE` | `/reviews/{id}` | `manage_woocommerce` | Remove a review |
 | `GET` | `/settings` | `manage_options` | Retrieve plugin settings |
 | `POST` | `/settings` | `manage_options` | Save plugin settings |
@@ -192,11 +194,12 @@ Document all hooks in `src/Core/HookManager.php`:
 |------|------|---------|
 | `beplus_advanced_reviews.services` | filter | Register container services |
 | `beplus_advanced_reviews.blocks` | filter | Register third-party blocks |
-| `beplus-advanced-reviews/criteria` | filter | Modify or extend rating criteria list |
 | `beplus-advanced-reviews/review.query` | filter | Modify review query args |
 | `beplus-advanced-reviews/review.results` | filter | Modify review result set |
 | `beplus-advanced-reviews/review.submitted` | action | Fires after a review is saved |
-| `beplus-advanced-reviews/media.uploaded` | action | Fires after review media is attached |
+| `beplus-advanced-reviews/media.uploaded` | action | Fires after review image is attached |
+| `beplus_advanced_reviews_custom_position` | action | Custom hook position for display mode |
+| `beplus_advanced_reviews_template_paths` | filter | Override template paths |
 
 ## Quality checks (from plugin root)
 
@@ -219,7 +222,7 @@ Husky **pre-push** runs: `ensure:composer` → `typecheck` → `lint:php:all` �
 
 - `npm run build` — compile assets
 - `npm run lint:php:all` — PHPStan + CS Fixer (needs `vendor/` from composer:install)
-- Manual: activate plugin, drop `advanced-review` block into a single product template, submit a test review with media, verify filter bar, check REST endpoints, confirm admin settings save.
+- Manual: activate plugin, drop `advanced-review` block into a single product template, submit a test review with images, verify filter bar, check REST endpoints, confirm admin settings save.
 
 ## Security baseline
 
@@ -228,17 +231,17 @@ Husky **pre-push** runs: `ensure:composer` → `typecheck` → `lint:php:all` �
 - `$wpdb->prepare()` for every raw SQL query.
 - REST: explicit `permission_callback` per route.
 - Nonce verification for admin forms, AJAX, and review submissions.
-- Media uploads: validate MIME type server-side via `wp_check_filetype_and_ext()`; reject executables.
+- Image uploads: validate MIME type server-side via `wp_check_filetype_and_ext()`; reject executables.
 - Strip EXIF data from uploaded images (privacy) using `wp_read_image_metadata` + `imagecreatefromjpeg` pipeline or an equivalent library.
 
 ## Accessibility baseline
 
-Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submission form, media previews, and settings screens.
+Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submission form, star distribution chart, lightbox, and settings screens.
 
 - **i18n:** All visible and assistive copy uses the `beplus-advanced-reviews` text domain. No hard-coded English in `aria-label` or error text.
 - **Icon-only controls:** Add `aria-label`; mark decorative SVGs `aria-hidden="true"`.
 - **Focus:** Never remove outlines without a visible `:focus-visible` replacement. Use real buttons, links, headings, lists, and form controls — not clickable generic containers.
-- **Reduced motion:** Respect `prefers-reduced-motion: reduce` for transitions, lightboxes, sliders, and modal-like UI.
+- **Reduced motion:** Respect `prefers-reduced-motion: reduce` for transitions, lightboxes, and load-more animations.
 - **Forms:** Associate labels with inputs, connect validation errors with `aria-describedby`, and keep error copy clear and actionable.
 - **Live updates:** Use `aria-live="polite"` for review count changes, filter results, and submission status messages.
 - **Keyboard:** Every control must be reachable and usable by keyboard alone; modals trap focus while open and restore it on close.
@@ -247,9 +250,8 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 
 | Doc | Purpose |
 |-----|---------|
-| [`docs/advanced-review-block.md`](./docs/advanced-review-block.md) | Primary feature — Advanced Review block spec (media, criteria, filter, REST, single product template) |
-| [`docs/multi-criteria-rating.md`](./docs/multi-criteria-rating.md) | Criteria schema, default weights, per-category configuration |
-| [`docs/review-media.md`](./docs/review-media.md) | Upload flow, storage, MIME validation, EXIF stripping, lightbox rendering |
-| [`docs/review-filter-ux.md`](./docs/review-filter-ux.md) | Filter bar UX, DOM contract, client-side logic, accessibility |
+| [`docs/advanced-review-block.md`](./docs/advanced-review-block.md) | Primary feature — Advanced Review block spec (media, filter, star distribution, REST, single product template) |
+| [`docs/review-media.md`](./docs/review-media.md) | Upload flow, storage, MIME validation, EXIF stripping, lightbox rendering, clipboard paste |
+| [`docs/review-filter-ux.md`](./docs/review-filter-ux.md) | Filter bar UX, DOM contract, sort controls, client-side logic, accessibility |
 | [`docs/mcp-setup.md`](./docs/mcp-setup.md) | Connect Cursor MCP to `plugin.local` Site Editor + WordPress Abilities API |
 | [`Document Plugin.md`](./Document Plugin.md) | Plugin architecture, naming, directory structure |

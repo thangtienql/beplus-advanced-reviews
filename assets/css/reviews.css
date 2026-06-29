@@ -1,0 +1,61 @@
+/**
+ * Front-end review CSS bundle.
+ *
+ * @package BePlusAdvancedReviews
+ */
+
+@import url('./components/review-card.css');
+@import url('./components/filter-bar.css');
+@import url('./components/submit-form.css');
+@import url('./components/star-distribution.css');
+@import url('./components/load-more.css');
+
+.beplus-advanced-reviews {
+	max-width: 800px;
+	margin: 2rem 0;
+	font-family: inherit;
+	color: inherit;
+}
+
+.beplus-advanced-reviews--loading {
+	min-height: 200px;
+	position: relative;
+}
+
+.beplus-advanced-reviews--loading::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 40px;
+	height: 40px;
+	margin: -20px 0 0 -20px;
+	border: 3px solid rgba(0,0,0,0.1);
+	border-top-color: #2271b1;
+	border-radius: 50%;
+	animation: bpar-spin 0.8s linear infinite;
+}
+
+@keyframes bpar-spin {
+	to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.beplus-advanced-reviews--loading::after {
+		animation: none;
+	}
+}
+
+.beplus-advanced-reviews--ready {
+	min-height: auto;
+}
+
+.beplus-advanced-reviews--ready::after {
+	display: none;
+}
+
+.beplus-advanced-reviews__no-reviews {
+	text-align: center;
+	padding: 2rem;
+	color: #888;
+}

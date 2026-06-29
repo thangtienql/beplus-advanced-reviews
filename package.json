@@ -1,0 +1,14 @@
+{
+	"name": "beplus-advanced-reviews",
+	"version": "1.0.0",
+	"description": "Modern WooCommerce product reviews with image support, star distribution, AJAX filtering, and load more.",
+	"private": true,
+	"scripts": {
+		"build": "node esbuild.config.mjs",
+		"watch": "node esbuild.config.mjs --watch",
+		"composer:install": "php composer.phar install --no-dev 2>/dev/null || composer install --no-dev 2>/dev/null || echo 'Composer not available'"
+	},
+	"devDependencies": {
+		"esbuild": "^0.19.0"
+	}
+}
