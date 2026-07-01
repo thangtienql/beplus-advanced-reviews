@@ -260,9 +260,11 @@ class MediaHandler extends AbstractModule {
 	private function insert_attachment( int $comment_id, array $file, string $file_path ): ?int {
 		global $wpdb;
 
+		$filetype = wp_check_filetype( basename( $file_path ), null );
+
 		$attachment_id = wp_insert_attachment(
 			array(
-				'post_mime_type' => mime_content_type( $file_path ),
+				'post_mime_type' => $filetype['type'],
 				'post_title'     => sanitize_file_name( $file['name'] ),
 				'post_content'   => '',
 				'post_status'    => 'inherit',
@@ -278,8 +280,10 @@ class MediaHandler extends AbstractModule {
 			require_once ABSPATH . 'wp-admin/includes/image.php';
 		}
 
+		ob_start();
 		$metadata = wp_generate_attachment_metadata( $attachment_id, $file_path );
 		wp_update_attachment_metadata( $attachment_id, $metadata );
+		ob_end_clean();
 
 		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'bpar_review_media',

@@ -32,7 +32,7 @@ class Plugin {
 		$this->register_services_from_filter();
 		$this->boot_registered_modules();
 
-		add_action( 'init', array( $this, 'on_init' ) );
+		add_action( 'rest_api_init', array( $this, 'init_rest_controllers' ) );
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 	}
@@ -83,11 +83,7 @@ class Plugin {
 		}
 	}
 
-	public function on_init(): void {
-		$this->init_rest_controllers();
-	}
-
-	private function init_rest_controllers(): void {
+	public function init_rest_controllers(): void {
 		$review_controller = new ReviewController();
 		$review_controller->register_routes();
 

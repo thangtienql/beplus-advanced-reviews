@@ -146,50 +146,63 @@ class ReviewController extends \WP_REST_Controller {
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function create_item( $request ) {
-		$params = array(
-			'product_id' => absint( $request->get_param( 'product_id' ) ),
-			'rating'     => absint( $request->get_param( 'rating' ) ),
-			'content'    => sanitize_textarea_field( $request->get_param( 'content' ) ),
-			'author'     => sanitize_text_field( $request->get_param( 'author' ) ),
-			'email'      => sanitize_email( $request->get_param( 'email' ) ),
-		);
+		try {
+			ob_start();
+			
+			$params = array(
+				'product_id' => absint( $request->get_param( 'product_id' ) ),
+				'rating'     => absint( $request->get_param( 'rating' ) ),
+				'content'    => sanitize_textarea_field( $request->get_param( 'content' ) ),
+				'author'     => sanitize_text_field( $request->get_param( 'author' ) ),
+				'email'      => sanitize_email( $request->get_param( 'email' ) ),
+			);
 
-		$valid = $this->submission->validate_submission( $params );
-		if ( is_wp_error( $valid ) ) {
-			return $valid;
-		}
+			$valid = $this->submission->validate_submission( $params );
+			if ( is_wp_error( $valid ) ) {
+				ob_end_clean();
+				return $valid;
+			}
 
-		$comment_id = $this->submission->create_review( $params['product_id'], $params );
-		if ( is_wp_error( $comment_id ) ) {
-			return $comment_id;
-		}
+			$comment_id = $this->submission->create_review( $params['product_id'], $params );
+			if ( is_wp_error( $comment_id ) ) {
+				ob_end_clean();
+				return $comment_id;
+			}
 
-		$media_handler = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
+			$media_handler = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
 
-		$file_params = $request->get_file_params();
-		if ( ! empty( $file_params ) ) {
-			foreach ( $file_params as $input_name => $file_data ) {
-				if ( ! empty( $file_data['name'] ) ) {
-					$media_handler->upload_files( $comment_id, $file_data );
+			$file_params = $request->get_file_params();
+			$base64_data = $request->get_param( 'paste_image' );
+
+			if ( ! empty( $file_params ) ) {
+				foreach ( $file_params as $input_name => $file_data ) {
+					if ( ! empty( $file_data['name'] ) ) {
+						$media_handler->upload_files( $comment_id, $file_data );
+					}
 				}
 			}
+
+			if ( ! empty( $base64_data ) ) {
+				$media_handler->upload_pasted_image( $comment_id, $base64_data );
+			}
+
+			do_action( HookManager::REVIEW_SUBMITTED, $comment_id, $params['product_id'] );
+
+			$review = $this->repository->get_review_by_id( $comment_id );
+			$data   = $review ? $this->formatter->format( $review ) : null;
+
+			ob_end_clean();
+			
+			return rest_ensure_response( array(
+				'success'   => true,
+				'message'   => __( 'Review submitted successfully!', 'beplus-advanced-reviews' ),
+				'review'    => $data,
+			) );
+		} catch ( \Throwable $e ) {
+			ob_end_clean();
+			error_log( 'BePlus Advanced Reviews Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString() );
+			return new \WP_Error( 'internal_error', $e->getMessage(), array( 'status' => 500 ) );
 		}
-
-		$base64_data = $request->get_param( 'paste_image' );
-		if ( ! empty( $base64_data ) ) {
-			$media_handler->upload_pasted_image( $comment_id, $base64_data );
-		}
-
-		do_action( HookManager::REVIEW_SUBMITTED, $comment_id, $params['product_id'] );
-
-		$review = $this->repository->get_review_by_id( $comment_id );
-		$data   = $review ? $this->formatter->format( $review ) : null;
-
-		return rest_ensure_response( array(
-			'success'   => true,
-			'message'   => __( 'Review submitted successfully!', 'beplus-advanced-reviews' ),
-			'review'    => $data,
-		) );
 	}
 
 	/**
