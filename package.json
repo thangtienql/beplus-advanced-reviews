@@ -6,9 +6,11 @@
 	"scripts": {
 		"build": "node esbuild.config.mjs",
 		"watch": "node esbuild.config.mjs --watch",
-		"composer:install": "php composer.phar install --no-dev 2>/dev/null || composer install --no-dev 2>/dev/null || echo 'Composer not available'"
+		"composer:install": "php composer.phar install --no-dev 2>/dev/null || composer install --no-dev 2>/dev/null || echo 'Composer not available'",
+		"build:package": "node ./scripts/build-package.mjs"
 	},
 	"devDependencies": {
+		"@wordpress/scripts": "^32.5.1",
 		"esbuild": "^0.19.0"
 	}
 }

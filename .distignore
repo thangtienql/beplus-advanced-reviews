@@ -1,0 +1,17 @@
+.git
+.gitignore
+.github
+node_modules
+vendor
+.codegraph
+.opencode
+AGENTS.md
+Document Plugin.md
+README.md
+composer.json
+composer.lock
+package.json
+package-lock.json
+esbuild.config.mjs
+opencode.json
+.distignore
