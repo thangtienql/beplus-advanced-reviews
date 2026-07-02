@@ -26,7 +26,7 @@ class ReviewFormatter {
 	 * Format a single review row into the API shape.
 	 *
 	 * @param object $review Database row.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function format( object $review ): array {
 		$comment_id = (int) $review->comment_ID;
@@ -54,8 +54,8 @@ class ReviewFormatter {
 	/**
 	 * Format a list of reviews.
 	 *
-	 * @param array $reviews Array of database rows.
-	 * @return array
+	 * @param array<int, object> $reviews Array of database rows.
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function format_list( array $reviews ): array {
 		$formatted = array();

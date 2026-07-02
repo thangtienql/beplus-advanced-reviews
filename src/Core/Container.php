@@ -14,13 +14,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Container {
 
+	/** @var array<string, callable> */
 	private array $bindings = array();
+
+	/** @var array<string, mixed> */
 	private array $instances = array();
 
 	public function set( string $id, callable $factory ): void {
 		$this->bindings[ $id ] = $factory;
 	}
 
+	/**
+	 * @param string $id
+	 * @return mixed
+	 */
 	public function get( string $id ) {
 		if ( isset( $this->instances[ $id ] ) ) {
 			return $this->instances[ $id ];
@@ -36,6 +43,9 @@ class Container {
 		return $instance;
 	}
 
+	/**
+	 * @param array<string|int, string|callable> $services
+	 */
 	public function register( array $services ): void {
 		foreach ( $services as $id => $factory ) {
 			if ( is_int( $id ) ) {

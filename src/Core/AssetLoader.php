@@ -57,9 +57,9 @@ class AssetLoader extends AbstractModule {
 	}
 
 	/**
-	 * Build the bparData array used by front-end scripts.
+	 * Get data for frontend JS.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_bpar_data(): array {
 		return array(

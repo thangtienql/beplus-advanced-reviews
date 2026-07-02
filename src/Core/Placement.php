@@ -32,6 +32,9 @@ class Placement extends AbstractModule {
 
 	/**
 	 * Replace the default WooCommerce reviews tab with Advanced Reviews.
+	 *
+	 * @param array<string, mixed> $tabs
+	 * @return array<string, mixed>
 	 */
 	public function replace_reviews_tab( array $tabs ): array {
 		unset( $tabs['reviews'] );

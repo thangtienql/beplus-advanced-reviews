@@ -34,8 +34,8 @@ $enable_lazy_load  = ! empty( $attributes['enableLazyLoad'] );
 $wrapper_attrs = get_block_wrapper_attributes(
 	array(
 		'class'            => 'beplus-advanced-reviews beplus-advanced-reviews--loading',
-		'data-product-id'  => $product_id,
-		'data-per-page'    => $reviews_per_load,
+		'data-product-id'  => (string) $product_id,
+		'data-per-page'    => (string) $reviews_per_load,
 		'data-show-avatar' => $show_avatar ? '1' : '0',
 		'data-show-images' => $show_images ? '1' : '0',
 		'data-enable-lazy' => $enable_lazy_load ? '1' : '0',
@@ -58,10 +58,13 @@ $wrapper_attrs = get_block_wrapper_attributes(
 				<?php for ( $i = 5; $i >= 1; $i-- ) : ?>
 					<button type="button"
 						class="beplus-advanced-reviews__filter-star"
-						data-rating="<?php echo esc_attr( $i ); ?>"
-						aria-label="<?php printf( esc_attr__( 'Filter by %d stars', 'beplus-advanced-reviews' ), $i ); ?>"
+						data-rating="<?php echo esc_attr( (string) $i ); ?>"
+						aria-label="<?php 
+						/* translators: %d: Number of stars to filter by */
+						echo esc_attr( sprintf( __( 'Filter by %d stars', 'beplus-advanced-reviews' ), $i ) ); 
+						?>"
 						aria-pressed="false">
-						<?php echo esc_html( $i ); ?>★
+						<?php echo esc_html( (string) $i ); ?>★
 					</button>
 				<?php endfor; ?>
 			</div>

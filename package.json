@@ -7,10 +7,17 @@
 		"build": "node esbuild.config.mjs",
 		"watch": "node esbuild.config.mjs --watch",
 		"composer:install": "php composer.phar install --no-dev 2>/dev/null || composer install --no-dev 2>/dev/null || echo 'Composer not available'",
-		"build:package": "node ./scripts/build-package.mjs"
+		"build:package": "node ./scripts/build-package.mjs",
+		"prepare": "husky",
+		"ensure:composer": "composer install",
+		"typecheck": "tsc --noEmit",
+		"lint:php:all": "vendor/bin/phpstan analyze --memory-limit 1G",
+		"precommit": "npm run typecheck && npm run lint:php:all",
+		"prepush": "npm run ensure:composer && npm run typecheck && npm run lint:php:all && npm run build"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^32.5.1",
-		"esbuild": "^0.19.0"
+		"esbuild": "^0.19.0",
+		"husky": "^9.1.7"
 	}
 }

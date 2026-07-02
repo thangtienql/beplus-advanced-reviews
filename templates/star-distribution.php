@@ -25,12 +25,15 @@ if ( ! $data['total'] ) {
 ?>
 <div class="beplus-advanced-reviews__distribution-header">
 	<div class="beplus-advanced-reviews__average">
-		<span class="beplus-advanced-reviews__average-value"><?php echo esc_html( $data['average'] ); ?></span>
+		<span class="beplus-advanced-reviews__average-value"><?php echo esc_html( number_format_i18n( (float) $data['average'], 1 ) ); ?></span>
 		<span class="beplus-advanced-reviews__average-stars">
 			<?php echo beplus_advanced_reviews_render_stars( (int) round( $data['average'] ), 1.2 ); // phpcs:ignore ?>
 		</span>
 		<span class="beplus-advanced-reviews__total">
-			<?php printf( esc_html( _n( '%d review', '%d reviews', $data['total'], 'beplus-advanced-reviews' ) ), $data['total'] ); ?>
+			<?php
+			/* translators: %d: number of reviews */
+			printf( esc_html( _n( '%d review', '%d reviews', (int) $data['total'], 'beplus-advanced-reviews' ) ), (int) $data['total'] );
+			?>
 		</span>
 	</div>
 	<div class="beplus-advanced-reviews__distribution-bars">
@@ -40,18 +43,18 @@ if ( ! $data['total'] ) {
 			$percent = $data['total'] > 0 ? ( $count / $data['total'] * 100 ) : 0;
 			?>
 			<div class="beplus-advanced-reviews__distribution-bar-row">
-				<span class="beplus-advanced-reviews__distribution-bar-label"><?php echo esc_html( $s ); ?> ★</span>
+				<span class="beplus-advanced-reviews__distribution-bar-label"><?php echo esc_html( (string) $s ); ?> ★</span>
 				<div class="beplus-advanced-reviews__distribution-bar-track">
 					<div
 						class="beplus-advanced-reviews__distribution-bar-fill"
-						style="width:<?php echo esc_attr( $percent ); ?>%"
+						style="width:<?php echo esc_attr( (string) round( $percent, 2 ) ); ?>%"
 						role="progressbar"
-						aria-valuenow="<?php echo esc_attr( $count ); ?>"
+						aria-valuenow="<?php echo esc_attr( (string) $count ); ?>"
 						aria-valuemin="0"
-						aria-valuemax="<?php echo esc_attr( $data['total'] ); ?>"
+						aria-valuemax="<?php echo esc_attr( (string) $data['total'] ); ?>"
 					></div>
 				</div>
-				<span class="beplus-advanced-reviews__distribution-bar-count"><?php echo esc_html( $count ); ?></span>
+				<span class="beplus-advanced-reviews__distribution-bar-count"><?php echo esc_html( (string) $count ); ?></span>
 			</div>
 		<?php endfor; ?>
 	</div>

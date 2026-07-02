@@ -25,8 +25,8 @@ class MediaHandler extends AbstractModule {
 	 * Handle file uploads from $_FILES.
 	 *
 	 * @param int   $comment_id Comment ID.
-	 * @param array $files      $_FILES array structure.
-	 * @return array Attachment IDs.
+	 * @param array<string, mixed> $files      $_FILES array structure.
+	 * @return array<int, int> Attachment IDs.
 	 */
 	public function upload_files( int $comment_id, array $files ): array {
 		if ( ! beplus_advanced_reviews_is_images_enabled() ) {
@@ -138,7 +138,7 @@ class MediaHandler extends AbstractModule {
 	 * Get media attached to a review.
 	 *
 	 * @param int $comment_id Comment ID.
-	 * @return array List of attachment data.
+	 * @return array<int, array<string, mixed>> List of attachment data.
 	 */
 	public function get_review_media( int $comment_id ): array {
 		global $wpdb;
@@ -212,7 +212,7 @@ class MediaHandler extends AbstractModule {
 	 * Process a single file upload and attach to review.
 	 *
 	 * @param int   $comment_id Comment ID.
-	 * @param array $file       Single file array.
+	 * @param array<string, mixed> $file       Single file array.
 	 * @return int|null Attachment ID.
 	 */
 	private function process_upload( int $comment_id, array $file ): ?int {
@@ -253,7 +253,7 @@ class MediaHandler extends AbstractModule {
 	 * Insert a media attachment and link to the review.
 	 *
 	 * @param int    $comment_id Comment ID.
-	 * @param array  $file       File data array.
+	 * @param array<string, mixed>  $file       File data array.
 	 * @param string $file_path  Actual file path on disk.
 	 * @return int|null Attachment ID.
 	 */
@@ -308,8 +308,8 @@ class MediaHandler extends AbstractModule {
 	/**
 	 * Normalize the $_FILES array into a cleaner structure.
 	 *
-	 * @param array $files $_FILES array.
-	 * @return array
+	 * @param array<string, mixed> $files $_FILES array.
+	 * @return array<int, array<string, mixed>>
 	 */
 	private function normalize_files_array( array $files ): array {
 		$normalized = array();

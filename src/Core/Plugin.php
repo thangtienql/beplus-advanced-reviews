@@ -91,6 +91,10 @@ class Plugin {
 		$settings_controller->register_routes();
 	}
 
+	/**
+	 * @param array<int, array<string, mixed>> $categories
+	 * @return array<int, array<string, mixed>>
+	 */
 	public function register_block_category( array $categories ): array {
 		$categories[] = array(
 			'slug'  => 'beplus-advanced-reviews',

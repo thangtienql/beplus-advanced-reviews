@@ -272,7 +272,7 @@ class ReviewController extends \WP_REST_Controller {
 	/**
 	 * Get collection params for the reviews endpoint.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_collection_params(): array {
 		return array(

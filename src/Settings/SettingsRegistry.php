@@ -161,7 +161,7 @@ class SettingsRegistry extends AbstractModule {
 	/**
 	 * Render checkbox field.
 	 *
-	 * @param array $args Field arguments.
+	 * @param array<string, mixed> $args Field arguments.
 	 * @return void
 	 */
 	public function render_checkbox_field( array $args ): void {
@@ -180,7 +180,7 @@ class SettingsRegistry extends AbstractModule {
 	/**
 	 * Render number field.
 	 *
-	 * @param array $args Field arguments.
+	 * @param array<string, mixed> $args Field arguments.
 	 * @return void
 	 */
 	public function render_number_field( array $args ): void {
@@ -190,7 +190,7 @@ class SettingsRegistry extends AbstractModule {
 		$max      = $args['max'] ?? 50;
 		$current  = isset( $settings[ $key ] ) ? absint( $settings[ $key ] ) : 10;
 		?>
-		<input type="number" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( $current ); ?>" min="<?php echo esc_attr( $min ); ?>" max="<?php echo esc_attr( $max ); ?>">
+		<input type="number" name="<?php echo esc_attr( self::OPTION_KEY ); ?>[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( (string) $current ); ?>" min="<?php echo esc_attr( (string) $min ); ?>" max="<?php echo esc_attr( (string) $max ); ?>">
 		<?php if ( ! empty( $args['description'] ) ) : ?>
 			<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
 		<?php endif; ?>
@@ -200,8 +200,8 @@ class SettingsRegistry extends AbstractModule {
 	/**
 	 * Sanitize settings before save.
 	 *
-	 * @param array $input Raw input.
-	 * @return array
+	 * @param array<string, mixed> $input Raw input.
+	 * @return array<string, mixed>
 	 */
 	public function sanitize_settings( array $input ): array {
 		$defaults = $this->get_defaults();
@@ -233,7 +233,7 @@ class SettingsRegistry extends AbstractModule {
 	/**
 	 * Get all settings merged with defaults.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_all(): array {
 		$saved = get_option( self::OPTION_KEY, array() );
@@ -257,7 +257,7 @@ class SettingsRegistry extends AbstractModule {
 	/**
 	 * Update settings.
 	 *
-	 * @param array $settings Settings to save.
+	 * @param array<string, mixed> $settings Settings to save.
 	 * @return bool
 	 */
 	public function update( array $settings ): bool {
@@ -267,7 +267,7 @@ class SettingsRegistry extends AbstractModule {
 	/**
 	 * Get default settings.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_defaults(): array {
 		return array(

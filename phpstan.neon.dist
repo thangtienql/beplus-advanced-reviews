@@ -1,0 +1,21 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+parameters:
+    level: 6
+    treatPhpDocTypesAsCertain: false
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+        - vendor/php-stubs/woocommerce-stubs/woocommerce-stubs.php
+    paths:
+        - src/
+        - includes/
+        - templates/
+        - blocks/
+        - beplus-advanced-reviews.php
+        - admin
+    excludePaths:
+        - vendor/
+        - node_modules/
+        - blocks/*/index.js
+        - blocks/*/view.js
+        - admin/js/settings.js

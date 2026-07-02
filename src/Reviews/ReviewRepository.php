@@ -18,8 +18,8 @@ class ReviewRepository {
 	 * Get reviews for a product.
 	 *
 	 * @param int   $product_id Product ID.
-	 * @param array $args       Query arguments.
-	 * @return array
+	 * @param array<string, mixed> $args       Query arguments.
+	 * @return array<string, mixed>
 	 */
 	public function get_reviews( int $product_id, array $args = array() ): array {
 		global $wpdb;
@@ -103,7 +103,7 @@ class ReviewRepository {
 	 * Get star distribution for a product.
 	 *
 	 * @param int $product_id Product ID.
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_star_distribution( int $product_id ): array {
 		global $wpdb;

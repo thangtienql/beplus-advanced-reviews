@@ -18,8 +18,8 @@ class ReviewSubmission {
 	 * Create a new review.
 	 *
 	 * @param int   $product_id Product ID.
-	 * @param array $data       Review data (rating, content, author info).
-	 * @return int|WP_Error Comment ID on success, WP_Error on failure.
+	 * @param array<string, mixed> $data       Review data (rating, content, author info).
+	 * @return int|\WP_Error Comment ID on success, \WP_Error on failure.
 	 */
 	public function create_review( int $product_id, array $data ) {
 		$current_user = wp_get_current_user();
@@ -68,7 +68,7 @@ class ReviewSubmission {
 	/**
 	 * Validate review submission data.
 	 *
-	 * @param array $data Raw input data.
+	 * @param array<string, mixed> $data Raw input data.
 	 * @return true|\WP_Error
 	 */
 	public function validate_submission( array $data ) {

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Get merged plugin settings (defaults + saved).
  *
- * @return array
+ * @return array<string, mixed>
  */
 function beplus_advanced_reviews_get_settings(): array {
 	static $settings = null;
@@ -109,9 +109,8 @@ function beplus_advanced_reviews_get_block_instance(): ?string {
 /**
  * Get a template from the plugin or theme.
  *
- * @param string $template_name Template file name.
- * @param array  $args          Arguments to pass to the template.
- * @return void
+ * @param string $template_name Template name.
+ * @param array<string, mixed>  $args          Arguments to pass to the template.
  */
 function beplus_advanced_reviews_get_template( string $template_name, array $args = array() ): void {
 	$paths = apply_filters(

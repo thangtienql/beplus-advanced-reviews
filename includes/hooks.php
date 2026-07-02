@@ -60,7 +60,7 @@ function beplus_advanced_reviews_render_stars( int $rating, float $size = 1.0 ):
 		$stars .= sprintf(
 			'<span class="beplus-advanced-reviews__star%s" aria-hidden="true" style="font-size:%fem;">&#9733;</span>',
 			esc_attr( $filled ),
-			esc_attr( $size )
+			esc_attr( (string) $size )
 		);
 	}
 

@@ -18,23 +18,29 @@ $user = wp_get_current_user();
 <div class="beplus-advanced-reviews__submit-form-wrapper">
 	<h3 class="beplus-advanced-reviews__submit-form-title"><?php esc_html_e( 'Write a Review', 'beplus-advanced-reviews' ); ?></h3>
 	<form class="beplus-advanced-reviews__submit-form" method="post" enctype="multipart/form-data">
-		<input type="hidden" name="product_id" value="<?php echo esc_attr( $product_id ); ?>">
+		<input type="hidden" name="product_id" value="<?php echo esc_attr( (string) $product_id ); ?>">
 
 		<div class="beplus-advanced-reviews__star-rating">
 			<?php for ( $i = 5; $i >= 1; $i-- ) : ?>
 				<input
 					type="radio"
-					id="bpar-star-<?php echo esc_attr( $i ); ?>"
+					id="bpar-star-<?php echo esc_attr( (string) $i ); ?>"
 					name="rating"
-					value="<?php echo esc_attr( $i ); ?>"
+					value="<?php echo esc_attr( (string) $i ); ?>"
 					class="beplus-advanced-reviews__star-input"
 					required
 				>
 				<label
-					for="bpar-star-<?php echo esc_attr( $i ); ?>"
+					for="bpar-star-<?php echo esc_attr( (string) $i ); ?>"
 					class="beplus-advanced-reviews__star-label"
-					aria-label="<?php printf( esc_attr__( '%d stars', 'beplus-advanced-reviews' ), $i ); ?>"
-					title="<?php printf( esc_attr__( '%d stars', 'beplus-advanced-reviews' ), $i ); ?>"
+					aria-label="<?php
+					/* translators: %d: Number of stars */
+					printf( esc_attr__( '%d stars', 'beplus-advanced-reviews' ), $i );
+					?>"
+					title="<?php
+					/* translators: %d: Number of stars */
+					printf( esc_attr__( '%d stars', 'beplus-advanced-reviews' ), $i );
+					?>"
 				>&#9733;</label>
 			<?php endfor; ?>
 		</div>

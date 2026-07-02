@@ -17,8 +17,8 @@ class ReviewQuery {
 	/**
 	 * Build query args for the repository.
 	 *
-	 * @param array $params Raw request parameters.
-	 * @return array
+	 * @param array<string, mixed> $params Raw request parameters.
+	 * @return array<string, mixed>
 	 */
 	public function build_args( array $params ): array {
 		$args = array();
@@ -36,7 +36,7 @@ class ReviewQuery {
 		}
 
 		if ( isset( $params['has_images'] ) ) {
-			$args['has_images'] = rest_sanitize_boolean( $params['has_images'] );
+			$args['has_images'] = filter_var( $params['has_images'], FILTER_VALIDATE_BOOLEAN );
 		}
 
 		if ( isset( $params['sort'] ) ) {
