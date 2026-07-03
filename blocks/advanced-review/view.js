@@ -251,6 +251,7 @@
 		}
 
 		initReviewForm( block );
+		initMediaUpload( block );
 		initPasteSupport( block );
 	}
 
@@ -304,6 +305,137 @@
 	}
 
 	/**
+	 * Initialize media upload previews and drag/drop.
+	 *
+	 * @param {HTMLElement} block The block container element.
+	 */
+	function initMediaUpload( block ) {
+		var form = block.querySelector( '.beplus-advanced-reviews__submit-form' );
+		if ( ! form ) return;
+
+		var previewContainer = form.querySelector( '.beplus-advanced-reviews__media-preview' );
+		var mediaFiles = [];
+		block._bparMediaFiles = mediaFiles;
+
+		var fileInputs = form.querySelectorAll( 'input[type="file"]' );
+
+		fileInputs.forEach( function ( input ) {
+			input.addEventListener( 'change', function () {
+				if ( ! input.files ) return;
+				for ( var i = 0; i < input.files.length; i++ ) {
+					var file = input.files[ i ];
+					var isImage = file.type && file.type.indexOf( 'image/' ) === 0;
+					var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
+					if ( isImage || isVideo ) {
+						mediaFiles.push( { file: file, removed: false } );
+					}
+				}
+				input.value = '';
+				updatePreviews();
+			} );
+		} );
+
+		var pasteArea = block.querySelector( '.beplus-advanced-reviews__paste-area' );
+		if ( pasteArea ) {
+			pasteArea.addEventListener( 'dragover', function ( e ) {
+				e.preventDefault();
+				e.stopPropagation();
+				pasteArea.classList.add( 'beplus-advanced-reviews__paste-area--dragover' );
+			} );
+
+			pasteArea.addEventListener( 'dragleave', function ( e ) {
+				e.preventDefault();
+				e.stopPropagation();
+				pasteArea.classList.remove( 'beplus-advanced-reviews__paste-area--dragover' );
+			} );
+
+			pasteArea.addEventListener( 'drop', function ( e ) {
+				e.preventDefault();
+				e.stopPropagation();
+				pasteArea.classList.remove( 'beplus-advanced-reviews__paste-area--dragover' );
+
+				var files = e.dataTransfer.files;
+				if ( ! files || ! files.length ) return;
+
+				for ( var i = 0; i < files.length; i++ ) {
+					var file = files[ i ];
+					var isImage = file.type && file.type.indexOf( 'image/' ) === 0;
+					var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
+					if ( isImage || isVideo ) {
+						mediaFiles.push( { file: file, removed: false } );
+					}
+				}
+				updatePreviews();
+			} );
+		}
+
+		function removeFile( index ) {
+			if ( mediaFiles[ index ] ) {
+				mediaFiles[ index ].removed = true;
+				updatePreviews();
+			}
+		}
+
+		function updatePreviews() {
+			if ( ! previewContainer ) return;
+
+			var activeFiles = mediaFiles.filter( function ( m ) {
+				return ! m.removed;
+			} );
+
+			if ( ! activeFiles.length ) {
+				previewContainer.style.display = 'none';
+				previewContainer.innerHTML = '';
+				return;
+			}
+
+			previewContainer.style.display = '';
+			var html = '';
+			var actualIndex = 0;
+
+			mediaFiles.forEach( function ( item, idx ) {
+				if ( item.removed ) return;
+
+				var file = item.file;
+				var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
+				html += '<div class="beplus-advanced-reviews__media-preview-item">';
+
+				if ( isVideo ) {
+					var videoUrl = URL.createObjectURL( file );
+					html += '<video src="' + videoUrl + '" width="120" height="68" controls class="beplus-advanced-reviews__media-preview-video"></video>';
+				} else {
+					var imgUrl = URL.createObjectURL( file );
+					html += '<img src="' + imgUrl + '" alt="' + escapeAttr( file.name ) + '" width="80" height="80" class="beplus-advanced-reviews__media-preview-img">';
+				}
+
+				html += '<span class="beplus-advanced-reviews__media-preview-name">' + escapeHtml( file.name ) + '</span>';
+				html += '<button type="button" class="beplus-advanced-reviews__media-preview-remove" data-index="' + idx + '" aria-label="Remove">&#10005;</button>';
+				html += '</div>';
+			} );
+
+			previewContainer.innerHTML = html;
+
+			var removeButtons = previewContainer.querySelectorAll( '.beplus-advanced-reviews__media-preview-remove' );
+			removeButtons.forEach( function ( btn ) {
+				btn.addEventListener( 'click', function () {
+					var idx = parseInt( btn.dataset.index, 10 );
+					removeFile( idx );
+				} );
+			} );
+		}
+
+		function escapeHtml( str ) {
+			var div = document.createElement( 'div' );
+			div.appendChild( document.createTextNode( str || '' ) );
+			return div.innerHTML;
+		}
+
+		function escapeAttr( str ) {
+			return ( str || '' ).replace( /"/g, '&quot;' ).replace( /'/g, '&#39;' );
+		}
+	}
+
+	/**
 	 * Submit a review via REST API.
 	 *
 	 * @param {HTMLElement} block Block container.
@@ -325,27 +457,25 @@
 			formData.append( 'email', data.email );
 		}
 
-		var fileInputs = form.querySelectorAll( 'input[type="file"]' );
+		var mediaFiles = block._bparMediaFiles || [];
 		var hasSizeError = false;
-		fileInputs.forEach( function ( fileInput ) {
-			if ( ! fileInput || ! fileInput.files.length ) return;
-			for ( var i = 0; i < fileInput.files.length; i++ ) {
-				var file = fileInput.files[ i ];
-				var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
-				var maxSize = isVideo
-					? ( bparData.maxVideoSize || 20971520 )
-					: ( bparData.maxUploadSize || 2097152 );
-				if ( file.size > maxSize ) {
-					showFormMessage( block, isVideo
-						? ( bparData.i18n.videoTooLarge || 'Video too large.' )
-						: ( bparData.i18n.imageTooLarge || 'Image too large.' ),
-						'error'
-					);
-					hasSizeError = true;
-					return;
-				}
-				formData.append( 'media[]', file );
+		mediaFiles.forEach( function ( item ) {
+			if ( item.removed ) return;
+			var file = item.file;
+			var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
+			var maxSize = isVideo
+				? ( bparData.maxVideoSize || 20971520 )
+				: ( bparData.maxUploadSize || 2097152 );
+			if ( file.size > maxSize ) {
+				showFormMessage( block, isVideo
+					? ( bparData.i18n.videoTooLarge || 'Video too large.' )
+					: ( bparData.i18n.imageTooLarge || 'Image too large.' ),
+					'error'
+				);
+				hasSizeError = true;
+				return;
 			}
+			formData.append( 'media[]', file );
 		} );
 		if ( hasSizeError ) return;
 
@@ -372,10 +502,13 @@
 						label.classList.remove( 'beplus-advanced-reviews__star-label--active' );
 					} );
 
-					var pastePreview = form.querySelector( '.beplus-advanced-reviews__paste-preview' );
-					if ( pastePreview ) {
-						pastePreview.remove();
+					block._bparMediaFiles = [];
+					var mediaPreview = form.querySelector( '.beplus-advanced-reviews__media-preview' );
+					if ( mediaPreview ) {
+						mediaPreview.style.display = 'none';
+						mediaPreview.innerHTML = '';
 					}
+
 					var pasteInput = form.querySelector( '.beplus-advanced-reviews__paste-input' );
 					if ( pasteInput ) {
 						pasteInput.value = '';
@@ -564,7 +697,7 @@
 						if ( pasteInput ) {
 							pasteInput.value = event.target.result;
 						}
-						showPreview( pasteArea, event.target.result );
+						showPastePreview( block, event.target.result );
 					};
 					reader.readAsDataURL( blob );
 					break;
@@ -572,22 +705,37 @@
 			}
 		} );
 
-		/**
-		 * Show preview of pasted image.
-		 *
-		 * @param {HTMLElement} container Container element.
-		 * @param {string}      dataUrl   Data URL.
-		 */
-		function showPreview( container, dataUrl ) {
-			var existing = container.querySelector( '.beplus-advanced-reviews__paste-preview' );
+		function showPastePreview( block, dataUrl ) {
+			var form = block.querySelector( '.beplus-advanced-reviews__submit-form' );
+			if ( ! form ) return;
+
+			var previewContainer = form.querySelector( '.beplus-advanced-reviews__media-preview' );
+			if ( ! previewContainer ) return;
+
+			var existing = previewContainer.querySelector( '.beplus-advanced-reviews__media-preview-item--paste' );
 			if ( existing ) {
 				existing.remove();
 			}
 
-			var preview = document.createElement( 'div' );
-			preview.className = 'beplus-advanced-reviews__paste-preview';
-			preview.innerHTML = '<img src="' + dataUrl + '" alt="Pasted image preview" style="max-width:200px;max-height:200px;">';
-			container.appendChild( preview );
+			previewContainer.style.display = '';
+
+			var item = document.createElement( 'div' );
+			item.className = 'beplus-advanced-reviews__media-preview-item beplus-advanced-reviews__media-preview-item--paste';
+			item.innerHTML =
+				'<img src="' + dataUrl + '" alt="Pasted image" width="80" height="80" class="beplus-advanced-reviews__media-preview-img">' +
+				'<span class="beplus-advanced-reviews__media-preview-name">Pasted image</span>' +
+				'<button type="button" class="beplus-advanced-reviews__media-preview-remove" aria-label="Remove">&#10005;</button>';
+
+			var removeBtn = item.querySelector( '.beplus-advanced-reviews__media-preview-remove' );
+			removeBtn.addEventListener( 'click', function () {
+				item.remove();
+				pasteInput.value = '';
+				if ( ! previewContainer.querySelector( '.beplus-advanced-reviews__media-preview-item' ) ) {
+					previewContainer.style.display = 'none';
+				}
+			} );
+
+			previewContainer.appendChild( item );
 		}
 	}
 

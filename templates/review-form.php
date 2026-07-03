@@ -70,6 +70,8 @@ $user = wp_get_current_user();
 		></textarea>
 
 		<?php if ( $show_images && $images_enabled ) : ?>
+			<div class="beplus-advanced-reviews__media-preview" style="display:none;"></div>
+
 			<div class="beplus-advanced-reviews__file-upload">
 				<label for="bpar-file-input" class="beplus-advanced-reviews__file-label">
 					<?php esc_html_e( 'Add images', 'beplus-advanced-reviews' ); ?>
@@ -119,8 +121,9 @@ $user = wp_get_current_user();
 			<?php endif; ?>
 
 			<?php if ( $paste_enabled ) : ?>
-				<div class="beplus-advanced-reviews__paste-area" tabindex="0" aria-label="<?php esc_attr_e( 'Paste image from clipboard', 'beplus-advanced-reviews' ); ?>">
-					<p><?php esc_html_e( 'Or paste an image from clipboard here', 'beplus-advanced-reviews' ); ?></p>
+				<div class="beplus-advanced-reviews__paste-area" tabindex="0"
+					aria-label="<?php esc_attr_e( 'Drag and drop or paste images from clipboard', 'beplus-advanced-reviews' ); ?>">
+					<p><?php esc_html_e( 'Drag & drop images/videos here, or paste from clipboard', 'beplus-advanced-reviews' ); ?></p>
 					<input type="hidden" class="beplus-advanced-reviews__paste-input" name="paste_image" value="">
 				</div>
 			<?php endif; ?>
