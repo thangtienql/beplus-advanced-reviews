@@ -30,6 +30,8 @@ function beplus_advanced_reviews_get_settings(): array {
 		'load_more_count'  => 10,
 		'rating_threshold' => 0,
 		'max_image_size_mb' => 2,
+		'enable_videos'    => false,
+		'max_video_size_mb' => 20,
 	);
 
 	$saved = get_option( 'beplus_advanced_reviews_settings', array() );
@@ -89,6 +91,27 @@ function beplus_advanced_reviews_is_paste_enabled(): bool {
 function beplus_advanced_reviews_get_max_image_size(): int {
 	$settings = beplus_advanced_reviews_get_settings();
 	$mb       = isset( $settings['max_image_size_mb'] ) ? absint( $settings['max_image_size_mb'] ) : 2;
+	return $mb * 1024 * 1024;
+}
+
+/**
+ * Check if video uploads are enabled.
+ *
+ * @return bool
+ */
+function beplus_advanced_reviews_is_videos_enabled(): bool {
+	$settings = beplus_advanced_reviews_get_settings();
+	return ! empty( $settings['enable_videos'] );
+}
+
+/**
+ * Get max video size in bytes from plugin setting.
+ *
+ * @return int
+ */
+function beplus_advanced_reviews_get_max_video_size(): int {
+	$settings = beplus_advanced_reviews_get_settings();
+	$mb       = isset( $settings['max_video_size_mb'] ) ? absint( $settings['max_video_size_mb'] ) : 20;
 	return $mb * 1024 * 1024;
 }
 

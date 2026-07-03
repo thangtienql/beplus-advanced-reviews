@@ -159,12 +159,14 @@ class MediaHandler extends AbstractModule {
 			$attachment_id = (int) $row->attachment_id;
 			$url           = wp_get_attachment_url( $attachment_id );
 			$thumbnail     = wp_get_attachment_image_url( $attachment_id, 'thumbnail' );
+			$mime_type     = get_post_mime_type( $attachment_id );
 
 			if ( $url ) {
 				$media[] = array(
 					'id'         => $attachment_id,
 					'url'        => $url,
 					'thumbnail'  => $thumbnail ?: $url,
+					'mime_type'  => $mime_type ?: '',
 				);
 			}
 		}
@@ -216,17 +218,35 @@ class MediaHandler extends AbstractModule {
 	 * @return int|null Attachment ID.
 	 */
 	private function process_upload( int $comment_id, array $file ): ?int {
-		$max_size     = beplus_advanced_reviews_get_max_image_size();
-		$file_size    = (int) ( $file['size'] ?? 0 );
+		$file_type_check = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'] );
+		$mime_type       = $file_type_check['type'] ?? '';
 
+		if ( ! $mime_type ) {
+			return null;
+		}
+
+		$is_video = str_starts_with( $mime_type, 'video/' );
+
+		if ( $is_video ) {
+			if ( ! beplus_advanced_reviews_is_videos_enabled() ) {
+				return null;
+			}
+			$max_size = beplus_advanced_reviews_get_max_video_size();
+			$allowed  = array( 'video/mp4', 'video/webm', 'video/ogg' );
+		} else {
+			if ( ! beplus_advanced_reviews_is_images_enabled() ) {
+				return null;
+			}
+			$max_size = beplus_advanced_reviews_get_max_image_size();
+			$allowed  = array( 'image/jpeg', 'image/png', 'image/webp' );
+		}
+
+		$file_size = (int) ( $file['size'] ?? 0 );
 		if ( $file_size > $max_size ) {
 			return null;
 		}
 
-		$allowed_types = array( 'image/jpeg', 'image/png', 'image/webp' );
-
-		$file_type = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'] );
-		if ( ! $file_type['type'] || ! in_array( $file_type['type'], $allowed_types, true ) ) {
+		if ( ! in_array( $mime_type, $allowed, true ) ) {
 			return null;
 		}
 
@@ -237,6 +257,9 @@ class MediaHandler extends AbstractModule {
 				'jpeg' => 'image/jpeg',
 				'png'  => 'image/png',
 				'webp' => 'image/webp',
+				'mp4'  => 'video/mp4',
+				'webm' => 'video/webm',
+				'ogv'  => 'video/ogg',
 			),
 		);
 
@@ -280,10 +303,13 @@ class MediaHandler extends AbstractModule {
 			require_once ABSPATH . 'wp-admin/includes/image.php';
 		}
 
-		ob_start();
-		$metadata = wp_generate_attachment_metadata( $attachment_id, $file_path );
-		wp_update_attachment_metadata( $attachment_id, $metadata );
-		ob_end_clean();
+		$mime_type = $filetype['type'] ?? '';
+		if ( str_starts_with( $mime_type, 'image/' ) ) {
+			ob_start();
+			$metadata = wp_generate_attachment_metadata( $attachment_id, $file_path );
+			wp_update_attachment_metadata( $attachment_id, $metadata );
+			ob_end_clean();
+		}
 
 		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'bpar_review_media',

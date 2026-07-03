@@ -109,6 +109,29 @@ class SettingsRegistry extends AbstractModule {
 				'description' => __( 'Maximum size per image in megabytes. Recommended: 2 MB.', 'beplus-advanced-reviews' ),
 			)
 		);
+
+		add_settings_field(
+			'enable_videos',
+			__( 'Video Uploads', 'beplus-advanced-reviews' ),
+			array( $this, 'render_checkbox_field' ),
+			'beplus-advanced-reviews',
+			'bpar_general',
+			array( 'key' => 'enable_videos', 'label' => __( 'Allow customers to upload videos with reviews', 'beplus-advanced-reviews' ) )
+		);
+
+		add_settings_field(
+			'max_video_size_mb',
+			__( 'Max Video Size (MB)', 'beplus-advanced-reviews' ),
+			array( $this, 'render_number_field' ),
+			'beplus-advanced-reviews',
+			'bpar_general',
+			array(
+				'key'         => 'max_video_size_mb',
+				'min'         => 1,
+				'max'         => 100,
+				'description' => __( 'Maximum size per video in megabytes. Recommended: 20 MB.', 'beplus-advanced-reviews' ),
+			)
+		);
 	}
 
 	/**
@@ -226,6 +249,12 @@ class SettingsRegistry extends AbstractModule {
 			? max( 1, min( 20, absint( $input['max_image_size_mb'] ) ) )
 			: $defaults['max_image_size_mb'];
 
+		$clean['enable_videos'] = ! empty( $input['enable_videos'] );
+
+		$clean['max_video_size_mb'] = isset( $input['max_video_size_mb'] )
+			? max( 1, min( 100, absint( $input['max_video_size_mb'] ) ) )
+			: $defaults['max_video_size_mb'];
+
 		return $clean;
 	}
 
@@ -278,6 +307,8 @@ class SettingsRegistry extends AbstractModule {
 			'load_more_count'  => 10,
 			'rating_threshold' => 0,
 			'max_image_size_mb' => 2,
+			'enable_videos'    => false,
+			'max_video_size_mb' => 20,
 		);
 	}
 }

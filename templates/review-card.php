@@ -35,10 +35,15 @@ $images      = $review['images'] ?? array();
 		<div class="beplus-advanced-reviews__review-content"><?php echo $content; // phpcs:ignore ?></div>
 		<?php if ( $show_images && $images ) : ?>
 			<div class="beplus-advanced-reviews__review-images">
-				<?php foreach ( $images as $image ) : ?>
-					<a href="<?php echo esc_url( $image['url'] ?? '' ); ?>" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">
-						<img src="<?php echo esc_url( $image['thumbnail'] ?? '' ); ?>" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">
-					</a>
+				<?php foreach ( $images as $media ) : ?>
+					<?php $is_video = ! empty( $media['mime_type'] ) && str_starts_with( $media['mime_type'], 'video/' ); ?>
+					<?php if ( $is_video ) : ?>
+						<video src="<?php echo esc_url( $media['url'] ?? '' ); ?>" controls width="320" class="beplus-advanced-reviews__review-video"></video>
+					<?php else : ?>
+						<a href="<?php echo esc_url( $media['url'] ?? '' ); ?>" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">
+							<img src="<?php echo esc_url( $media['thumbnail'] ?? '' ); ?>" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">
+						</a>
+					<?php endif; ?>
 				<?php endforeach; ?>
 			</div>
 		<?php endif; ?>

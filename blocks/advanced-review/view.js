@@ -130,9 +130,13 @@
 				if ( block.dataset.showImages !== '0' && review.has_images && review.images.length ) {
 					html += '<div class="beplus-advanced-reviews__review-images">';
 					review.images.forEach( function ( img ) {
-						html += '<a href="' + escAttr( img.url ) + '" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">';
-						html += '<img src="' + escAttr( img.thumbnail ) + '" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">';
-						html += '</a>';
+						if ( img.mime_type && img.mime_type.indexOf( 'video/' ) === 0 ) {
+							html += '<video src="' + escAttr( img.url ) + '" controls width="320" class="beplus-advanced-reviews__review-video"></video>';
+						} else {
+							html += '<a href="' + escAttr( img.url ) + '" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">';
+							html += '<img src="' + escAttr( img.thumbnail ) + '" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">';
+							html += '</a>';
+						}
 					} );
 					html += '</div>';
 				}
@@ -321,17 +325,29 @@
 			formData.append( 'email', data.email );
 		}
 
-		var fileInput = form.querySelector( 'input[type="file"]' );
-		if ( fileInput && fileInput.files.length ) {
-			var maxSize = bparData.maxUploadSize || 2097152;
+		var fileInputs = form.querySelectorAll( 'input[type="file"]' );
+		var hasSizeError = false;
+		fileInputs.forEach( function ( fileInput ) {
+			if ( ! fileInput || ! fileInput.files.length ) return;
 			for ( var i = 0; i < fileInput.files.length; i++ ) {
-				if ( fileInput.files[ i ].size > maxSize ) {
-					showFormMessage( block, bparData.i18n.imageTooLarge || 'Image too large.', 'error' );
+				var file = fileInput.files[ i ];
+				var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
+				var maxSize = isVideo
+					? ( bparData.maxVideoSize || 20971520 )
+					: ( bparData.maxUploadSize || 2097152 );
+				if ( file.size > maxSize ) {
+					showFormMessage( block, isVideo
+						? ( bparData.i18n.videoTooLarge || 'Video too large.' )
+						: ( bparData.i18n.imageTooLarge || 'Image too large.' ),
+						'error'
+					);
+					hasSizeError = true;
 					return;
 				}
-				formData.append( 'media[]', fileInput.files[ i ] );
+				formData.append( 'media[]', file );
 			}
-		}
+		} );
+		if ( hasSizeError ) return;
 
 		var pasteInput = form.querySelector( '.beplus-advanced-reviews__paste-input' );
 		if ( pasteInput && pasteInput.value ) {
@@ -501,9 +517,13 @@
 		if ( block.dataset.showImages !== '0' && review.has_images && review.images.length ) {
 			html += '<div class="beplus-advanced-reviews__review-images">';
 			review.images.forEach( function ( img ) {
-				html += '<a href="' + escAttr( img.url ) + '" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">';
-				html += '<img src="' + escAttr( img.thumbnail ) + '" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">';
-				html += '</a>';
+				if ( img.mime_type && img.mime_type.indexOf( 'video/' ) === 0 ) {
+					html += '<video src="' + escAttr( img.url ) + '" controls width="320" class="beplus-advanced-reviews__review-video"></video>';
+				} else {
+					html += '<a href="' + escAttr( img.url ) + '" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">';
+					html += '<img src="' + escAttr( img.thumbnail ) + '" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">';
+					html += '</a>';
+				}
 			} );
 			html += '</div>';
 		}

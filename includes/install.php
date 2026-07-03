@@ -26,6 +26,9 @@ function beplus_advanced_reviews_install_defaults(): void {
 			'enable_sort'     => true,
 			'load_more_count' => 10,
 			'rating_threshold' => 0,
+			'max_image_size_mb' => 2,
+			'enable_videos'    => false,
+			'max_video_size_mb' => 20,
 		);
 		update_option( 'beplus_advanced_reviews_settings', $defaults, false );
 	}

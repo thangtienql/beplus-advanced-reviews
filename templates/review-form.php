@@ -13,6 +13,7 @@ $product_id  = $args['product_id'] ?? 0;
 $show_images = ! empty( $args['show_images'] );
 $paste_enabled = beplus_advanced_reviews_is_paste_enabled();
 $images_enabled = beplus_advanced_reviews_is_images_enabled();
+$videos_enabled = beplus_advanced_reviews_is_videos_enabled();
 $user = wp_get_current_user();
 ?>
 <div class="beplus-advanced-reviews__submit-form-wrapper">
@@ -91,6 +92,31 @@ $user = wp_get_current_user();
 					?>
 				</p>
 			</div>
+
+			<?php if ( $videos_enabled ) : ?>
+				<div class="beplus-advanced-reviews__file-upload">
+					<label for="bpar-video-input" class="beplus-advanced-reviews__file-label">
+						<?php esc_html_e( 'Add videos', 'beplus-advanced-reviews' ); ?>
+					</label>
+					<input
+						type="file"
+						id="bpar-video-input"
+						name="media[]"
+						multiple
+						accept="video/mp4,video/webm,video/ogg"
+						aria-label="<?php esc_attr_e( 'Upload review videos', 'beplus-advanced-reviews' ); ?>"
+					>
+					<p class="beplus-advanced-reviews__file-hint">
+						<?php
+						printf(
+							/* translators: %s: max video size in MB */
+							esc_html__( 'Accepted formats: MP4, WebM, OGG (max %s MB per video)', 'beplus-advanced-reviews' ),
+							esc_html( (string) ( beplus_advanced_reviews_get_settings()['max_video_size_mb'] ?? 20 ) )
+						);
+						?>
+					</p>
+				</div>
+			<?php endif; ?>
 
 			<?php if ( $paste_enabled ) : ?>
 				<div class="beplus-advanced-reviews__paste-area" tabindex="0" aria-label="<?php esc_attr_e( 'Paste image from clipboard', 'beplus-advanced-reviews' ); ?>">
