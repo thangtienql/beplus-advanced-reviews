@@ -143,9 +143,8 @@ class SettingsRegistry extends AbstractModule {
 		$settings = $this->get_all();
 		$current  = $settings['display_mode'] ?? 'replace';
 		$options  = array(
-			'keep'        => __( 'Keep default WooCommerce reviews; place block manually', 'beplus-advanced-reviews' ),
-			'replace'     => __( 'Replace default reviews with Advanced Reviews', 'beplus-advanced-reviews' ),
-			'custom_hook' => __( 'Use custom hook position (beplus_advanced_reviews_custom_position)', 'beplus-advanced-reviews' ),
+			'keep'    => __( 'Keep default WooCommerce reviews; place block manually', 'beplus-advanced-reviews' ),
+			'replace' => __( 'Replace default reviews with Advanced Reviews', 'beplus-advanced-reviews' ),
 		);
 		?>
 		<select name="<?php echo esc_attr( self::OPTION_KEY ); ?>[display_mode]">
@@ -211,7 +210,7 @@ class SettingsRegistry extends AbstractModule {
 			? sanitize_text_field( $input['display_mode'] )
 			: $defaults['display_mode'];
 
-		$allowed_modes = array( 'keep', 'replace', 'custom_hook' );
+		$allowed_modes = array( 'keep', 'replace' );
 		if ( ! in_array( $clean['display_mode'], $allowed_modes, true ) ) {
 			$clean['display_mode'] = 'replace';
 		}

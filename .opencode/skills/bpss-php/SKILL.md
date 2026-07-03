@@ -32,7 +32,7 @@ Before finishing PHP work:
 | Class | PascalCase | `ReviewController`, `SettingsRegistry` |
 | Abstract | `Abstract` + name | `AbstractModule` |
 | Global helper | `beplus_advanced_reviews_*` | `beplus_advanced_reviews_get_settings()` |
-| Hook constant | `HookManager::CONST` | `CUSTOM_POSITION` |
+| Hook constant | `HookManager::CONST` | `SERVICES`, `BLOCKS` |
 
 ## Infrastructure patterns
 

@@ -23,7 +23,7 @@ BePlus Advanced Reviews upgrades WooCommerce product reviews with a modern, AJAX
 * Sort by date (newest/oldest) or rating (highest/lowest)
 * Load More button for AJAX pagination
 * Drag-and-drop Gutenberg block, automatically applied to all Single Product pages
-* Display mode settings: keep default, replace default, or custom hook position
+* Display mode settings: keep default or replace default
 
 == Installation ==
 

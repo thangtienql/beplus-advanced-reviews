@@ -44,7 +44,7 @@ function beplus_advanced_reviews_get_settings(): array {
 /**
  * Get the display mode setting.
  *
- * @return string 'keep' | 'replace' | 'custom_hook'
+ * @return string 'keep' | 'replace'
  */
 function beplus_advanced_reviews_get_display_mode(): string {
 	$settings = beplus_advanced_reviews_get_settings();

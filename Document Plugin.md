@@ -71,7 +71,6 @@ Each review card displays:
 |------|----------|
 | **Keep default** | WooCommerce's built-in reviews remain as-is; the block can be placed manually |
 | **Replace default** | Completely replaces the standard WooCommerce reviews tab/area with the Advanced Reviews block |
-| **Custom hook position** | Inserts Advanced Reviews at a developer-specified hook (`beplus_advanced_reviews_custom_position`) |
 
 ---
 
@@ -412,7 +411,6 @@ public const REVIEW_QUERY       = 'beplus-advanced-reviews/review.query';
 public const REVIEW_RESULTS     = 'beplus-advanced-reviews/review.results';
 public const REVIEW_SUBMITTED   = 'beplus-advanced-reviews/review.submitted';
 public const MEDIA_UPLOADED     = 'beplus-advanced-reviews/media.uploaded';
-public const CUSTOM_POSITION    = 'beplus_advanced_reviews_custom_position';
 ```
 
 **Legacy WordPress style (still used for compatibility hooks):**
@@ -565,19 +563,9 @@ class Plugin {
 	public function apply_display_mode(): void {
 		$mode = $this->container->get( SettingsRegistry::class )->get_display_mode();
 
-		switch ( $mode ) {
-			case 'replace':
-				// Remove default WooCommerce reviews tab
-				add_filter( 'woocommerce_product_tabs', array( Core\Placement::class, 'replace_reviews_tab' ) );
-				break;
-			case 'custom_hook':
-				// Let developer hook into beplus_advanced_reviews_custom_position
-				add_action( HookManager::CUSTOM_POSITION, array( Core\Placement::class, 'render_at_custom_hook' ) );
-				break;
-			case 'keep':
-			default:
-				// Block is available but no automatic replacement
-				break;
+		if ( 'replace' === $mode ) {
+			// Remove default WooCommerce reviews tab
+			add_filter( 'woocommerce_product_tabs', array( Core\Placement::class, 'replace_reviews_tab' ) );
 		}
 	}
 
@@ -619,7 +607,7 @@ class SettingsRegistry extends AbstractModule {
 	private const OPTION_KEY = 'beplus_advanced_reviews_settings';
 
 	private const DEFAULTS = array(
-		'display_mode'      => 'replace',   // 'keep' | 'replace' | 'custom_hook'
+		'display_mode'      => 'replace',
 		'enable_images'     => true,
 		'enable_paste'      => true,        // clipboard paste support
 		'enable_filter'     => true,
@@ -987,7 +975,6 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 | `beplus-advanced-reviews/review.results` | filter | Modify review result set |
 | `beplus-advanced-reviews/review.submitted` | action | Fires after a review is saved |
 | `beplus-advanced-reviews/media.uploaded` | action | Fires after review image is attached |
-| `beplus_advanced_reviews_custom_position` | action | Custom hook position for display mode |
 | `beplus_advanced_reviews_template_paths` | filter | Override template paths |
 
 ---

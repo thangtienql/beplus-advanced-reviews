@@ -69,7 +69,6 @@ Long-form context stays in this file and in `Document Plugin.md`; avoid duplicat
 ### 5. Plugin Settings — Display Mode
 - **Keep default** — WooCommerce's built-in reviews remain as-is; the block can be placed manually.
 - **Replace default** — completely replaces the standard WooCommerce reviews tab/area with the Advanced Reviews block.
-- **Custom hook position** — inserts Advanced Reviews at a developer-specified hook (`beplus_advanced_reviews_custom_position`).
 - Display mode logic lives in `src/Core/Placement.php`.
 
 ## Files you usually touch
@@ -198,7 +197,6 @@ Document all hooks in `src/Core/HookManager.php`:
 | `beplus-advanced-reviews/review.results` | filter | Modify review result set |
 | `beplus-advanced-reviews/review.submitted` | action | Fires after a review is saved |
 | `beplus-advanced-reviews/media.uploaded` | action | Fires after review image is attached |
-| `beplus_advanced_reviews_custom_position` | action | Custom hook position for display mode |
 | `beplus_advanced_reviews_template_paths` | filter | Override template paths |
 
 ## Quality checks (from plugin root)
