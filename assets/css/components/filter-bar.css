@@ -1,48 +1,50 @@
-/* Filter Bar component styles */
+/* Filter Bar component styles — TrustShop-inspired */
 .beplus-advanced-reviews__filter-bar {
 	display: flex;
 	align-items: center;
-	gap: 1rem;
+	gap: 12px;
 	flex-wrap: wrap;
-	padding: 1rem 0;
-	border-bottom: 1px solid #eee;
-	margin-bottom: 1.5rem;
+	padding: 0 0 12px;
+	border-bottom: 1px solid #E2EBE4;
+	margin-bottom: 16px;
 }
 
 .beplus-advanced-reviews__filter-label {
-	font-size: 0.875rem;
-	font-weight: 600;
-	margin-right: 0.5rem;
+	font-size: 14px;
+	font-weight: 500;
+	color: #666;
 }
 
 .beplus-advanced-reviews__filter-stars {
 	display: flex;
 	align-items: center;
-	gap: 0.25rem;
+	gap: 4px;
 }
 
 .beplus-advanced-reviews__filter-star {
-	padding: 2px 8px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
+	padding: 4px 10px;
+	border: 1px solid #E2EBE4;
+	border-radius: 20px;
 	background: #fff;
 	cursor: pointer;
-	font-size: 0.875rem;
-	transition: background 0.2s, border-color 0.2s;
+	font-size: 13px;
+	color: #666;
+	transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
 .beplus-advanced-reviews__filter-star:hover {
-	border-color: #f4a261;
+	border-color: #21652F;
+	color: #21652F;
 }
 
 .beplus-advanced-reviews__filter-star--active {
-	background: #f4a261;
-	border-color: #f4a261;
+	background: #21652F;
+	border-color: #21652F;
 	color: #fff;
 }
 
 .beplus-advanced-reviews__filter-star:focus-visible {
-	outline: 2px solid #2271b1;
+	outline: 2px solid #21652F;
 	outline-offset: 2px;
 }
 
@@ -54,27 +56,34 @@
 .beplus-advanced-reviews__filter-toggle {
 	display: flex;
 	align-items: center;
-	gap: 0.25rem;
-	font-size: 0.875rem;
+	gap: 4px;
+	font-size: 13px;
 	cursor: pointer;
+	color: #666;
+}
+
+.beplus-advanced-reviews__filter-toggle:hover {
+	color: #21652F;
 }
 
 .beplus-advanced-reviews__filter-sort {
 	display: flex;
 	align-items: center;
-	gap: 0.25rem;
+	gap: 6px;
 	margin-left: auto;
 }
 
 .beplus-advanced-reviews__sort-select {
-	padding: 4px 8px;
-	border: 1px solid #ddd;
-	border-radius: 4px;
-	font-size: 0.875rem;
+	padding: 5px 10px;
+	border: 1px solid #E2EBE4;
+	border-radius: 6px;
+	font-size: 13px;
 	background: #fff;
+	color: #666;
+	cursor: pointer;
 }
 
 .beplus-advanced-reviews__sort-select:focus-visible {
-	outline: 2px solid #2271b1;
+	outline: 2px solid #21652F;
 	outline-offset: 2px;
 }

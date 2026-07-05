@@ -10,7 +10,7 @@
         "chrome-devtools-mcp@latest",
         "--autoConnect"
       ],
-      "enabled": false
+      "enabled": true
     }
   }
 }

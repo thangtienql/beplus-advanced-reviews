@@ -26,15 +26,17 @@ if ( ! $data['total'] ) {
 <div class="beplus-advanced-reviews__distribution-header">
 	<div class="beplus-advanced-reviews__average">
 		<span class="beplus-advanced-reviews__average-value"><?php echo esc_html( number_format_i18n( (float) $data['average'], 1 ) ); ?></span>
-		<span class="beplus-advanced-reviews__average-stars">
-			<?php echo beplus_advanced_reviews_render_stars( (int) round( $data['average'] ), 1.2 ); // phpcs:ignore ?>
-		</span>
-		<span class="beplus-advanced-reviews__total">
-			<?php
-			/* translators: %d: number of reviews */
-			printf( esc_html( _n( '%d review', '%d reviews', (int) $data['total'], 'beplus-advanced-reviews' ) ), (int) $data['total'] );
-			?>
-		</span>
+		<div>
+			<span class="beplus-advanced-reviews__average-stars">
+				<?php echo beplus_advanced_reviews_render_stars( (int) round( $data['average'] ), 1 ); // phpcs:ignore ?>
+			</span>
+			<span class="beplus-advanced-reviews__total">
+				<?php
+				/* translators: %d: number of reviews */
+				printf( esc_html( _n( '%d review', '%d reviews', (int) $data['total'], 'beplus-advanced-reviews' ) ), (int) $data['total'] );
+				?>
+			</span>
+		</div>
 	</div>
 	<div class="beplus-advanced-reviews__distribution-bars">
 		<?php for ( $s = 5; $s >= 1; $s-- ) : ?>
@@ -43,7 +45,7 @@ if ( ! $data['total'] ) {
 			$percent = $data['total'] > 0 ? ( $count / $data['total'] * 100 ) : 0;
 			?>
 			<div class="beplus-advanced-reviews__distribution-bar-row">
-				<span class="beplus-advanced-reviews__distribution-bar-label"><?php echo esc_html( (string) $s ); ?> ★</span>
+				<span class="beplus-advanced-reviews__distribution-bar-label"><?php echo esc_html( (string) $s ); ?>★</span>
 				<div class="beplus-advanced-reviews__distribution-bar-track">
 					<div
 						class="beplus-advanced-reviews__distribution-bar-fill"

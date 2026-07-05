@@ -116,7 +116,11 @@
 
 				if ( block.dataset.showAvatar !== '0' ) {
 					html += '<div class="beplus-advanced-reviews__review-avatar">';
-					html += '<img src="' + escAttr( review.avatar ) + '" alt="' + escAttr( review.author ) + '" width="48" height="48" loading="lazy">';
+					if ( review.avatar ) {
+						html += '<img src="' + escAttr( review.avatar ) + '" alt="' + escAttr( review.author ) + '" width="40" height="40" loading="lazy">';
+					} else {
+						html += '<div class="beplus-advanced-reviews__review-avatar--fallback">' + escHtml( ( review.author || '' ).charAt(0).toUpperCase() ) + '</div>';
+					}
 					html += '</div>';
 				}
 
@@ -631,19 +635,17 @@
 		var html = '<article class="beplus-advanced-reviews__review-card">';
 		if ( block.dataset.showAvatar !== '0' ) {
 			html += '<div class="beplus-advanced-reviews__review-avatar">';
-			html += '<img src="' + escAttr( review.avatar ) + '" alt="' + escAttr( review.author ) + '" width="48" height="48" loading="lazy">';
+			if ( review.avatar ) {
+				html += '<img src="' + escAttr( review.avatar ) + '" alt="' + escAttr( review.author ) + '" width="40" height="40" loading="lazy">';
+			} else {
+				html += '<div class="beplus-advanced-reviews__review-avatar--fallback">' + escHtml( ( review.author || '' ).charAt(0).toUpperCase() ) + '</div>';
+			}
 			html += '</div>';
 		}
 		html += '<div class="beplus-advanced-reviews__review-body">';
 		html += '<div class="beplus-advanced-reviews__review-header">';
 		html += '<span class="beplus-advanced-reviews__review-author">' + escHtml( review.author ) + '</span>';
-
-		var stars = '';
-		for ( var i = 1; i <= 5; i++ ) {
-			var filled = i <= review.rating ? ' beplus-advanced-reviews__star--filled' : ' beplus-advanced-reviews__star--empty';
-			stars += '<span class="beplus-advanced-reviews__star' + filled + '" aria-hidden="true" style="font-size:1em;">&#9733;</span>';
-		}
-		html += '<span class="beplus-advanced-reviews__review-rating">' + stars + '</span>';
+		html += '<span class="beplus-advanced-reviews__review-rating">' + renderStars( review.rating ) + '</span>';
 		html += '</div>';
 		html += '<div class="beplus-advanced-reviews__review-content">' + review.content + '</div>';
 

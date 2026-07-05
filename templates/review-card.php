@@ -9,20 +9,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$review     = $args['review'] ?? array();
-$show_avatar = ! empty( $args['show_avatar'] );
-$show_images = ! empty( $args['show_images'] );
-$rating      = (int) ( $review['rating'] ?? 0 );
-$author      = esc_html( $review['author'] ?? '' );
-$content     = wp_kses_post( $review['content'] ?? '' );
-$date_human  = esc_html( $review['date_human'] ?? '' );
-$avatar      = esc_url( $review['avatar'] ?? '' );
-$images      = $review['images'] ?? array();
+$review       = $args['review'] ?? array();
+$show_avatar   = ! empty( $args['show_avatar'] );
+$show_images   = ! empty( $args['show_images'] );
+$rating        = (int) ( $review['rating'] ?? 0 );
+$author        = esc_html( $review['author'] ?? '' );
+$author_init   = mb_substr( $author, 0, 1 );
+$content       = wp_kses_post( $review['content'] ?? '' );
+$date_human    = esc_html( $review['date_human'] ?? '' );
+$avatar        = esc_url( $review['avatar'] ?? '' );
+$images        = $review['images'] ?? array();
 ?>
 <article class="beplus-advanced-reviews__review-card">
-	<?php if ( $show_avatar && $avatar ) : ?>
+	<?php if ( $show_avatar ) : ?>
 		<div class="beplus-advanced-reviews__review-avatar">
-			<img src="<?php echo $avatar; // phpcs:ignore ?>" alt="<?php echo $author; // phpcs:ignore ?>" width="48" height="48" loading="lazy">
+			<?php if ( $avatar ) : ?>
+				<img src="<?php echo $avatar; // phpcs:ignore ?>" alt="<?php echo $author; // phpcs:ignore ?>" width="40" height="40" loading="lazy">
+			<?php else : ?>
+				<div class="beplus-advanced-reviews__review-avatar--fallback"><?php echo esc_html( $author_init ); ?></div>
+			<?php endif; ?>
 		</div>
 	<?php endif; ?>
 	<div class="beplus-advanced-reviews__review-body">

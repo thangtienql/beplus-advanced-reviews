@@ -1,27 +1,28 @@
-/* Submit Form component styles */
+/* Submit Form component styles — TrustShop-inspired */
 .beplus-advanced-reviews__submit-form-wrapper {
-	margin-top: 2rem;
-	padding-top: 2rem;
-	border-top: 2px solid #eee;
+	margin-top: 32px;
+	padding-top: 32px;
+	border-top: 1px solid #E2EBE4;
 }
 
 .beplus-advanced-reviews__submit-form-title {
-	font-size: 1.25rem;
+	font-size: 20px;
 	font-weight: 700;
-	margin-bottom: 1rem;
+	margin-bottom: 16px;
+	color: #101010;
 }
 
 .beplus-advanced-reviews__submit-form {
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
+	gap: 14px;
 }
 
 .beplus-advanced-reviews__star-rating {
 	display: flex;
 	flex-direction: row-reverse;
 	justify-content: flex-end;
-	gap: 2px;
+	gap: 4px;
 }
 
 .beplus-advanced-reviews__star-input {
@@ -34,8 +35,8 @@
 }
 
 .beplus-advanced-reviews__star-label {
-	font-size: 1.5em;
-	color: #ddd;
+	font-size: 1.8em;
+	color: #ccc;
 	cursor: pointer;
 	transition: color 0.2s;
 }
@@ -43,11 +44,11 @@
 .beplus-advanced-reviews__star-label:hover,
 .beplus-advanced-reviews__star-label:hover ~ .beplus-advanced-reviews__star-label,
 .beplus-advanced-reviews__star-label--active {
-	color: #f4a261;
+	color: #21652F;
 }
 
 .beplus-advanced-reviews__star-input:focus-visible + .beplus-advanced-reviews__star-label {
-	outline: 2px solid #2271b1;
+	outline: 2px solid #21652F;
 	outline-offset: 2px;
 	border-radius: 2px;
 }
@@ -55,58 +56,61 @@
 .beplus-advanced-reviews__submit-form textarea {
 	width: 100%;
 	min-height: 100px;
-	padding: 0.75rem;
-	border: 1px solid #ddd;
-	border-radius: 4px;
+	padding: 12px;
+	border: 1px solid #E2EBE4;
+	border-radius: 8px;
 	font-family: inherit;
-	font-size: 1rem;
+	font-size: 14px;
 	resize: vertical;
+	background: #fff;
 }
 
 .beplus-advanced-reviews__submit-form textarea:focus {
-	border-color: #2271b1;
+	border-color: #21652F;
 	outline: none;
-	box-shadow: 0 0 0 1px #2271b1;
+	box-shadow: 0 0 0 1px #21652F;
 }
 
 .beplus-advanced-reviews__submit-form input[type="text"],
 .beplus-advanced-reviews__submit-form input[type="email"] {
 	width: 100%;
-	padding: 0.5rem 0.75rem;
-	border: 1px solid #ddd;
-	border-radius: 4px;
+	padding: 10px 12px;
+	border: 1px solid #E2EBE4;
+	border-radius: 8px;
 	font-family: inherit;
-	font-size: 1rem;
+	font-size: 14px;
+	background: #fff;
 }
 
 .beplus-advanced-reviews__submit-form input[type="text"]:focus,
 .beplus-advanced-reviews__submit-form input[type="email"]:focus {
-	border-color: #2271b1;
+	border-color: #21652F;
 	outline: none;
-	box-shadow: 0 0 0 1px #2271b1;
+	box-shadow: 0 0 0 1px #21652F;
 }
 
 .beplus-advanced-reviews__file-upload {
 	display: flex;
 	flex-direction: column;
-	gap: 0.25rem;
+	gap: 4px;
 }
 
 .beplus-advanced-reviews__file-label {
-	font-size: 0.875rem;
+	font-size: 13px;
+	font-weight: 500;
 	color: #666;
 }
 
 .beplus-advanced-reviews__file-hint {
-	font-size: 0.75rem;
-	color: #888;
+	font-size: 12px;
+	color: #999;
 	margin: 0;
 }
 
 .beplus-advanced-reviews__paste-area {
-	padding: 1rem;
-	border: 2px dashed #ddd;
-	border-radius: 4px;
+	padding: 16px;
+	border: 2px dashed #E2EBE4;
+	border-radius: 8px;
 	text-align: center;
 	cursor: pointer;
 	transition: border-color 0.2s;
@@ -114,55 +118,56 @@
 
 .beplus-advanced-reviews__paste-area:hover,
 .beplus-advanced-reviews__paste-area:focus-within {
-	border-color: #2271b1;
+	border-color: #21652F;
 }
 
 .beplus-advanced-reviews__paste-area p {
 	margin: 0;
-	font-size: 0.875rem;
-	color: #888;
+	font-size: 14px;
+	color: #666;
 }
 
 .beplus-advanced-reviews__paste-preview {
-	margin-top: 0.5rem;
+	margin-top: 8px;
 }
 
 .beplus-advanced-reviews__paste-preview img {
-	border-radius: 4px;
+	border-radius: 8px;
 	object-fit: cover;
 }
 
 .beplus-advanced-reviews__submit-btn {
 	align-self: flex-start;
-	padding: 10px 24px;
-	border: none;
-	border-radius: 4px;
-	background: #2271b1;
+	padding: 10px 28px;
+	border: 1px solid #21652F;
+	border-radius: 8px;
+	background: #21652F;
 	color: #fff;
 	cursor: pointer;
-	font-size: 0.9rem;
-	transition: background 0.2s;
+	font-size: 14px;
+	font-weight: 500;
+	transition: opacity 0.2s;
 }
 
 .beplus-advanced-reviews__submit-btn:hover {
-	background: #135e96;
+	opacity: 0.9;
 }
 
 .beplus-advanced-reviews__submit-btn:focus-visible {
-	outline: 2px solid #2271b1;
+	outline: 2px solid #21652F;
 	outline-offset: 2px;
 }
 
 .beplus-advanced-reviews__submit-btn:disabled {
-	opacity: 0.6;
+	opacity: 0.5;
 	cursor: not-allowed;
 }
 
 .beplus-advanced-reviews__form-message {
-	padding: 0.75rem 1rem;
-	border-radius: 4px;
-	margin-bottom: 1rem;
-	font-size: 0.9rem;
+	padding: 12px 16px;
+	border-radius: 8px;
+	margin-bottom: 14px;
+	font-size: 14px;
 }
 
 .beplus-advanced-reviews__form-message--success {
