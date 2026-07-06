@@ -64,8 +64,9 @@
 		function loadDistribution() {
 			const url = new URL( bparData.restUrl + 'reviews/distribution' );
 			url.searchParams.set( 'product_id', productId );
+			url.searchParams.set( '_t', Date.now() );
 
-			fetch( url.toString(), { cache: 'no-cache' } )
+			fetch( url.toString(), { cache: 'no-store' } )
 				.then( function ( res ) { return res.json(); } )
 				.then( function ( data ) {
 					if ( distributionArea ) {
@@ -94,7 +95,9 @@
 				url.searchParams.set( 'has_images', '1' );
 			}
 
-			return fetch( url.toString(), { cache: 'no-cache' } )
+			url.searchParams.set( '_t', Date.now() );
+
+			return fetch( url.toString(), { cache: 'no-store' } )
 				.then( function ( res ) { return res.json(); } )
 				.catch( function () { return null; } );
 		}
@@ -132,14 +135,19 @@
 				html += '<div class="beplus-advanced-reviews__review-content">' + review.content + '</div>';
 
 				if ( block.dataset.showImages !== '0' && review.has_images && review.images.length ) {
-					html += '<div class="beplus-advanced-reviews__review-images">';
-					review.images.forEach( function ( img ) {
+					var mediaData = review.images.map( function ( m ) {
+						return { url: m.url, thumbnail: m.thumbnail || m.url, mime_type: m.mime_type || '' };
+					} );
+					html += '<div class="beplus-advanced-reviews__review-images" data-review-media="' + escAttr( JSON.stringify( mediaData ) ) + '">';
+					review.images.forEach( function ( img, idx ) {
 						if ( img.mime_type && img.mime_type.indexOf( 'video/' ) === 0 ) {
-							html += '<video src="' + escAttr( img.url ) + '" controls width="320" class="beplus-advanced-reviews__review-video"></video>';
+							html += '<button type="button" class="beplus-advanced-reviews__review-media-btn beplus-advanced-reviews__review-media-btn--video" data-media-index="' + idx + '" data-media-type="video" aria-label="' + escAttr( bparData.i18n.viewMedia || 'View media' ) + '">';
+							html += '<video src="' + escAttr( img.url ) + '" width="320" class="beplus-advanced-reviews__review-video" muted preload="metadata"></video>';
+							html += '</button>';
 						} else {
-							html += '<a href="' + escAttr( img.url ) + '" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">';
+							html += '<button type="button" class="beplus-advanced-reviews__review-media-btn" data-media-index="' + idx + '" data-media-type="image" aria-label="' + escAttr( bparData.i18n.viewMedia || 'View media' ) + '">';
 							html += '<img src="' + escAttr( img.thumbnail ) + '" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">';
-							html += '</a>';
+							html += '</button>';
 						}
 					} );
 					html += '</div>';
@@ -257,6 +265,7 @@
 		initReviewForm( block );
 		initMediaUpload( block );
 		initPasteSupport( block );
+		initLightbox( block );
 	}
 
 	/**
@@ -539,7 +548,8 @@
 						if ( productId ) {
 							var distUrl = new URL( bparData.restUrl + 'reviews/distribution' );
 							distUrl.searchParams.set( 'product_id', productId );
-							fetch( distUrl.toString(), { cache: 'no-cache' } )
+							distUrl.searchParams.set( '_t', Date.now() );
+							fetch( distUrl.toString(), { cache: 'no-store' } )
 								.then( function ( res ) { return res.json(); } )
 								.then( function ( data ) {
 									var distArea = block.querySelector( '.beplus-advanced-reviews__distribution' );
@@ -657,14 +667,19 @@
 		html += '<div class="beplus-advanced-reviews__review-content">' + review.content + '</div>';
 
 		if ( block.dataset.showImages !== '0' && review.has_images && review.images.length ) {
-			html += '<div class="beplus-advanced-reviews__review-images">';
-			review.images.forEach( function ( img ) {
+			var mediaData = review.images.map( function ( m ) {
+				return { url: m.url, thumbnail: m.thumbnail || m.url, mime_type: m.mime_type || '' };
+			} );
+			html += '<div class="beplus-advanced-reviews__review-images" data-review-media="' + escAttr( JSON.stringify( mediaData ) ) + '">';
+			review.images.forEach( function ( img, idx ) {
 				if ( img.mime_type && img.mime_type.indexOf( 'video/' ) === 0 ) {
-					html += '<video src="' + escAttr( img.url ) + '" controls width="320" class="beplus-advanced-reviews__review-video"></video>';
+					html += '<button type="button" class="beplus-advanced-reviews__review-media-btn beplus-advanced-reviews__review-media-btn--video" data-media-index="' + idx + '" data-media-type="video" aria-label="' + escAttr( bparData.i18n.viewMedia || 'View media' ) + '">';
+					html += '<video src="' + escAttr( img.url ) + '" width="320" class="beplus-advanced-reviews__review-video" muted preload="metadata"></video>';
+					html += '</button>';
 				} else {
-					html += '<a href="' + escAttr( img.url ) + '" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">';
+					html += '<button type="button" class="beplus-advanced-reviews__review-media-btn" data-media-index="' + idx + '" data-media-type="image" aria-label="' + escAttr( bparData.i18n.viewMedia || 'View media' ) + '">';
 					html += '<img src="' + escAttr( img.thumbnail ) + '" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">';
-					html += '</a>';
+					html += '</button>';
 				}
 			} );
 			html += '</div>';
@@ -745,6 +760,277 @@
 			} );
 
 			previewContainer.appendChild( item );
+		}
+	}
+
+	/**
+	 * Initialize lightbox for review media (images + videos).
+	 * Uses event delegation for performance, supports prev/next nav,
+	 * keyboard (Esc/arrows), focus trap, counter display.
+	 *
+	 * @param {HTMLElement} block The block container element.
+	 */
+	function initLightbox( block ) {
+		var listContainer = block.querySelector( '.beplus-advanced-reviews__list' );
+		if ( ! listContainer ) return;
+
+		var lightbox = null;
+		var currentMedia = [];
+		var currentIndex = 0;
+		var lastFocusedEl = null;
+		var currentVideoEl = null;
+
+		var LIGHTBOX_ID = 'bpar-lightbox';
+
+		listContainer.addEventListener( 'click', function ( e ) {
+			var mediaBtn = e.target.closest( '.beplus-advanced-reviews__review-media-btn' );
+			if ( ! mediaBtn ) return;
+
+			e.preventDefault();
+
+			var imagesContainer = mediaBtn.closest( '.beplus-advanced-reviews__review-images' );
+			if ( ! imagesContainer ) return;
+
+			var rawMedia = imagesContainer.getAttribute( 'data-review-media' );
+			if ( ! rawMedia ) return;
+
+			try {
+				currentMedia = JSON.parse( rawMedia );
+			} catch ( err ) {
+				return;
+			}
+
+			if ( ! currentMedia.length ) return;
+
+			currentIndex = parseInt( mediaBtn.getAttribute( 'data-media-index' ), 10 ) || 0;
+			if ( currentIndex < 0 ) currentIndex = 0;
+			if ( currentIndex >= currentMedia.length ) currentIndex = currentMedia.length - 1;
+
+			lastFocusedEl = mediaBtn;
+			openLightbox();
+		} );
+
+		function openLightbox() {
+			if ( lightbox ) return;
+
+			lightbox = document.createElement( 'div' );
+			lightbox.id = LIGHTBOX_ID;
+			lightbox.className = 'beplus-advanced-reviews__lightbox';
+			lightbox.setAttribute( 'role', 'dialog' );
+			lightbox.setAttribute( 'aria-modal', 'true' );
+			lightbox.setAttribute( 'aria-label', 'Media viewer' );
+
+			var overlay = document.createElement( 'div' );
+			overlay.className = 'beplus-advanced-reviews__lightbox-overlay';
+
+			var closeBtn = document.createElement( 'button' );
+			closeBtn.type = 'button';
+			closeBtn.className = 'beplus-advanced-reviews__lightbox-close';
+			closeBtn.setAttribute( 'aria-label', 'Close' );
+			closeBtn.innerHTML = '&#10005;';
+			closeBtn.addEventListener( 'click', closeLightbox );
+
+			var content = document.createElement( 'div' );
+			content.className = 'beplus-advanced-reviews__lightbox-content';
+
+			var prevBtn = null;
+			var nextBtn = null;
+
+			if ( currentMedia.length > 1 ) {
+				prevBtn = document.createElement( 'button' );
+				prevBtn.type = 'button';
+				prevBtn.className = 'beplus-advanced-reviews__lightbox-nav beplus-advanced-reviews__lightbox-prev';
+				prevBtn.setAttribute( 'aria-label', 'Previous' );
+				prevBtn.innerHTML = '&#8249;';
+				prevBtn.addEventListener( 'click', function () { navigate( -1 ); } );
+
+				nextBtn = document.createElement( 'button' );
+				nextBtn.type = 'button';
+				nextBtn.className = 'beplus-advanced-reviews__lightbox-nav beplus-advanced-reviews__lightbox-next';
+				nextBtn.setAttribute( 'aria-label', 'Next' );
+				nextBtn.innerHTML = '&#8250;';
+				nextBtn.addEventListener( 'click', function () { navigate( 1 ); } );
+			}
+
+			var counter = document.createElement( 'div' );
+			counter.className = 'beplus-advanced-reviews__lightbox-counter';
+			counter.setAttribute( 'aria-live', 'polite' );
+
+			lightbox.appendChild( overlay );
+			lightbox.appendChild( closeBtn );
+			lightbox.appendChild( content );
+			if ( prevBtn ) lightbox.appendChild( prevBtn );
+			if ( nextBtn ) lightbox.appendChild( nextBtn );
+			lightbox.appendChild( counter );
+
+			document.body.appendChild( lightbox );
+
+			overlay.addEventListener( 'click', closeLightbox );
+
+			document.addEventListener( 'keydown', onKeyDown );
+			document.body.style.overflow = 'hidden';
+
+			requestAnimationFrame( function () {
+				lightbox.classList.add( 'beplus-advanced-reviews__lightbox--open' );
+			} );
+
+			renderCurrentMedia();
+			trapFocus();
+		}
+
+		function closeLightbox() {
+			if ( ! lightbox ) return;
+
+			destroyVideo();
+
+			document.removeEventListener( 'keydown', onKeyDown );
+			document.body.style.overflow = '';
+
+			lightbox.classList.remove( 'beplus-advanced-reviews__lightbox--open' );
+
+			var onTransitionEnd = function () {
+				if ( lightbox && lightbox.parentNode ) {
+					lightbox.parentNode.removeChild( lightbox );
+				}
+				lightbox = null;
+				currentMedia = [];
+				currentIndex = 0;
+				currentVideoEl = null;
+
+				if ( lastFocusedEl ) {
+					lastFocusedEl.focus();
+					lastFocusedEl = null;
+				}
+			};
+
+			if ( window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
+				onTransitionEnd();
+			} else {
+				lightbox.addEventListener( 'transitionend', onTransitionEnd, { once: true } );
+				setTimeout( onTransitionEnd, 350 );
+			}
+		}
+
+		function renderCurrentMedia() {
+			if ( ! lightbox ) return;
+
+			var content = lightbox.querySelector( '.beplus-advanced-reviews__lightbox-content' );
+			var counter = lightbox.querySelector( '.beplus-advanced-reviews__lightbox-counter' );
+			if ( ! content ) return;
+
+			destroyVideo();
+
+			var media = currentMedia[ currentIndex ];
+			if ( ! media ) return;
+
+			var isVideo = media.mime_type && media.mime_type.indexOf( 'video/' ) === 0;
+
+			content.innerHTML = '';
+
+			if ( isVideo ) {
+				var video = document.createElement( 'video' );
+				video.src = media.url;
+				video.className = 'beplus-advanced-reviews__lightbox-media beplus-advanced-reviews__lightbox-media--video';
+				video.controls = true;
+				video.setAttribute( 'playsinline', '' );
+				video.style.width = 'min( 90vw, 1280px )';
+				video.style.height = 'auto';
+				content.appendChild( video );
+				currentVideoEl = video;
+			} else {
+				var img = document.createElement( 'img' );
+				img.src = media.url;
+				img.className = 'beplus-advanced-reviews__lightbox-media';
+				img.alt = '';
+				content.appendChild( img );
+			}
+
+			if ( counter ) {
+				counter.textContent = ( currentIndex + 1 ) + ' / ' + currentMedia.length;
+			}
+
+			updateNavVisibility();
+		}
+
+		function navigate( direction ) {
+			if ( ! lightbox || ! currentMedia.length ) return;
+
+			var newIndex = currentIndex + direction;
+			if ( newIndex < 0 || newIndex >= currentMedia.length ) return;
+
+			currentIndex = newIndex;
+			renderCurrentMedia();
+		}
+
+		function updateNavVisibility() {
+			var prevBtn = lightbox.querySelector( '.beplus-advanced-reviews__lightbox-prev' );
+			var nextBtn = lightbox.querySelector( '.beplus-advanced-reviews__lightbox-next' );
+
+			if ( prevBtn ) {
+				prevBtn.style.visibility = currentIndex > 0 ? '' : 'hidden';
+			}
+			if ( nextBtn ) {
+				nextBtn.style.visibility = currentIndex < currentMedia.length - 1 ? '' : 'hidden';
+			}
+		}
+
+		function destroyVideo() {
+			if ( currentVideoEl ) {
+				currentVideoEl.pause();
+				currentVideoEl.removeAttribute( 'src' );
+				currentVideoEl.load();
+				currentVideoEl = null;
+			}
+		}
+
+		function onKeyDown( e ) {
+			if ( e.key === 'Escape' || e.key === 'Esc' ) {
+				e.preventDefault();
+				closeLightbox();
+				return;
+			}
+
+			if ( e.key === 'ArrowLeft' ) {
+				e.preventDefault();
+				navigate( -1 );
+				return;
+			}
+
+			if ( e.key === 'ArrowRight' ) {
+				e.preventDefault();
+				navigate( 1 );
+				return;
+			}
+
+			if ( e.key === 'Tab' ) {
+				trapFocus( e );
+			}
+		}
+
+		function trapFocus( e ) {
+			if ( ! lightbox ) return;
+
+			var focusable = lightbox.querySelectorAll(
+				'button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+			);
+
+			if ( ! focusable.length ) return;
+
+			var first = focusable[ 0 ];
+			var last = focusable[ focusable.length - 1 ];
+
+			if ( e ) {
+				if ( e.shiftKey && document.activeElement === first ) {
+					e.preventDefault();
+					last.focus();
+				} else if ( ! e.shiftKey && document.activeElement === last ) {
+					e.preventDefault();
+					first.focus();
+				}
+				return;
+			}
+
+			first.focus();
 		}
 	}
 

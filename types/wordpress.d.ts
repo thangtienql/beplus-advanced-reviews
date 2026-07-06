@@ -4,6 +4,7 @@ declare module '@wordpress/blocks' {
 
 declare module '@wordpress/block-editor' {
 	export const InspectorControls: React.ComponentType< { children?: React.ReactNode } >;
+	export function useBlockProps( props?: Record< string, unknown > ): Record< string, unknown >;
 }
 
 declare module '@wordpress/components' {

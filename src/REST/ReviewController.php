@@ -138,11 +138,12 @@ class ReviewController extends \WP_REST_Controller {
 		);
 
 		$response = rest_ensure_response( $response );
-		$response->header( 'Cache-Control', 'no-cache, must-revalidate, max-age=0' );
-		$response->header( 'Pragma', 'no-cache' );
+			$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0' );
+			$response->header( 'Pragma', 'no-cache' );
+			$response->header( 'Expires', 'Thu, 01 Jan 1970 00:00:00 GMT' );
 
-		return $response;
-	}
+			return $response;
+		}
 
 	/**
 	 * Create a new review.
@@ -246,8 +247,9 @@ class ReviewController extends \WP_REST_Controller {
 		$data       = $this->repository->get_star_distribution( $product_id );
 
 		$response = rest_ensure_response( $data );
-		$response->header( 'Cache-Control', 'no-cache, must-revalidate, max-age=0' );
+		$response->header( 'Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0' );
 		$response->header( 'Pragma', 'no-cache' );
+		$response->header( 'Expires', 'Thu, 01 Jan 1970 00:00:00 GMT' );
 
 		return $response;
 	}

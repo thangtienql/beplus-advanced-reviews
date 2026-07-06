@@ -39,15 +39,31 @@ $images        = $review['images'] ?? array();
 		</div>
 		<div class="beplus-advanced-reviews__review-content"><?php echo $content; // phpcs:ignore ?></div>
 		<?php if ( $show_images && $images ) : ?>
-			<div class="beplus-advanced-reviews__review-images">
-				<?php foreach ( $images as $media ) : ?>
+			<?php
+			$media_json = wp_json_encode(
+				array_map(
+					function ( $m ) {
+						return array(
+							'url'       => $m['url'] ?? '',
+							'thumbnail' => $m['thumbnail'] ?? $m['url'] ?? '',
+							'mime_type' => $m['mime_type'] ?? '',
+						);
+					},
+					$images
+				)
+			);
+			?>
+			<div class="beplus-advanced-reviews__review-images" data-review-media="<?php echo esc_attr( $media_json ); ?>">
+				<?php foreach ( $images as $idx => $media ) : ?>
 					<?php $is_video = ! empty( $media['mime_type'] ) && str_starts_with( $media['mime_type'], 'video/' ); ?>
 					<?php if ( $is_video ) : ?>
-						<video src="<?php echo esc_url( $media['url'] ?? '' ); ?>" controls width="320" class="beplus-advanced-reviews__review-video"></video>
+						<button type="button" class="beplus-advanced-reviews__review-media-btn beplus-advanced-reviews__review-media-btn--video" data-media-index="<?php echo esc_attr( (string) $idx ); ?>" data-media-type="video" aria-label="<?php esc_attr_e( 'View media', 'beplus-advanced-reviews' ); ?>">
+							<video src="<?php echo esc_url( $media['url'] ?? '' ); ?>" width="320" class="beplus-advanced-reviews__review-video" muted preload="metadata"></video>
+						</button>
 					<?php else : ?>
-						<a href="<?php echo esc_url( $media['url'] ?? '' ); ?>" class="beplus-advanced-reviews__review-image-link" target="_blank" rel="noopener">
+						<button type="button" class="beplus-advanced-reviews__review-media-btn" data-media-index="<?php echo esc_attr( (string) $idx ); ?>" data-media-type="image" aria-label="<?php esc_attr_e( 'View media', 'beplus-advanced-reviews' ); ?>">
 							<img src="<?php echo esc_url( $media['thumbnail'] ?? '' ); ?>" alt="" width="80" height="80" loading="lazy" class="beplus-advanced-reviews__review-image-thumb">
-						</a>
+						</button>
 					<?php endif; ?>
 				<?php endforeach; ?>
 			</div>
