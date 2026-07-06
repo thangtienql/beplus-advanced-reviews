@@ -5,7 +5,7 @@
  */
 
 import { registerBlockType } from '@wordpress/blocks';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	ToggleControl,
@@ -26,6 +26,10 @@ registerBlockType( blockJson.name, {
 			reviewsPerLoad,
 			enableLazyLoad,
 		} = attributes;
+
+		const blockProps = useBlockProps( {
+			className: 'beplus-advanced-reviews beplus-advanced-reviews--editor-preview',
+		} );
 
 		return (
 			<>
@@ -70,7 +74,7 @@ registerBlockType( blockJson.name, {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<div className="beplus-advanced-reviews beplus-advanced-reviews--editor-preview">
+				<div { ...blockProps }>
 					<div className="beplus-advanced-reviews__editor-placeholder">
 						<span className="dashicons dashicons-star-filled"></span>
 						<h3>{ __( 'Advanced Reviews', 'beplus-advanced-reviews' ) }</h3>

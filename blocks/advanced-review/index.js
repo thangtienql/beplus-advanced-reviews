@@ -8,6 +8,7 @@
 ( function ( wp ) {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var InspectorControls = wp.blockEditor.InspectorControls;
+	var useBlockProps = wp.blockEditor.useBlockProps;
 	var PanelBody = wp.components.PanelBody;
 	var ToggleControl = wp.components.ToggleControl;
 	var RangeControl = wp.components.RangeControl;
@@ -43,6 +44,9 @@
 		edit: function ( props ) {
 			var attributes = props.attributes;
 			var setAttributes = props.setAttributes;
+			var blockProps = useBlockProps( {
+				className: 'beplus-advanced-reviews beplus-advanced-reviews--editor-preview'
+			} );
 
 			return el(
 				wp.element.Fragment,
@@ -92,7 +96,7 @@
 						} )
 					)
 				),
-				el( 'div', { className: 'beplus-advanced-reviews beplus-advanced-reviews--editor-preview' },
+				el( 'div', blockProps,
 					el( 'div', { className: 'beplus-advanced-reviews__editor-placeholder' },
 						el( 'span', { className: 'dashicons dashicons-star-filled' } ),
 						el( 'h3', null, __( 'Advanced Reviews', 'beplus-advanced-reviews' ) ),

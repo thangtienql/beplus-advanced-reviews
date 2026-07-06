@@ -29,6 +29,7 @@ $prefix: beplus-advanced-reviews;
 
 	&--ready {
 		min-height: auto;
+		max-width: 100%;
 
 		&::after {
 			display: none;
