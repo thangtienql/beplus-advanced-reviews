@@ -14,6 +14,8 @@ use BePlusAdvancedReviews\Blocks\BlockRegistry;
 use BePlusAdvancedReviews\REST\ReviewController;
 use BePlusAdvancedReviews\REST\SettingsController;
 use BePlusAdvancedReviews\Media\MediaHandler;
+use BePlusAdvancedReviews\Media\LocalMediaStorage;
+use BePlusAdvancedReviews\Media\MediaStorageInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -61,6 +63,10 @@ class Plugin {
 		$this->container->set( MediaHandler::class, function ( Container $c ) {
 			return new MediaHandler( $c );
 		} );
+
+		$this->container->set( MediaStorageInterface::class, function ( Container $c ) {
+			return new LocalMediaStorage();
+		} );
 	}
 
 	private function register_services_from_filter(): void {
@@ -75,6 +81,7 @@ class Plugin {
 			BlockRegistry::class,
 			AssetLoader::class,
 			Placement::class,
+			MediaHandler::class,
 		);
 
 		foreach ( $modules as $module_class ) {

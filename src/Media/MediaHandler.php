@@ -1,6 +1,9 @@
 <?php
 /**
- * MediaHandler — image upload, validation, paste support, and retrieval.
+ * MediaHandler — image/video upload, validation, paste support, retrieval, and deletion.
+ *
+ * Uses a swappable MediaStorageInterface backend (default: LocalMediaStorage).
+ * To switch to cloud storage, bind a different implementation in the container.
  *
  * @package BePlusAdvancedReviews
  * @subpackage Media
@@ -10,6 +13,7 @@ namespace BePlusAdvancedReviews\Media;
 
 use BePlusAdvancedReviews\Core\AbstractModule;
 use BePlusAdvancedReviews\Core\HookManager;
+use BePlusAdvancedReviews\Core\Container;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -17,14 +21,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class MediaHandler extends AbstractModule {
 
+	private MediaStorageInterface $storage;
+
+	public function __construct( Container $container, MediaStorageInterface $storage = null ) {
+		parent::__construct( $container );
+		$this->storage = $storage ?? new LocalMediaStorage();
+	}
+
 	public function register(): void {
 		add_action( 'wp_ajax_bpar_upload_media', array( $this, 'handle_ajax_upload' ) );
+
+		add_action( 'delete_comment', array( $this, 'delete_media_for_comment' ), 10, 1 );
+		add_action( 'wp_trash_comment', array( $this, 'delete_media_for_comment' ), 10, 1 );
 	}
 
 	/**
 	 * Handle file uploads from $_FILES.
 	 *
-	 * @param int   $comment_id Comment ID.
+	 * @param int                 $comment_id Comment ID.
 	 * @param array<string, mixed> $files      $_FILES array structure.
 	 * @return array<int, int> Attachment IDs.
 	 */
@@ -130,7 +144,7 @@ class MediaHandler extends AbstractModule {
 			return null;
 		}
 
-		$attachment_id = $this->insert_attachment( $comment_id, $file_array, $file_path );
+		$attachment_id = $this->store_attachment( $comment_id, $file_array, $file_path );
 		return $attachment_id;
 	}
 
@@ -157,21 +171,46 @@ class MediaHandler extends AbstractModule {
 		$media = array();
 		foreach ( $rows as $row ) {
 			$attachment_id = (int) $row->attachment_id;
-			$url           = wp_get_attachment_url( $attachment_id );
-			$thumbnail     = wp_get_attachment_image_url( $attachment_id, 'thumbnail' );
-			$mime_type     = get_post_mime_type( $attachment_id );
+			$url           = $this->storage->get_url( $attachment_id );
+			$thumbnail     = $this->storage->get_thumbnail_url( $attachment_id, 'thumbnail' );
+			$mime_type     = $this->storage->get_mime_type( $attachment_id );
 
 			if ( $url ) {
 				$media[] = array(
-					'id'         => $attachment_id,
-					'url'        => $url,
-					'thumbnail'  => $thumbnail ?: $url,
-					'mime_type'  => $mime_type ?: '',
+					'id'        => $attachment_id,
+					'url'       => $url,
+					'thumbnail' => $thumbnail ?: $url,
+					'mime_type' => $mime_type ?: '',
 				);
 			}
 		}
 
 		return $media;
+	}
+
+	/**
+	 * Delete all media attached to a comment.
+	 *
+	 * This is hooked into WordPress 'delete_comment' and 'wp_trash_comment'.
+	 * It removes both the storage files AND the bpar_review_media rows.
+	 *
+	 * @param int $comment_id Comment ID.
+	 * @return void
+	 */
+	public function delete_media_for_comment( int $comment_id ): void {
+		$attachment_ids = $this->get_attachment_ids_for_comment( $comment_id );
+
+		if ( empty( $attachment_ids ) ) {
+			return;
+		}
+
+		foreach ( $attachment_ids as $attachment_id ) {
+			$this->storage->delete( $attachment_id );
+
+			do_action( HookManager::MEDIA_DELETED, $comment_id, $attachment_id );
+		}
+
+		$this->remove_media_links( $comment_id );
 	}
 
 	/**
@@ -213,7 +252,7 @@ class MediaHandler extends AbstractModule {
 	/**
 	 * Process a single file upload and attach to review.
 	 *
-	 * @param int   $comment_id Comment ID.
+	 * @param int                 $comment_id Comment ID.
 	 * @param array<string, mixed> $file       Single file array.
 	 * @return int|null Attachment ID.
 	 */
@@ -269,47 +308,30 @@ class MediaHandler extends AbstractModule {
 			return null;
 		}
 
-		return $this->insert_attachment( $comment_id, $file, $result['file'] ?? '' );
+		return $this->store_attachment( $comment_id, $file, $result['file'] ?? '' );
 	}
 
 	/**
-	 * Insert a media attachment and link to the review.
+	 * Store an attachment via the storage backend and link it to the review.
 	 *
-	 * @param int    $comment_id Comment ID.
-	 * @param array<string, mixed>  $file       File data array.
-	 * @param string $file_path  Actual file path on disk.
+	 * @param int                 $comment_id Comment ID.
+	 * @param array<string, mixed> $file       File data array.
+	 * @param string              $file_path  Actual file path on disk.
 	 * @return int|null Attachment ID.
 	 */
-	private function insert_attachment( int $comment_id, array $file, string $file_path ): ?int {
+	private function store_attachment( int $comment_id, array $file, string $file_path ): ?int {
 		global $wpdb;
 
-		$filetype = wp_check_filetype( basename( $file_path ), null );
+		$result = $this->storage->store( $file_path, $file['name'] );
 
-		$attachment_id = wp_insert_attachment(
-			array(
-				'post_mime_type' => $filetype['type'],
-				'post_title'     => sanitize_file_name( $file['name'] ),
-				'post_content'   => '',
-				'post_status'    => 'inherit',
-			),
-			$file_path
-		);
-
-		if ( is_wp_error( $attachment_id ) || ! $attachment_id ) {
+		if ( is_wp_error( $result ) ) {
+			error_log( 'BePlus Advanced Reviews: Storage store() failed. comment_id=' . $comment_id . ' error=' . $result->get_error_message() );
 			return null;
 		}
 
-		if ( ! function_exists( 'wp_generate_attachment_metadata' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/image.php';
-		}
+		$attachment_id = (int) $result;
 
-		$mime_type = $filetype['type'] ?? '';
-		if ( str_starts_with( $mime_type, 'image/' ) ) {
-			ob_start();
-			$metadata = wp_generate_attachment_metadata( $attachment_id, $file_path );
-			wp_update_attachment_metadata( $attachment_id, $metadata );
-			ob_end_clean();
-		}
+		$this->storage->generate_metadata( $attachment_id, $file_path );
 
 		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'bpar_review_media',
@@ -329,6 +351,50 @@ class MediaHandler extends AbstractModule {
 		do_action( HookManager::MEDIA_UPLOADED, $comment_id, $attachment_id );
 
 		return $attachment_id;
+	}
+
+	/**
+	 * Get all attachment IDs linked to a comment.
+	 *
+	 * @param int $comment_id Comment ID.
+	 * @return array<int, int>
+	 */
+	private function get_attachment_ids_for_comment( int $comment_id ): array {
+		global $wpdb;
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT attachment_id FROM {$wpdb->prefix}bpar_review_media WHERE comment_id = %d",
+				$comment_id
+			)
+		);
+
+		if ( empty( $rows ) ) {
+			return array();
+		}
+
+		return array_map(
+			function ( $row ) {
+				return (int) $row->attachment_id;
+			},
+			$rows
+		);
+	}
+
+	/**
+	 * Remove all bpar_review_media links for a comment.
+	 *
+	 * @param int $comment_id Comment ID.
+	 * @return void
+	 */
+	private function remove_media_links( int $comment_id ): void {
+		global $wpdb;
+
+		$wpdb->delete(
+			$wpdb->prefix . 'bpar_review_media',
+			array( 'comment_id' => $comment_id ),
+			array( '%d' )
+		);
 	}
 
 	/**

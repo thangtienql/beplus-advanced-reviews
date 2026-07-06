@@ -65,7 +65,7 @@
 			const url = new URL( bparData.restUrl + 'reviews/distribution' );
 			url.searchParams.set( 'product_id', productId );
 
-			fetch( url.toString() )
+			fetch( url.toString(), { cache: 'no-cache' } )
 				.then( function ( res ) { return res.json(); } )
 				.then( function ( data ) {
 					if ( distributionArea ) {
@@ -94,7 +94,7 @@
 				url.searchParams.set( 'has_images', '1' );
 			}
 
-			return fetch( url.toString() )
+			return fetch( url.toString(), { cache: 'no-cache' } )
 				.then( function ( res ) { return res.json(); } )
 				.catch( function () { return null; } );
 		}
@@ -513,7 +513,7 @@
 						label.classList.remove( 'beplus-advanced-reviews__star-label--active' );
 					} );
 
-					block._bparMediaFiles = [];
+					block._bparMediaFiles.length = 0;
 					var mediaPreview = form.querySelector( '.beplus-advanced-reviews__media-preview' );
 					if ( mediaPreview ) {
 						mediaPreview.style.display = 'none';
@@ -539,7 +539,7 @@
 						if ( productId ) {
 							var distUrl = new URL( bparData.restUrl + 'reviews/distribution' );
 							distUrl.searchParams.set( 'product_id', productId );
-							fetch( distUrl.toString() )
+							fetch( distUrl.toString(), { cache: 'no-cache' } )
 								.then( function ( res ) { return res.json(); } )
 								.then( function ( data ) {
 									var distArea = block.querySelector( '.beplus-advanced-reviews__distribution' );

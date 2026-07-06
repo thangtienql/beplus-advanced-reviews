@@ -20,6 +20,7 @@ class HookManager {
 	public const REVIEW_RESULTS     = 'beplus-advanced-reviews/review.results';
 	public const REVIEW_SUBMITTED   = 'beplus-advanced-reviews/review.submitted';
 	public const MEDIA_UPLOADED     = 'beplus-advanced-reviews/media.uploaded';
+	public const MEDIA_DELETED      = 'beplus-advanced-reviews/media.deleted';
 
 	public static function template_paths(): string {
 		return 'beplus_advanced_reviews_template_paths';

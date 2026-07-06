@@ -25,16 +25,17 @@ class ReviewController extends \WP_REST_Controller {
 	private ReviewFormatter $formatter;
 	private ReviewQuery $review_query;
 	private ReviewSubmission $submission;
+	private MediaHandler $media_handler;
 
 	public function __construct() {
 		$this->namespace  = 'beplus-advanced-reviews/v1';
 		$this->rest_base  = 'reviews';
 
-		$media_handler  = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
-		$this->repository  = new ReviewRepository();
-		$this->formatter   = new ReviewFormatter( $media_handler );
-		$this->review_query = new ReviewQuery();
-		$this->submission  = new ReviewSubmission();
+		$this->media_handler = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
+		$this->repository    = new ReviewRepository();
+		$this->formatter     = new ReviewFormatter( $this->media_handler );
+		$this->review_query  = new ReviewQuery();
+		$this->submission    = new ReviewSubmission();
 	}
 
 	public function register_routes(): void {
@@ -136,7 +137,11 @@ class ReviewController extends \WP_REST_Controller {
 			'has_more'     => $result['page'] < $result['pages'],
 		);
 
-		return rest_ensure_response( $response );
+		$response = rest_ensure_response( $response );
+		$response->header( 'Cache-Control', 'no-cache, must-revalidate, max-age=0' );
+		$response->header( 'Pragma', 'no-cache' );
+
+		return $response;
 	}
 
 	/**
@@ -169,22 +174,20 @@ class ReviewController extends \WP_REST_Controller {
 				return $comment_id;
 			}
 
-			$media_handler = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
+		$file_params = $request->get_file_params();
+		$base64_data = $request->get_param( 'paste_image' );
 
-			$file_params = $request->get_file_params();
-			$base64_data = $request->get_param( 'paste_image' );
-
-			if ( ! empty( $file_params ) ) {
-				foreach ( $file_params as $input_name => $file_data ) {
-					if ( ! empty( $file_data['name'] ) ) {
-						$media_handler->upload_files( $comment_id, $file_data );
-					}
+		if ( ! empty( $file_params ) ) {
+			foreach ( $file_params as $input_name => $file_data ) {
+				if ( ! empty( $file_data['name'] ) ) {
+					$this->media_handler->upload_files( $comment_id, $file_data );
 				}
 			}
+		}
 
-			if ( ! empty( $base64_data ) ) {
-				$media_handler->upload_pasted_image( $comment_id, $base64_data );
-			}
+		if ( ! empty( $base64_data ) ) {
+			$this->media_handler->upload_pasted_image( $comment_id, $base64_data );
+		}
 
 			do_action( HookManager::REVIEW_SUBMITTED, $comment_id, $params['product_id'] );
 
@@ -214,6 +217,8 @@ class ReviewController extends \WP_REST_Controller {
 	public function delete_item( $request ) {
 		$comment_id = absint( $request->get_param( 'id' ) );
 
+		$this->media_handler->delete_media_for_comment( $comment_id );
+
 		$deleted = wp_delete_comment( $comment_id, true );
 
 		if ( ! $deleted ) {
@@ -240,7 +245,11 @@ class ReviewController extends \WP_REST_Controller {
 		$product_id = absint( $request->get_param( 'product_id' ) );
 		$data       = $this->repository->get_star_distribution( $product_id );
 
-		return rest_ensure_response( $data );
+		$response = rest_ensure_response( $data );
+		$response->header( 'Cache-Control', 'no-cache, must-revalidate, max-age=0' );
+		$response->header( 'Pragma', 'no-cache' );
+
+		return $response;
 	}
 
 	/**
