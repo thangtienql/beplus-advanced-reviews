@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SettingsRegistry extends AbstractModule {
 
-	private const OPTION_KEY = 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings';
+	private const OPTION_KEY = 'beplus_advanced_reviews_for_woocommerce_settings';
 
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
@@ -46,7 +46,7 @@ class SettingsRegistry extends AbstractModule {
 	 */
 	public function register_settings(): void {
 		register_setting(
-			'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings',
+			'beplus_advanced_reviews_for_woocommerce_settings',
 			self::OPTION_KEY,
 			array(
 				'type'              => 'array',
@@ -149,7 +149,7 @@ class SettingsRegistry extends AbstractModule {
 			<h1><?php echo esc_html__( 'Beplus Advanced Reviews For Woocommerce Settings', 'beplus-advanced-reviews-for-woocommerce' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
-				settings_fields( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings' );
+				settings_fields( 'beplus_advanced_reviews_for_woocommerce_settings' );
 				do_settings_sections( 'beplus-advanced-reviews-for-woocommerce' );
 				submit_button();
 				?>

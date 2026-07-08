@@ -28,7 +28,7 @@ function beplus_advanced_reviews_for_woocommerce_register_block_template(): void
 
 	$template_content = array(
 		array(
-			'beplus-advanced-reviews-for-woocommerce/advanced-review',
+			'beplus-advanced-reviews/advanced-review',
 			array(
 				'showDistribution' => true,
 				'showFilterBar'    => true,

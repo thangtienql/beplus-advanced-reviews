@@ -34,7 +34,7 @@ function beplus_advanced_reviews_for_woocommerce_get_settings(): array {
 		'max_video_size_mb' => 20,
 	);
 
-	$saved = get_option( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings', array() );
+	$saved = get_option( 'beplus_advanced_reviews_for_woocommerce_settings', array() );
 	if ( ! is_array( $saved ) ) {
 		$saved = array();
 	}
@@ -125,7 +125,7 @@ function beplus_advanced_reviews_for_woocommerce_get_block_instance(): ?string {
 		return null;
 	}
 
-	$block_content = '<!-- wp:beplus-advanced-reviews-for-woocommerce/advanced-review /-->';
+	$block_content = '<!-- wp:beplus-advanced-reviews/advanced-review /-->';
 	return do_blocks( $block_content );
 }
 

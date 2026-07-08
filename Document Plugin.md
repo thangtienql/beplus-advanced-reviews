@@ -424,8 +424,8 @@ apply_filters( 'beplus_advanced_reviews_for_woocommerce_review_card_html', $html
 
 ```php
 // Options
-'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings'        // main settings (display mode, etc.)
-'beplus_advanced_reviews_for_woocommerce_for_woocommerce_schema_version'  // schema version tracker
+'beplus_advanced_reviews_for_woocommerce_settings'        // main settings (display mode, etc.)
+'beplus_advanced_reviews_for_woocommerce_schema_version'  // schema version tracker
 
 // Transients
 'beplus_advanced_reviews_for_woocommerce_review_counts'
@@ -604,7 +604,7 @@ namespace BeplusAdvancedReviewsForWoocommerce\Settings;
 
 class SettingsRegistry extends AbstractModule {
 
-	private const OPTION_KEY = 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings';
+	private const OPTION_KEY = 'beplus_advanced_reviews_for_woocommerce_settings';
 
 	private const DEFAULTS = array(
 		'display_mode'      => 'replace',
@@ -738,7 +738,7 @@ blocks/advanced-review/
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "beplus-advanced-reviews-for-woocommerce/advanced-review",
+	"name": "beplus-advanced-reviews/advanced-review",
 	"title": "Advanced Reviews",
 	"category": "beplus-advanced-reviews-for-woocommerce",
 	"icon": "star-filled",

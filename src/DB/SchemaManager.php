@@ -26,10 +26,10 @@ class SchemaManager extends AbstractModule {
 	 * @return void
 	 */
 	public function maybe_create_tables(): void {
-		$current_version = get_option( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_schema_version', '0' );
+		$current_version = get_option( 'beplus_advanced_reviews_for_woocommerce_schema_version', '0' );
 		if ( version_compare( $current_version, BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION, '<' ) ) {
 			$this->create_tables();
-			update_option( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_schema_version', BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION, false );
+			update_option( 'beplus_advanced_reviews_for_woocommerce_schema_version', BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION, false );
 		}
 	}
 

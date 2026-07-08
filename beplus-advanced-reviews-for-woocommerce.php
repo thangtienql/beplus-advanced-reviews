@@ -1,12 +1,12 @@
 <?php
 /**
  * Plugin Name: Beplus Advanced Reviews For Woocommerce
- * Plugin URI:  https://github.com/thangtienql/beplus-advanced-reviews-for-woocommerce-for-woocommerce
+ * Plugin URI:  https://github.com/thangtienql/beplus-advanced-reviews-for-woocommerce
  * Description: Modern WooCommerce product reviews with image support, star distribution, AJAX filtering, and load more.
  * Version:     1.0.0
  * Author:      Beplus
  * Author URI:  https://beplusthemes.com/
- * Text Domain: beplus-advanced-reviews-for-woocommerce-for-woocommerce
+ * Text Domain: beplus-advanced-reviews-for-woocommerce
  * Domain Path: /languages
  * Requires at least: 6.0
  * Requires PHP: 7.4
@@ -56,7 +56,7 @@ require_once BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'includes/hook
  *
  * @return \BeplusAdvancedReviewsForWoocommerce\Core\Plugin
  */
-function beplus_advanced_reviews_for_woocommerce_for_woocommerce_boot() {
+function beplus_advanced_reviews_for_woocommerce_boot() {
 	static $plugin = null;
 
 	if ( null === $plugin ) {
@@ -67,30 +67,30 @@ function beplus_advanced_reviews_for_woocommerce_for_woocommerce_boot() {
 	return $plugin;
 }
 
-add_action( 'plugins_loaded', 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_init' );
+add_action( 'plugins_loaded', 'beplus_advanced_reviews_for_woocommerce_init' );
 
 /**
  * Init on plugins_loaded.
  *
  * @return void
  */
-function beplus_advanced_reviews_for_woocommerce_for_woocommerce_init() {
-	beplus_advanced_reviews_for_woocommerce_for_woocommerce_boot();
+function beplus_advanced_reviews_for_woocommerce_init() {
+	beplus_advanced_reviews_for_woocommerce_boot();
 }
 
-register_activation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_activate' );
-register_deactivation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_deactivate' );
+register_activation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_activate' );
+register_deactivation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_deactivate' );
 
 /**
  * Activation handler.
  *
  * @return void
  */
-function beplus_advanced_reviews_for_woocommerce_for_woocommerce_activate() {
+function beplus_advanced_reviews_for_woocommerce_activate() {
 	if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		wp_die(
-			esc_html__( 'Beplus Advanced Reviews For Woocommerce requires PHP 7.4 or higher.', 'beplus-advanced-reviews-for-woocommerce-for-woocommerce' ),
+			esc_html__( 'Beplus Advanced Reviews For Woocommerce requires PHP 7.4 or higher.', 'beplus-advanced-reviews-for-woocommerce' ),
 			'Plugin Activation Error',
 			array( 'back_link' => true )
 		);
@@ -104,6 +104,6 @@ function beplus_advanced_reviews_for_woocommerce_for_woocommerce_activate() {
  *
  * @return void
  */
-function beplus_advanced_reviews_for_woocommerce_for_woocommerce_deactivate() {
+function beplus_advanced_reviews_for_woocommerce_deactivate() {
 	( new \BeplusAdvancedReviewsForWoocommerce\Core\Plugin() )->deactivate();
 }
