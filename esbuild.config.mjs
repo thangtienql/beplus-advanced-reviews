@@ -1,4 +1,4 @@
-// esbuild configuration for BePlus Advanced Reviews
+// esbuild configuration for Beplus Advanced Reviews For Woocommerce
 
 import * as esbuild from 'esbuild';
 

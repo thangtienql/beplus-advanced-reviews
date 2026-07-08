@@ -2,13 +2,13 @@
 /**
  * SettingsController — REST API for plugin settings.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage REST
  */
 
-namespace BePlusAdvancedReviews\REST;
+namespace BeplusAdvancedReviewsForWoocommerce\REST;
 
-use BePlusAdvancedReviews\Settings\SettingsRegistry;
+use BeplusAdvancedReviewsForWoocommerce\Settings\SettingsRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -19,9 +19,9 @@ class SettingsController extends \WP_REST_Controller {
 	private SettingsRegistry $registry;
 
 	public function __construct() {
-		$this->namespace = 'beplus-advanced-reviews/v1';
+		$this->namespace = 'beplus-advanced-reviews-for-woocommerce/v1';
 		$this->rest_base = 'settings';
-		$this->registry  = new SettingsRegistry( new \BePlusAdvancedReviews\Core\Container() );
+		$this->registry  = new SettingsRegistry( new \BeplusAdvancedReviewsForWoocommerce\Core\Container() );
 	}
 
 	public function register_routes(): void {
@@ -66,7 +66,7 @@ class SettingsController extends \WP_REST_Controller {
 		if ( ! $updated ) {
 			return new \WP_Error(
 				'save_failed',
-				__( 'Failed to save settings.', 'beplus-advanced-reviews' ),
+				__( 'Failed to save settings.', 'beplus-advanced-reviews-for-woocommerce' ),
 				array( 'status' => 500 )
 			);
 		}

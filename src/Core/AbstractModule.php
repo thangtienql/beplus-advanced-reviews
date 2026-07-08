@@ -2,11 +2,11 @@
 /**
  * AbstractModule — base class for all plugin modules.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Core
  */
 
-namespace BePlusAdvancedReviews\Core;
+namespace BeplusAdvancedReviewsForWoocommerce\Core;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,9 +21,9 @@ abstract class AbstractModule {
 
 	public function __construct( Container $container ) {
 		$this->container  = $container;
-		$this->version    = BEPLUS_ADVANCED_REVIEWS_VERSION;
-		$this->plugin_dir = BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR;
-		$this->plugin_url = BEPLUS_ADVANCED_REVIEWS_PLUGIN_URL;
+		$this->version    = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION;
+		$this->plugin_dir = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR;
+		$this->plugin_url = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_URL;
 	}
 
 	/**

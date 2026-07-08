@@ -2,13 +2,13 @@
 /**
  * SettingsRegistry — plugin options, defaults, and settings page.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Settings
  */
 
-namespace BePlusAdvancedReviews\Settings;
+namespace BeplusAdvancedReviewsForWoocommerce\Settings;
 
-use BePlusAdvancedReviews\Core\AbstractModule;
+use BeplusAdvancedReviewsForWoocommerce\Core\AbstractModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class SettingsRegistry extends AbstractModule {
 
-	private const OPTION_KEY = 'beplus_advanced_reviews_settings';
+	private const OPTION_KEY = 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings';
 
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
@@ -31,10 +31,10 @@ class SettingsRegistry extends AbstractModule {
 	public function add_settings_page(): void {
 		add_submenu_page(
 			'woocommerce',
-			__( 'BePlus Reviews', 'beplus-advanced-reviews' ),
-			__( 'BePlus Reviews', 'beplus-advanced-reviews' ),
+			__( 'BePlus Reviews', 'beplus-advanced-reviews-for-woocommerce' ),
+			__( 'BePlus Reviews', 'beplus-advanced-reviews-for-woocommerce' ),
 			'manage_options',
-			'beplus-advanced-reviews',
+			'beplus-advanced-reviews-for-woocommerce',
 			array( $this, 'render_settings_page' )
 		);
 	}
@@ -46,7 +46,7 @@ class SettingsRegistry extends AbstractModule {
 	 */
 	public function register_settings(): void {
 		register_setting(
-			'beplus_advanced_reviews_settings',
+			'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings',
 			self::OPTION_KEY,
 			array(
 				'type'              => 'array',
@@ -56,81 +56,81 @@ class SettingsRegistry extends AbstractModule {
 		);
 
 		add_settings_section(
-			'bpar_general',
-			__( 'General Settings', 'beplus-advanced-reviews' ),
+			'bparfw_general',
+			__( 'General Settings', 'beplus-advanced-reviews-for-woocommerce' ),
 			'__return_empty_string',
-			'beplus-advanced-reviews'
+			'beplus-advanced-reviews-for-woocommerce'
 		);
 
 		add_settings_field(
 			'display_mode',
-			__( 'Display Mode', 'beplus-advanced-reviews' ),
+			__( 'Display Mode', 'beplus-advanced-reviews-for-woocommerce' ),
 			array( $this, 'render_display_mode_field' ),
-			'beplus-advanced-reviews',
-			'bpar_general'
+			'beplus-advanced-reviews-for-woocommerce',
+			'bparfw_general'
 		);
 
 		add_settings_field(
 			'enable_images',
-			__( 'Image Uploads', 'beplus-advanced-reviews' ),
+			__( 'Image Uploads', 'beplus-advanced-reviews-for-woocommerce' ),
 			array( $this, 'render_checkbox_field' ),
-			'beplus-advanced-reviews',
-			'bpar_general',
-			array( 'key' => 'enable_images', 'label' => __( 'Allow customers to upload images with reviews', 'beplus-advanced-reviews' ) )
+			'beplus-advanced-reviews-for-woocommerce',
+			'bparfw_general',
+			array( 'key' => 'enable_images', 'label' => __( 'Allow customers to upload images with reviews', 'beplus-advanced-reviews-for-woocommerce' ) )
 		);
 
 		add_settings_field(
 			'enable_paste',
-			__( 'Clipboard Paste', 'beplus-advanced-reviews' ),
+			__( 'Clipboard Paste', 'beplus-advanced-reviews-for-woocommerce' ),
 			array( $this, 'render_checkbox_field' ),
-			'beplus-advanced-reviews',
-			'bpar_general',
-			array( 'key' => 'enable_paste', 'label' => __( 'Allow copy/paste images from clipboard', 'beplus-advanced-reviews' ) )
+			'beplus-advanced-reviews-for-woocommerce',
+			'bparfw_general',
+			array( 'key' => 'enable_paste', 'label' => __( 'Allow copy/paste images from clipboard', 'beplus-advanced-reviews-for-woocommerce' ) )
 		);
 
 		add_settings_field(
 			'load_more_count',
-			__( 'Reviews Per Load', 'beplus-advanced-reviews' ),
+			__( 'Reviews Per Load', 'beplus-advanced-reviews-for-woocommerce' ),
 			array( $this, 'render_number_field' ),
-			'beplus-advanced-reviews',
-			'bpar_general',
+			'beplus-advanced-reviews-for-woocommerce',
+			'bparfw_general',
 			array( 'key' => 'load_more_count', 'min' => 1, 'max' => 50 )
 		);
 
 		add_settings_field(
 			'max_image_size_mb',
-			__( 'Max Image Size (MB)', 'beplus-advanced-reviews' ),
+			__( 'Max Image Size (MB)', 'beplus-advanced-reviews-for-woocommerce' ),
 			array( $this, 'render_number_field' ),
-			'beplus-advanced-reviews',
-			'bpar_general',
+			'beplus-advanced-reviews-for-woocommerce',
+			'bparfw_general',
 			array(
 				'key'         => 'max_image_size_mb',
 				'min'         => 1,
 				'max'         => 20,
-				'description' => __( 'Maximum size per image in megabytes. Recommended: 2 MB.', 'beplus-advanced-reviews' ),
+				'description' => __( 'Maximum size per image in megabytes. Recommended: 2 MB.', 'beplus-advanced-reviews-for-woocommerce' ),
 			)
 		);
 
 		add_settings_field(
 			'enable_videos',
-			__( 'Video Uploads', 'beplus-advanced-reviews' ),
+			__( 'Video Uploads', 'beplus-advanced-reviews-for-woocommerce' ),
 			array( $this, 'render_checkbox_field' ),
-			'beplus-advanced-reviews',
-			'bpar_general',
-			array( 'key' => 'enable_videos', 'label' => __( 'Allow customers to upload videos with reviews', 'beplus-advanced-reviews' ) )
+			'beplus-advanced-reviews-for-woocommerce',
+			'bparfw_general',
+			array( 'key' => 'enable_videos', 'label' => __( 'Allow customers to upload videos with reviews', 'beplus-advanced-reviews-for-woocommerce' ) )
 		);
 
 		add_settings_field(
 			'max_video_size_mb',
-			__( 'Max Video Size (MB)', 'beplus-advanced-reviews' ),
+			__( 'Max Video Size (MB)', 'beplus-advanced-reviews-for-woocommerce' ),
 			array( $this, 'render_number_field' ),
-			'beplus-advanced-reviews',
-			'bpar_general',
+			'beplus-advanced-reviews-for-woocommerce',
+			'bparfw_general',
 			array(
 				'key'         => 'max_video_size_mb',
 				'min'         => 1,
 				'max'         => 100,
-				'description' => __( 'Maximum size per video in megabytes. Recommended: 20 MB.', 'beplus-advanced-reviews' ),
+				'description' => __( 'Maximum size per video in megabytes. Recommended: 20 MB.', 'beplus-advanced-reviews-for-woocommerce' ),
 			)
 		);
 	}
@@ -146,11 +146,11 @@ class SettingsRegistry extends AbstractModule {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php echo esc_html__( 'BePlus Advanced Reviews Settings', 'beplus-advanced-reviews' ); ?></h1>
+			<h1><?php echo esc_html__( 'Beplus Advanced Reviews For Woocommerce Settings', 'beplus-advanced-reviews-for-woocommerce' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
-				settings_fields( 'beplus_advanced_reviews_settings' );
-				do_settings_sections( 'beplus-advanced-reviews' );
+				settings_fields( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings' );
+				do_settings_sections( 'beplus-advanced-reviews-for-woocommerce' );
 				submit_button();
 				?>
 			</form>
@@ -167,8 +167,8 @@ class SettingsRegistry extends AbstractModule {
 		$settings = $this->get_all();
 		$current  = $settings['display_mode'] ?? 'replace';
 		$options  = array(
-			'keep'    => __( 'Keep default WooCommerce reviews; place block manually', 'beplus-advanced-reviews' ),
-			'replace' => __( 'Replace default reviews with Advanced Reviews', 'beplus-advanced-reviews' ),
+			'keep'    => __( 'Keep default WooCommerce reviews; place block manually', 'beplus-advanced-reviews-for-woocommerce' ),
+			'replace' => __( 'Replace default reviews with Advanced Reviews', 'beplus-advanced-reviews-for-woocommerce' ),
 		);
 		?>
 		<select name="<?php echo esc_attr( self::OPTION_KEY ); ?>[display_mode]">

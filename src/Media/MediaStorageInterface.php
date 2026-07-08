@@ -5,11 +5,11 @@
  * Implement this interface to swap the storage layer (e.g. local WP Media Library,
  * Cloudflare R2, AWS S3, etc.) without touching review logic.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Media
  */
 
-namespace BePlusAdvancedReviews\Media;
+namespace BeplusAdvancedReviewsForWoocommerce\Media;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -2,11 +2,11 @@
 /**
  * ReviewSubmission — handles review creation and validation.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Reviews
  */
 
-namespace BePlusAdvancedReviews\Reviews;
+namespace BeplusAdvancedReviewsForWoocommerce\Reviews;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -29,7 +29,7 @@ class ReviewSubmission {
 		if ( $rating < 1 || $rating > 5 ) {
 			return new \WP_Error(
 				'invalid_rating',
-				__( 'Rating must be between 1 and 5.', 'beplus-advanced-reviews' )
+				__( 'Rating must be between 1 and 5.', 'beplus-advanced-reviews-for-woocommerce' )
 			);
 		}
 
@@ -37,7 +37,7 @@ class ReviewSubmission {
 		if ( empty( trim( $content ) ) ) {
 			return new \WP_Error(
 				'empty_content',
-				__( 'Review content cannot be empty.', 'beplus-advanced-reviews' )
+				__( 'Review content cannot be empty.', 'beplus-advanced-reviews-for-woocommerce' )
 			);
 		}
 
@@ -56,7 +56,7 @@ class ReviewSubmission {
 		if ( ! $comment_id ) {
 			return new \WP_Error(
 				'insert_failed',
-				__( 'Failed to save review.', 'beplus-advanced-reviews' )
+				__( 'Failed to save review.', 'beplus-advanced-reviews-for-woocommerce' )
 			);
 		}
 
@@ -75,7 +75,7 @@ class ReviewSubmission {
 		if ( ! isset( $data['rating'] ) || ! is_numeric( $data['rating'] ) ) {
 			return new \WP_Error(
 				'missing_rating',
-				__( 'Please select a rating.', 'beplus-advanced-reviews' )
+				__( 'Please select a rating.', 'beplus-advanced-reviews-for-woocommerce' )
 			);
 		}
 
@@ -83,21 +83,21 @@ class ReviewSubmission {
 		if ( $rating < 1 || $rating > 5 ) {
 			return new \WP_Error(
 				'invalid_rating',
-				__( 'Rating must be between 1 and 5.', 'beplus-advanced-reviews' )
+				__( 'Rating must be between 1 and 5.', 'beplus-advanced-reviews-for-woocommerce' )
 			);
 		}
 
 		if ( ! isset( $data['content'] ) || empty( trim( $data['content'] ) ) ) {
 			return new \WP_Error(
 				'missing_content',
-				__( 'Please write a review.', 'beplus-advanced-reviews' )
+				__( 'Please write a review.', 'beplus-advanced-reviews-for-woocommerce' )
 			);
 		}
 
 		if ( ! isset( $data['product_id'] ) || absint( $data['product_id'] ) < 1 ) {
 			return new \WP_Error(
 				'missing_product',
-				__( 'Invalid product.', 'beplus-advanced-reviews' )
+				__( 'Invalid product.', 'beplus-advanced-reviews-for-woocommerce' )
 			);
 		}
 

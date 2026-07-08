@@ -26,7 +26,7 @@ const PLUGIN_SLUG = path.basename( ROOT );
  * Run `npm run build` before packaging so block/admin JS/CSS is up to date.
  */
 const INCLUDE_GLOBS = [
-	'beplus-advanced-reviews.php',
+	'beplus-advanced-reviews-for-woocommerce.php',
 	'readme.txt',
 	'src/**/*.php',
 	'includes/**/*.php',
@@ -45,15 +45,15 @@ const INCLUDE_GLOBS = [
 
 function readVersion() {
 	const bootstrap = fs.readFileSync(
-		path.join( ROOT, 'beplus-advanced-reviews.php' ),
+		path.join( ROOT, 'beplus-advanced-reviews-for-woocommerce.php' ),
 		'utf8',
 	);
 	const m = bootstrap.match(
-		/define\(\s*'BEPLUS_ADVANCED_REVIEWS_VERSION'\s*,\s*'([^']+)'\s*\)/,
+		/define\(\s*'BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION'\s*,\s*'([^']+)'\s*\)/,
 	);
 	if ( ! m ) {
 		console.error(
-			'Could not parse BEPLUS_ADVANCED_REVIEWS_VERSION from beplus-advanced-reviews.php',
+			'Could not parse BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION from beplus-advanced-reviews-for-woocommerce.php',
 		);
 		process.exit( 1 );
 	}

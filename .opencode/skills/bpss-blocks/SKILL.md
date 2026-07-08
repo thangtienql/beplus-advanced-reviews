@@ -1,9 +1,9 @@
 ---
 name: bpss-blocks
-description: Use when creating or editing Gutenberg blocks under blocks/, including block.json, render.php, edit.tsx, view.ts, style.css, and BlockRegistry. Covers registration, attributes, render callbacks, accessibility, and build workflow for beplus-advanced-reviews blocks.
+description: Use when creating or editing Gutenberg blocks under blocks/, including block.json, render.php, edit.tsx, view.ts, style.css, and BlockRegistry. Covers registration, attributes, render callbacks, accessibility, and build workflow for beplus-advanced-reviews-for-woocommerce blocks.
 ---
 
-# BePlus Advanced Reviews — blocks
+# Beplus Advanced Reviews For Woocommerce — blocks
 
 Standards: [`Document Plugin.md`](../../../Document%20Plugin.md). Keep block structure aligned with the plugin's Gutenberg and WooCommerce template approach.
 
@@ -37,7 +37,7 @@ Standards: [`Document Plugin.md`](../../../Document%20Plugin.md). Keep block str
 
 ## Styling
 
-- Scope classes with `beplus-advanced-reviews__*` and modifier classes for state changes.
+- Scope classes with `beplus-advanced-reviews-for-woocommerce__*` and modifier classes for state changes.
 - Keep loading, empty, and error states explicit so the review UI remains stable.
 - Prefer idempotent front-end initialization so the block can mount safely in the editor and on the front end.
 
@@ -66,5 +66,5 @@ Standards: [`Document Plugin.md`](../../../Document%20Plugin.md). Keep block str
 ## Build and verify
 
 1. `npm run build` from plugin root.
-2. Block inserter: block appears under **BePlus Advanced Reviews** category.
+2. Block inserter: block appears under **Beplus Advanced Reviews For Woocommerce** category.
 3. Front-end: filters work, images open correctly, review submission states are visible, and layout remains stable.

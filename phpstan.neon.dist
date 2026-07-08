@@ -11,7 +11,7 @@ parameters:
         - includes/
         - templates/
         - blocks/
-        - beplus-advanced-reviews.php
+        - beplus-advanced-reviews-for-woocommerce.php
         - admin
     excludePaths:
         - vendor/

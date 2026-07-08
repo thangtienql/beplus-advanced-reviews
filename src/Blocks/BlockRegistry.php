@@ -2,14 +2,14 @@
 /**
  * BlockRegistry — auto-discovers and registers Gutenberg blocks under blocks/.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Blocks
  */
 
-namespace BePlusAdvancedReviews\Blocks;
+namespace BeplusAdvancedReviewsForWoocommerce\Blocks;
 
-use BePlusAdvancedReviews\Core\AbstractModule;
-use BePlusAdvancedReviews\Core\HookManager;
+use BeplusAdvancedReviewsForWoocommerce\Core\AbstractModule;
+use BeplusAdvancedReviewsForWoocommerce\Core\HookManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

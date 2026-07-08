@@ -1,8 +1,8 @@
 <?php
 /**
- * Common helper functions for BePlus Advanced Reviews.
+ * Common helper functions for Beplus Advanced Reviews For Woocommerce.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @return array<string, mixed>
  */
-function beplus_advanced_reviews_get_settings(): array {
+function beplus_advanced_reviews_for_woocommerce_get_settings(): array {
 	static $settings = null;
 
 	if ( null !== $settings ) {
@@ -34,7 +34,7 @@ function beplus_advanced_reviews_get_settings(): array {
 		'max_video_size_mb' => 20,
 	);
 
-	$saved = get_option( 'beplus_advanced_reviews_settings', array() );
+	$saved = get_option( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings', array() );
 	if ( ! is_array( $saved ) ) {
 		$saved = array();
 	}
@@ -48,8 +48,8 @@ function beplus_advanced_reviews_get_settings(): array {
  *
  * @return string 'keep' | 'replace'
  */
-function beplus_advanced_reviews_get_display_mode(): string {
-	$settings = beplus_advanced_reviews_get_settings();
+function beplus_advanced_reviews_for_woocommerce_get_display_mode(): string {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
 	return isset( $settings['display_mode'] ) ? $settings['display_mode'] : 'replace';
 }
 
@@ -58,8 +58,8 @@ function beplus_advanced_reviews_get_display_mode(): string {
  *
  * @return int
  */
-function beplus_advanced_reviews_get_load_more_count(): int {
-	$settings = beplus_advanced_reviews_get_settings();
+function beplus_advanced_reviews_for_woocommerce_get_load_more_count(): int {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
 	return isset( $settings['load_more_count'] ) ? absint( $settings['load_more_count'] ) : 10;
 }
 
@@ -68,8 +68,8 @@ function beplus_advanced_reviews_get_load_more_count(): int {
  *
  * @return bool
  */
-function beplus_advanced_reviews_is_images_enabled(): bool {
-	$settings = beplus_advanced_reviews_get_settings();
+function beplus_advanced_reviews_for_woocommerce_is_images_enabled(): bool {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
 	return ! empty( $settings['enable_images'] );
 }
 
@@ -78,8 +78,8 @@ function beplus_advanced_reviews_is_images_enabled(): bool {
  *
  * @return bool
  */
-function beplus_advanced_reviews_is_paste_enabled(): bool {
-	$settings = beplus_advanced_reviews_get_settings();
+function beplus_advanced_reviews_for_woocommerce_is_paste_enabled(): bool {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
 	return ! empty( $settings['enable_paste'] );
 }
 
@@ -88,8 +88,8 @@ function beplus_advanced_reviews_is_paste_enabled(): bool {
  *
  * @return int
  */
-function beplus_advanced_reviews_get_max_image_size(): int {
-	$settings = beplus_advanced_reviews_get_settings();
+function beplus_advanced_reviews_for_woocommerce_get_max_image_size(): int {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
 	$mb       = isset( $settings['max_image_size_mb'] ) ? absint( $settings['max_image_size_mb'] ) : 2;
 	return $mb * 1024 * 1024;
 }
@@ -99,8 +99,8 @@ function beplus_advanced_reviews_get_max_image_size(): int {
  *
  * @return bool
  */
-function beplus_advanced_reviews_is_videos_enabled(): bool {
-	$settings = beplus_advanced_reviews_get_settings();
+function beplus_advanced_reviews_for_woocommerce_is_videos_enabled(): bool {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
 	return ! empty( $settings['enable_videos'] );
 }
 
@@ -109,8 +109,8 @@ function beplus_advanced_reviews_is_videos_enabled(): bool {
  *
  * @return int
  */
-function beplus_advanced_reviews_get_max_video_size(): int {
-	$settings = beplus_advanced_reviews_get_settings();
+function beplus_advanced_reviews_for_woocommerce_get_max_video_size(): int {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
 	$mb       = isset( $settings['max_video_size_mb'] ) ? absint( $settings['max_video_size_mb'] ) : 20;
 	return $mb * 1024 * 1024;
 }
@@ -120,12 +120,12 @@ function beplus_advanced_reviews_get_max_video_size(): int {
  *
  * @return string|null
  */
-function beplus_advanced_reviews_get_block_instance(): ?string {
+function beplus_advanced_reviews_for_woocommerce_get_block_instance(): ?string {
 	if ( ! function_exists( 'do_blocks' ) ) {
 		return null;
 	}
 
-	$block_content = '<!-- wp:beplus-advanced-reviews/advanced-review /-->';
+	$block_content = '<!-- wp:beplus-advanced-reviews-for-woocommerce/advanced-review /-->';
 	return do_blocks( $block_content );
 }
 
@@ -135,12 +135,12 @@ function beplus_advanced_reviews_get_block_instance(): ?string {
  * @param string $template_name Template name.
  * @param array<string, mixed>  $args          Arguments to pass to the template.
  */
-function beplus_advanced_reviews_get_template( string $template_name, array $args = array() ): void {
+function beplus_advanced_reviews_for_woocommerce_get_template( string $template_name, array $args = array() ): void {
 	$paths = apply_filters(
-		'beplus_advanced_reviews_template_paths',
+		'beplus_advanced_reviews_for_woocommerce_template_paths',
 		array(
-			get_stylesheet_directory() . '/beplus-advanced-reviews/',
-			BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR . 'templates/',
+			get_stylesheet_directory() . '/beplus-advanced-reviews-for-woocommerce/',
+			BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'templates/',
 		)
 	);
 
@@ -159,7 +159,7 @@ function beplus_advanced_reviews_get_template( string $template_name, array $arg
  *
  * @return int
  */
-function beplus_advanced_reviews_get_current_product_id(): int {
+function beplus_advanced_reviews_for_woocommerce_get_current_product_id(): int {
 	if ( function_exists( 'wc_get_product' ) ) {
 		$product = wc_get_product();
 		if ( $product ) {

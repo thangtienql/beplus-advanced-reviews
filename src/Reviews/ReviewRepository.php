@@ -2,11 +2,11 @@
 /**
  * ReviewRepository — data access for WooCommerce product reviews.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Reviews
  */
 
-namespace BePlusAdvancedReviews\Reviews;
+namespace BeplusAdvancedReviewsForWoocommerce\Reviews;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -48,7 +48,7 @@ class ReviewRepository {
 		}
 
 		if ( $args['has_images'] ) {
-			$where .= ' AND EXISTS (SELECT 1 FROM ' . $wpdb->prefix . 'bpar_review_media rm WHERE rm.comment_id = c.comment_ID)';
+			$where .= ' AND EXISTS (SELECT 1 FROM ' . $wpdb->prefix . 'bparfw_review_media rm WHERE rm.comment_id = c.comment_ID)';
 		}
 
 		switch ( $args['sort'] ) {
@@ -161,7 +161,7 @@ class ReviewRepository {
 
 		$count = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->prefix}bpar_review_media WHERE comment_id = %d",
+				"SELECT COUNT(*) FROM {$wpdb->prefix}bparfw_review_media WHERE comment_id = %d",
 				$comment_id
 			)
 		);

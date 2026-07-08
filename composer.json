@@ -1,11 +1,11 @@
 {
-	"name": "beplus/beplus-advanced-reviews",
+	"name": "beplus/beplus-advanced-reviews-for-woocommerce",
 	"description": "Modern WooCommerce product reviews with image support, AJAX filtering, and load more.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"autoload": {
 		"psr-4": {
-			"BePlusAdvancedReviews\\": "src/"
+			"BeplusAdvancedReviewsForWoocommerce\\": "src/"
 		}
 	},
 	"require": {

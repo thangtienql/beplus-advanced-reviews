@@ -1,9 +1,9 @@
 ---
 name: bpss-add-plugin-block
-description: Adds or extends a BePlus Advanced Reviews Gutenberg block under blocks/ using block.json, TypeScript, esbuild, render.php. Use when creating blocks, editing BlockRegistry, block.json, render.php, index.tsx, edit.tsx, view.ts, or build scripts for beplus-advanced-reviews.
+description: Adds or extends a Beplus Advanced Reviews For Woocommerce Gutenberg block under blocks/ using block.json, TypeScript, esbuild, render.php. Use when creating blocks, editing BlockRegistry, block.json, render.php, index.tsx, edit.tsx, view.ts, or build scripts for beplus-advanced-reviews.
 ---
 
-# BePlus Advanced Reviews — add or change a plugin block
+# Beplus Advanced Reviews For Woocommerce — add or change a plugin block
 
 ## Before you edit
 
@@ -28,18 +28,18 @@ description: Adds or extends a BePlus Advanced Reviews Gutenberg block under blo
 2. **render.php:** wrap with `get_block_wrapper_attributes()`; render review list, star distribution chart, filter controls, sort controls, submit form shell, and image placeholders; escape all output.
 3. **edit.tsx:** provide Inspector controls for review display and filtering options.
 4. **view.ts:** hydrate client-side filter interactions, image lightbox behavior, load more pagination, star distribution chart, and paste-to-upload support.
-5. **REST:** use `beplus-advanced-reviews/v1/reviews` and `beplus-advanced-reviews/v1/reviews/distribution` for live data and submission flows; do not embed ad-hoc SQL in the block.
+5. **REST:** use `beplus-advanced-reviews-for-woocommerce/v1/reviews` and `beplus-advanced-reviews-for-woocommerce/v1/reviews/distribution` for live data and submission flows; do not embed ad-hoc SQL in the block.
 
 ## Styling
 
-- Class prefix: `beplus-advanced-reviews__*`
+- Class prefix: `beplus-advanced-reviews-for-woocommerce__*`
 - Loading: `beplus-advanced-reviews--loading` → `beplus-advanced-reviews--ready`
 - Scope styles to the block wrapper — avoid global resets
 
 ## Build and verify
 
 1. `npm run build` from plugin root.
-2. Block inserter: block appears under **BePlus Advanced Reviews** category.
+2. Block inserter: block appears under **Beplus Advanced Reviews For Woocommerce** category.
 3. Front-end: filters work, images open correctly, star distribution renders, review submission states are visible, and layout remains stable.
 
 ## Reference

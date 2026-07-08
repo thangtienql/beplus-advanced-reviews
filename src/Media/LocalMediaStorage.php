@@ -6,11 +6,11 @@
  * wp_delete_attachment. This is the default backend; swap it out
  * via the container binding for cloud storage (Cloudflare R2, S3, etc.).
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Media
  */
 
-namespace BePlusAdvancedReviews\Media;
+namespace BeplusAdvancedReviewsForWoocommerce\Media;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -49,7 +49,7 @@ class LocalMediaStorage implements MediaStorageInterface {
 		}
 
 		if ( ! $attachment_id ) {
-			return new \WP_Error( 'insert_failed', __( 'Failed to insert attachment.', 'beplus-advanced-reviews' ) );
+			return new \WP_Error( 'insert_failed', __( 'Failed to insert attachment.', 'beplus-advanced-reviews-for-woocommerce' ) );
 		}
 
 		return (int) $attachment_id;

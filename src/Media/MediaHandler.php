@@ -5,15 +5,15 @@
  * Uses a swappable MediaStorageInterface backend (default: LocalMediaStorage).
  * To switch to cloud storage, bind a different implementation in the container.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Media
  */
 
-namespace BePlusAdvancedReviews\Media;
+namespace BeplusAdvancedReviewsForWoocommerce\Media;
 
-use BePlusAdvancedReviews\Core\AbstractModule;
-use BePlusAdvancedReviews\Core\HookManager;
-use BePlusAdvancedReviews\Core\Container;
+use BeplusAdvancedReviewsForWoocommerce\Core\AbstractModule;
+use BeplusAdvancedReviewsForWoocommerce\Core\HookManager;
+use BeplusAdvancedReviewsForWoocommerce\Core\Container;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -29,7 +29,7 @@ class MediaHandler extends AbstractModule {
 	}
 
 	public function register(): void {
-		add_action( 'wp_ajax_bpar_upload_media', array( $this, 'handle_ajax_upload' ) );
+		add_action( 'wp_ajax_bparfw_upload_media', array( $this, 'handle_ajax_upload' ) );
 
 		add_action( 'delete_comment', array( $this, 'delete_media_for_comment' ), 10, 1 );
 		add_action( 'wp_trash_comment', array( $this, 'delete_media_for_comment' ), 10, 1 );
@@ -43,7 +43,7 @@ class MediaHandler extends AbstractModule {
 	 * @return array<int, int> Attachment IDs.
 	 */
 	public function upload_files( int $comment_id, array $files ): array {
-		if ( ! beplus_advanced_reviews_is_images_enabled() ) {
+		if ( ! beplus_advanced_reviews_for_woocommerce_is_images_enabled() ) {
 			return array();
 		}
 
@@ -83,7 +83,7 @@ class MediaHandler extends AbstractModule {
 	 * @return int|null Attachment ID or null on failure.
 	 */
 	public function upload_pasted_image( int $comment_id, string $base64_data ): ?int {
-		if ( ! beplus_advanced_reviews_is_paste_enabled() ) {
+		if ( ! beplus_advanced_reviews_for_woocommerce_is_paste_enabled() ) {
 			return null;
 		}
 
@@ -109,7 +109,7 @@ class MediaHandler extends AbstractModule {
 			return null;
 		}
 
-		$max_size = beplus_advanced_reviews_get_max_image_size();
+		$max_size = beplus_advanced_reviews_for_woocommerce_get_max_image_size();
 		if ( strlen( $decoded ) > $max_size ) {
 			return null;
 		}
@@ -159,7 +159,7 @@ class MediaHandler extends AbstractModule {
 
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT attachment_id FROM {$wpdb->prefix}bpar_review_media WHERE comment_id = %d ORDER BY sort_order ASC",
+				"SELECT attachment_id FROM {$wpdb->prefix}bparfw_review_media WHERE comment_id = %d ORDER BY sort_order ASC",
 				$comment_id
 			)
 		);
@@ -192,7 +192,7 @@ class MediaHandler extends AbstractModule {
 	 * Delete all media attached to a comment.
 	 *
 	 * This is hooked into WordPress 'delete_comment' and 'wp_trash_comment'.
-	 * It removes both the storage files AND the bpar_review_media rows.
+	 * It removes both the storage files AND the bparfw_review_media rows.
 	 *
 	 * @param int $comment_id Comment ID.
 	 * @return void
@@ -222,13 +222,13 @@ class MediaHandler extends AbstractModule {
 		check_ajax_referer( 'wp_rest', '_wpnonce' );
 
 		if ( ! isset( $_POST['comment_id'] ) ) {
-			wp_send_json_error( array( 'message' => __( 'Missing comment ID.', 'beplus-advanced-reviews' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Missing comment ID.', 'beplus-advanced-reviews-for-woocommerce' ) ) );
 		}
 
 		$comment_id = absint( $_POST['comment_id'] );
 
 		if ( empty( $_FILES ) ) {
-			wp_send_json_error( array( 'message' => __( 'No files uploaded.', 'beplus-advanced-reviews' ) ) );
+			wp_send_json_error( array( 'message' => __( 'No files uploaded.', 'beplus-advanced-reviews-for-woocommerce' ) ) );
 		}
 
 		$attachment_ids = array();
@@ -240,7 +240,7 @@ class MediaHandler extends AbstractModule {
 		}
 
 		if ( empty( $attachment_ids ) ) {
-			wp_send_json_error( array( 'message' => __( 'Upload failed.', 'beplus-advanced-reviews' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Upload failed.', 'beplus-advanced-reviews-for-woocommerce' ) ) );
 		}
 
 		wp_send_json_success( array(
@@ -267,16 +267,16 @@ class MediaHandler extends AbstractModule {
 		$is_video = str_starts_with( $mime_type, 'video/' );
 
 		if ( $is_video ) {
-			if ( ! beplus_advanced_reviews_is_videos_enabled() ) {
+			if ( ! beplus_advanced_reviews_for_woocommerce_is_videos_enabled() ) {
 				return null;
 			}
-			$max_size = beplus_advanced_reviews_get_max_video_size();
+			$max_size = beplus_advanced_reviews_for_woocommerce_get_max_video_size();
 			$allowed  = array( 'video/mp4', 'video/webm', 'video/ogg' );
 		} else {
-			if ( ! beplus_advanced_reviews_is_images_enabled() ) {
+			if ( ! beplus_advanced_reviews_for_woocommerce_is_images_enabled() ) {
 				return null;
 			}
-			$max_size = beplus_advanced_reviews_get_max_image_size();
+			$max_size = beplus_advanced_reviews_for_woocommerce_get_max_image_size();
 			$allowed  = array( 'image/jpeg', 'image/png', 'image/webp' );
 		}
 
@@ -325,7 +325,7 @@ class MediaHandler extends AbstractModule {
 		$result = $this->storage->store( $file_path, $file['name'] );
 
 		if ( is_wp_error( $result ) ) {
-			error_log( 'BePlus Advanced Reviews: Storage store() failed. comment_id=' . $comment_id . ' error=' . $result->get_error_message() );
+			error_log( 'Beplus Advanced Reviews For Woocommerce: Storage store() failed. comment_id=' . $comment_id . ' error=' . $result->get_error_message() );
 			return null;
 		}
 
@@ -334,7 +334,7 @@ class MediaHandler extends AbstractModule {
 		$this->storage->generate_metadata( $attachment_id, $file_path );
 
 		$inserted = $wpdb->insert(
-			$wpdb->prefix . 'bpar_review_media',
+			$wpdb->prefix . 'bparfw_review_media',
 			array(
 				'comment_id'    => $comment_id,
 				'attachment_id' => $attachment_id,
@@ -345,7 +345,7 @@ class MediaHandler extends AbstractModule {
 		);
 
 		if ( false === $inserted ) {
-			error_log( 'BePlus Advanced Reviews: Failed to insert review media link. comment_id=' . $comment_id . ' attachment_id=' . $attachment_id . ' error=' . $wpdb->last_error );
+			error_log( 'Beplus Advanced Reviews For Woocommerce: Failed to insert review media link. comment_id=' . $comment_id . ' attachment_id=' . $attachment_id . ' error=' . $wpdb->last_error );
 		}
 
 		do_action( HookManager::MEDIA_UPLOADED, $comment_id, $attachment_id );
@@ -364,7 +364,7 @@ class MediaHandler extends AbstractModule {
 
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT attachment_id FROM {$wpdb->prefix}bpar_review_media WHERE comment_id = %d",
+				"SELECT attachment_id FROM {$wpdb->prefix}bparfw_review_media WHERE comment_id = %d",
 				$comment_id
 			)
 		);
@@ -382,7 +382,7 @@ class MediaHandler extends AbstractModule {
 	}
 
 	/**
-	 * Remove all bpar_review_media links for a comment.
+	 * Remove all bparfw_review_media links for a comment.
 	 *
 	 * @param int $comment_id Comment ID.
 	 * @return void
@@ -391,7 +391,7 @@ class MediaHandler extends AbstractModule {
 		global $wpdb;
 
 		$wpdb->delete(
-			$wpdb->prefix . 'bpar_review_media',
+			$wpdb->prefix . 'bparfw_review_media',
 			array( 'comment_id' => $comment_id ),
 			array( '%d' )
 		);

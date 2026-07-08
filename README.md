@@ -1,1 +1,1 @@
-# beplus-advanced-reviews
+# beplus-advanced-reviews-for-woocommerce

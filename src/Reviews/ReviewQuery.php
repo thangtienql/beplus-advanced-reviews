@@ -2,11 +2,11 @@
 /**
  * ReviewQuery — builds and modifies review queries.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Reviews
  */
 
-namespace BePlusAdvancedReviews\Reviews;
+namespace BeplusAdvancedReviewsForWoocommerce\Reviews;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -47,7 +47,7 @@ class ReviewQuery {
 			}
 		}
 
-		$args = apply_filters( 'beplus-advanced-reviews/review.query', $args, $params );
+		$args = apply_filters( 'beplus-advanced-reviews-for-woocommerce/review.query', $args, $params );
 
 		return $args;
 	}

@@ -1,7 +1,7 @@
 /**
  * Editor script for the Advanced Reviews block.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  */
 
 import { registerBlockType } from '@wordpress/blocks';
@@ -28,57 +28,57 @@ registerBlockType( blockJson.name, {
 		} = attributes;
 
 		const blockProps = useBlockProps( {
-			className: 'beplus-advanced-reviews beplus-advanced-reviews--editor-preview',
+			className: 'beplus-advanced-reviews-for-woocommerce beplus-advanced-reviews-for-woocommerce--editor-preview',
 		} );
 
 		return (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Display Options', 'beplus-advanced-reviews' ) }>
+					<PanelBody title={ __( 'Display Options', 'beplus-advanced-reviews-for-woocommerce' ) }>
 						<ToggleControl
-							label={ __( 'Show star distribution', 'beplus-advanced-reviews' ) }
+							label={ __( 'Show star distribution', 'beplus-advanced-reviews-for-woocommerce' ) }
 							checked={ showDistribution }
 							onChange={ ( val ) => setAttributes( { showDistribution: val } ) }
 						/>
 						<ToggleControl
-							label={ __( 'Show filter bar', 'beplus-advanced-reviews' ) }
+							label={ __( 'Show filter bar', 'beplus-advanced-reviews-for-woocommerce' ) }
 							checked={ showFilterBar }
 							onChange={ ( val ) => setAttributes( { showFilterBar: val } ) }
 						/>
 						<ToggleControl
-							label={ __( 'Show submit form', 'beplus-advanced-reviews' ) }
+							label={ __( 'Show submit form', 'beplus-advanced-reviews-for-woocommerce' ) }
 							checked={ showSubmitForm }
 							onChange={ ( val ) => setAttributes( { showSubmitForm: val } ) }
 						/>
 						<ToggleControl
-							label={ __( 'Show images in reviews', 'beplus-advanced-reviews' ) }
+							label={ __( 'Show images in reviews', 'beplus-advanced-reviews-for-woocommerce' ) }
 							checked={ showImages }
 							onChange={ ( val ) => setAttributes( { showImages: val } ) }
 						/>
 						<ToggleControl
-							label={ __( 'Show reviewer avatar', 'beplus-advanced-reviews' ) }
+							label={ __( 'Show reviewer avatar', 'beplus-advanced-reviews-for-woocommerce' ) }
 							checked={ showAvatar }
 							onChange={ ( val ) => setAttributes( { showAvatar: val } ) }
 						/>
 						<RangeControl
-							label={ __( 'Reviews per load', 'beplus-advanced-reviews' ) }
+							label={ __( 'Reviews per load', 'beplus-advanced-reviews-for-woocommerce' ) }
 							value={ reviewsPerLoad }
 							onChange={ ( val ) => setAttributes( { reviewsPerLoad: val } ) }
 							min={ 1 }
 							max={ 50 }
 						/>
 						<ToggleControl
-							label={ __( 'Enable lazy load', 'beplus-advanced-reviews' ) }
+							label={ __( 'Enable lazy load', 'beplus-advanced-reviews-for-woocommerce' ) }
 							checked={ enableLazyLoad }
 							onChange={ ( val ) => setAttributes( { enableLazyLoad: val } ) }
 						/>
 					</PanelBody>
 				</InspectorControls>
 				<div { ...blockProps }>
-					<div className="beplus-advanced-reviews__editor-placeholder">
+					<div className="beplus-advanced-reviews-for-woocommerce__editor-placeholder">
 						<span className="dashicons dashicons-star-filled"></span>
-						<h3>{ __( 'Advanced Reviews', 'beplus-advanced-reviews' ) }</h3>
-						<p>{ __( 'Reviews will display here on the product page.', 'beplus-advanced-reviews' ) }</p>
+						<h3>{ __( 'Advanced Reviews', 'beplus-advanced-reviews-for-woocommerce' ) }</h3>
+						<p>{ __( 'Reviews will display here on the product page.', 'beplus-advanced-reviews-for-woocommerce' ) }</p>
 					</div>
 				</div>
 			</>

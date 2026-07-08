@@ -1,4 +1,4 @@
-=== BePlus Advanced Reviews ===
+=== Beplus Advanced Reviews For Woocommerce ===
 Contributors: beplus
 Tags: woocommerce, reviews, product reviews, images, star rating, gutenberg
 Requires at least: 6.0
@@ -12,7 +12,7 @@ Modern WooCommerce product reviews with image support, star distribution, AJAX f
 
 == Description ==
 
-BePlus Advanced Reviews upgrades WooCommerce product reviews with a modern, AJAX-driven interface. Features include:
+Beplus Advanced Reviews For Woocommerce upgrades WooCommerce product reviews with a modern, AJAX-driven interface. Features include:
 
 * Average rating score and total review count
 * Star distribution bar chart (1★–5★)
@@ -27,7 +27,7 @@ BePlus Advanced Reviews upgrades WooCommerce product reviews with a modern, AJAX
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/beplus-advanced-reviews/`.
+1. Upload the plugin files to `/wp-content/plugins/beplus-advanced-reviews-for-woocommerce/`.
 2. Activate the plugin through the 'Plugins' screen in WordPress.
 3. The Advanced Reviews block is automatically applied to all Single Product pages.
 4. Configure display mode and other settings under Settings > BePlus Reviews.

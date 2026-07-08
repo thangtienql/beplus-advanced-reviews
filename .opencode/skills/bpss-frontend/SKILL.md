@@ -1,9 +1,9 @@
 ---
 name: bpss-frontend
-description: Use when editing JavaScript, TypeScript, or CSS assets under admin/js/, blocks/ (view scripts), or assets/. Covers build workflow, localization, REST integration, CSS scoping, and front-end accessibility for BePlus Advanced Reviews.
+description: Use when editing JavaScript, TypeScript, or CSS assets under admin/js/, blocks/ (view scripts), or assets/. Covers build workflow, localization, REST integration, CSS scoping, and front-end accessibility for Beplus Advanced Reviews For Woocommerce.
 ---
 
-# BePlus Advanced Reviews — front-end (JS + CSS)
+# Beplus Advanced Reviews For Woocommerce — front-end (JS + CSS)
 
 ## Source vs build
 
@@ -49,11 +49,11 @@ Run `npm run build` or the plugin's preferred watch/build command after source c
 
 ```text
 ❌ Hard-code /wp-json/ paths in front-end requests
-✅ Use localized REST URLs or `rest_url( 'beplus-advanced-reviews/v1/' )`
+✅ Use localized REST URLs or `rest_url( 'beplus-advanced-reviews-for-woocommerce/v1/' )`
 
 ❌ Edit generated build files to tweak spacing
 ✅ Change the source stylesheet or JS and rebuild
 
-❌ .beplus-advanced-reviews__button:focus { outline: none; }
-✅ .beplus-advanced-reviews__button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+❌ .beplus-advanced-reviews-for-woocommerce__button:focus { outline: none; }
+✅ .beplus-advanced-reviews-for-woocommerce__button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 ```

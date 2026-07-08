@@ -2,13 +2,13 @@
 /**
  * SchemaManager — create and migrate custom database tables.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage DB
  */
 
-namespace BePlusAdvancedReviews\DB;
+namespace BeplusAdvancedReviewsForWoocommerce\DB;
 
-use BePlusAdvancedReviews\Core\AbstractModule;
+use BeplusAdvancedReviewsForWoocommerce\Core\AbstractModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -26,10 +26,10 @@ class SchemaManager extends AbstractModule {
 	 * @return void
 	 */
 	public function maybe_create_tables(): void {
-		$current_version = get_option( 'beplus_advanced_reviews_schema_version', '0' );
-		if ( version_compare( $current_version, BEPLUS_ADVANCED_REVIEWS_VERSION, '<' ) ) {
+		$current_version = get_option( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_schema_version', '0' );
+		if ( version_compare( $current_version, BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION, '<' ) ) {
 			$this->create_tables();
-			update_option( 'beplus_advanced_reviews_schema_version', BEPLUS_ADVANCED_REVIEWS_VERSION, false );
+			update_option( 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_schema_version', BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION, false );
 		}
 	}
 
@@ -43,7 +43,7 @@ class SchemaManager extends AbstractModule {
 
 		$charset_collate = $wpdb->get_charset_collate();
 
-		$table_media = $wpdb->prefix . 'bpar_review_media';
+		$table_media = $wpdb->prefix . 'bparfw_review_media';
 
 		$sql = "CREATE TABLE {$table_media} (
 			id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

@@ -2,20 +2,20 @@
 /**
  * Plugin — main bootstrap, activate, and deactivate.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Core
  */
 
-namespace BePlusAdvancedReviews\Core;
+namespace BeplusAdvancedReviewsForWoocommerce\Core;
 
-use BePlusAdvancedReviews\Settings\SettingsRegistry;
-use BePlusAdvancedReviews\DB\SchemaManager;
-use BePlusAdvancedReviews\Blocks\BlockRegistry;
-use BePlusAdvancedReviews\REST\ReviewController;
-use BePlusAdvancedReviews\REST\SettingsController;
-use BePlusAdvancedReviews\Media\MediaHandler;
-use BePlusAdvancedReviews\Media\LocalMediaStorage;
-use BePlusAdvancedReviews\Media\MediaStorageInterface;
+use BeplusAdvancedReviewsForWoocommerce\Settings\SettingsRegistry;
+use BeplusAdvancedReviewsForWoocommerce\DB\SchemaManager;
+use BeplusAdvancedReviewsForWoocommerce\Blocks\BlockRegistry;
+use BeplusAdvancedReviewsForWoocommerce\REST\ReviewController;
+use BeplusAdvancedReviewsForWoocommerce\REST\SettingsController;
+use BeplusAdvancedReviewsForWoocommerce\Media\MediaHandler;
+use BeplusAdvancedReviewsForWoocommerce\Media\LocalMediaStorage;
+use BeplusAdvancedReviewsForWoocommerce\Media\MediaStorageInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -104,8 +104,8 @@ class Plugin {
 	 */
 	public function register_block_category( array $categories ): array {
 		$categories[] = array(
-			'slug'  => 'beplus-advanced-reviews',
-			'title' => __( 'BePlus Advanced Reviews', 'beplus-advanced-reviews' ),
+			'slug'  => 'beplus-advanced-reviews-for-woocommerce',
+			'title' => __( 'Beplus Advanced Reviews For Woocommerce', 'beplus-advanced-reviews-for-woocommerce' ),
 		);
 
 		return $categories;
@@ -113,9 +113,9 @@ class Plugin {
 
 	public function load_textdomain(): void {
 		load_plugin_textdomain(
-			'beplus-advanced-reviews',
+			'beplus-advanced-reviews-for-woocommerce',
 			false,
-			dirname( BEPLUS_ADVANCED_REVIEWS_PLUGIN_BASENAME ) . '/languages'
+			dirname( BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_BASENAME ) . '/languages'
 		);
 	}
 

@@ -1,9 +1,9 @@
 ---
 name: bpss-add-review-provider
-description: Adds a new review provider or review data source to BePlus Advanced Reviews by extending the plugin's storage, REST, and formatting layers. Use when adding imported reviews, external syncs, custom criteria sources, or review enrichment services.
+description: Adds a new review provider or review data source to Beplus Advanced Reviews For Woocommerce by extending the plugin's storage, REST, and formatting layers. Use when adding imported reviews, external syncs, custom criteria sources, or review enrichment services.
 ---
 
-# BePlus Advanced Reviews — add a review provider
+# Beplus Advanced Reviews For Woocommerce — add a review provider
 
 ## Before you edit
 

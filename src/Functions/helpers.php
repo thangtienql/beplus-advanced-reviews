@@ -1,11 +1,11 @@
 <?php
 /**
- * Namespaced helper functions for BePlus Advanced Reviews.
+ * Namespaced helper functions for Beplus Advanced Reviews For Woocommerce.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  */
 
-namespace BePlusAdvancedReviews\Functions;
+namespace BeplusAdvancedReviewsForWoocommerce\Functions;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array<string, mixed>
  */
 function get_settings(): array {
-	return function_exists( 'beplus_advanced_reviews_get_settings' )
-		? beplus_advanced_reviews_get_settings()
+	return function_exists( 'beplus_advanced_reviews_for_woocommerce_get_settings' )
+		? beplus_advanced_reviews_for_woocommerce_get_settings()
 		: array();
 }
 
@@ -28,7 +28,7 @@ function get_settings(): array {
  * @return string
  */
 function get_display_mode(): string {
-	return function_exists( 'beplus_advanced_reviews_get_display_mode' )
-		? beplus_advanced_reviews_get_display_mode()
+	return function_exists( 'beplus_advanced_reviews_for_woocommerce_get_display_mode' )
+		? beplus_advanced_reviews_for_woocommerce_get_display_mode()
 		: 'replace';
 }

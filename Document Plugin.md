@@ -1,6 +1,6 @@
-# BePlus Advanced Reviews — Plugin Structure Documentation
+# Beplus Advanced Reviews For Woocommerce — Plugin Structure Documentation
 
-> This document defines the architecture standards, naming conventions, and build checklist for the **BePlus Advanced Reviews** plugin.
+> This document defines the architecture standards, naming conventions, and build checklist for the **Beplus Advanced Reviews For Woocommerce** plugin.
 
 ---
 
@@ -8,18 +8,18 @@
 
 | Item | Value |
 |------|-------|
-| **Display name** | BePlus Advanced Reviews |
-| **Directory slug** | `beplus-advanced-reviews` |
-| **Bootstrap file** | `beplus-advanced-reviews.php` |
-| **Text domain** | `beplus-advanced-reviews` |
-| **PHP namespace** | `BePlusAdvancedReviews` |
-| **Global function prefix** | `beplus_advanced_reviews_` |
+| **Display name** | Beplus Advanced Reviews For Woocommerce |
+| **Directory slug** | `beplus-advanced-reviews-for-woocommerce` |
+| **Bootstrap file** | `beplus-advanced-reviews-for-woocommerce.php` |
+| **Text domain** | `beplus-advanced-reviews-for-woocommerce` |
+| **PHP namespace** | `BeplusAdvancedReviewsForWoocommerce` |
+| **Global function prefix** | `beplus_advanced_reviews_for_woocommerce_` |
 | **Constants prefix** | `BEPLUS_ADVANCED_REVIEWS_` |
-| **Hook prefix (legacy WP style)** | `beplus_advanced_reviews_` |
-| **Hook prefix (new, namespaced)** | `beplus-advanced-reviews/` or `beplus_advanced_reviews.` |
-| **REST namespace** | `beplus-advanced-reviews/v1` |
-| **Block category** | `beplus-advanced-reviews` |
-| **Block name prefix** | `beplus-advanced-reviews/` |
+| **Hook prefix (legacy WP style)** | `beplus_advanced_reviews_for_woocommerce_` |
+| **Hook prefix (new, namespaced)** | `beplus-advanced-reviews-for-woocommerce/` or `beplus_advanced_reviews.` |
+| **REST namespace** | `beplus-advanced-reviews-for-woocommerce/v1` |
+| **Block category** | `beplus-advanced-reviews-for-woocommerce` |
+| **Block name prefix** | `beplus-advanced-reviews-for-woocommerce/` |
 | **Requires WP** | 6.0+ |
 | **Requires PHP** | 7.4+ (8.0+ recommended) |
 
@@ -63,7 +63,7 @@ Each review card displays:
 - Upload via file input (multi-select)
 - **Copy/paste from clipboard** into the review form
 - Uses WordPress Media Library for storage
-- Linked via `{wpdb->prefix}bpar_review_media` table
+- Linked via `{wpdb->prefix}bparfw_review_media` table
 
 ### 2.5 Plugin Settings — Display Mode
 
@@ -79,10 +79,10 @@ Each review card displays:
 This plugin uses a **container-based architecture** — every module registers hooks inside `register()`, with no side effects when files are `require`d.
 
 ```
-beplus-advanced-reviews.php   ← Bootstrap: constants, autoload, activation hooks
+beplus-advanced-reviews-for-woocommerce.php   ← Bootstrap: constants, autoload, activation hooks
         │
         ▼
-BePlusAdvancedReviews\Core\Plugin    ← Entry point: boot(), activate(), deactivate()
+BeplusAdvancedReviewsForWoocommerce\Core\Plugin    ← Entry point: boot(), activate(), deactivate()
         │
         ├── Container                 ← DI container (lazy singleton)
         ├── AbstractModule           ← Base class for all modules
@@ -108,8 +108,8 @@ BePlusAdvancedReviews\Core\Plugin    ← Entry point: boot(), activate(), deacti
 ## 4. Recommended Directory Structure
 
 ```
-beplus-advanced-reviews/
-├── beplus-advanced-reviews.php   # Main plugin file (WordPress reads the header here)
+beplus-advanced-reviews-for-woocommerce/
+├── beplus-advanced-reviews-for-woocommerce.php   # Main plugin file (WordPress reads the header here)
 ├── readme.txt                    # WordPress.org readme (if publishing)
 ├── composer.json                 # PSR-4 autoload + dev dependencies
 ├── package.json                  # esbuild / TypeScript build
@@ -195,7 +195,7 @@ beplus-advanced-reviews/
 │       └── media-item.php
 │
 ├── languages/                    # .pot, .po, .mo
-│   └── beplus-advanced-reviews.pot
+│   └── beplus-advanced-reviews-for-woocommerce.pot
 │
 └── vendor/                       # Composer autoload (dev)
 ```
@@ -204,48 +204,48 @@ beplus-advanced-reviews/
 
 ---
 
-## 5. Bootstrap File — `beplus-advanced-reviews.php`
+## 5. Bootstrap File — `beplus-advanced-reviews-for-woocommerce.php`
 
 ```php
 <?php
 /**
- * Plugin Name: BePlus Advanced Reviews
+ * Plugin Name: Beplus Advanced Reviews For Woocommerce
  * Plugin URI:  https://beplusthemes.com/
  * Description: Modern WooCommerce product reviews with image support, star distribution, AJAX filtering, and load more.
  * Version:     1.0.0
  * Author:      Beplus
  * Author URI:  https://beplusthemes.com/
- * Text Domain: beplus-advanced-reviews
+ * Text Domain: beplus-advanced-reviews-for-woocommerce
  * Domain Path: /languages
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * License:     GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'BEPLUS_ADVANCED_REVIEWS_VERSION', '1.0.0' );
-define( 'BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-define( 'BEPLUS_ADVANCED_REVIEWS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'BEPLUS_ADVANCED_REVIEWS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION', '1.0.0' );
+define( 'BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-$autoload = BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR . 'vendor/autoload.php';
+$autoload = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'vendor/autoload.php';
 if ( file_exists( $autoload ) ) {
 	require_once $autoload;
 } else {
 	spl_autoload_register(
 		function ( string $class_name ) {
-			$prefix = 'BePlusAdvancedReviews\\';
+			$prefix = 'BeplusAdvancedReviewsForWoocommerce\\';
 			if ( strncmp( $class_name, $prefix, strlen( $prefix ) ) !== 0 ) {
 				return;
 			}
 
-			$file = BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR
+			$file = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR
 				. 'src/'
 				. str_replace( '\\', '/', substr( $class_name, strlen( $prefix ) ) )
 				. '.php';
@@ -260,49 +260,49 @@ if ( file_exists( $autoload ) ) {
 /**
  * Boot plugin.
  *
- * @return \BePlusAdvancedReviews\Core\Plugin
+ * @return \BeplusAdvancedReviewsForWoocommerce\Core\Plugin
  */
-function beplus_advanced_reviews_boot() {
+function beplus_advanced_reviews_for_woocommerce_boot() {
 	static $plugin = null;
 
 	if ( null === $plugin ) {
-		$plugin = new \BePlusAdvancedReviews\Core\Plugin();
+		$plugin = new \BeplusAdvancedReviewsForWoocommerce\Core\Plugin();
 		$plugin->boot();
 	}
 
 	return $plugin;
 }
 
-add_action( 'plugins_loaded', 'beplus_advanced_reviews_init' );
+add_action( 'plugins_loaded', 'beplus_advanced_reviews_for_woocommerce_init' );
 
 /**
  * Init on plugins_loaded.
  *
  * @return void
  */
-function beplus_advanced_reviews_init() {
-	beplus_advanced_reviews_boot();
+function beplus_advanced_reviews_for_woocommerce_init() {
+	beplus_advanced_reviews_for_woocommerce_boot();
 }
 
-register_activation_hook( __FILE__, 'beplus_advanced_reviews_activate' );
-register_deactivation_hook( __FILE__, 'beplus_advanced_reviews_deactivate' );
+register_activation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_activate' );
+register_deactivation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_deactivate' );
 
 /**
  * Activation handler.
  *
  * @return void
  */
-function beplus_advanced_reviews_activate() {
+function beplus_advanced_reviews_for_woocommerce_activate() {
 	if ( version_compare( PHP_VERSION, '7.4', '<' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		wp_die(
-			esc_html__( 'BePlus Advanced Reviews requires PHP 7.4 or higher.', 'beplus-advanced-reviews' ),
+			esc_html__( 'Beplus Advanced Reviews For Woocommerce requires PHP 7.4 or higher.', 'beplus-advanced-reviews-for-woocommerce' ),
 			'Plugin Activation Error',
 			array( 'back_link' => true )
 		);
 	}
 
-	( new \BePlusAdvancedReviews\Core\Plugin() )->activate();
+	( new \BeplusAdvancedReviewsForWoocommerce\Core\Plugin() )->activate();
 }
 
 /**
@@ -310,8 +310,8 @@ function beplus_advanced_reviews_activate() {
  *
  * @return void
  */
-function beplus_advanced_reviews_deactivate() {
-	( new \BePlusAdvancedReviews\Core\Plugin() )->deactivate();
+function beplus_advanced_reviews_for_woocommerce_deactivate() {
+	( new \BeplusAdvancedReviewsForWoocommerce\Core\Plugin() )->deactivate();
 }
 ```
 
@@ -323,10 +323,10 @@ function beplus_advanced_reviews_deactivate() {
 
 | Constant | Purpose |
 |----------|---------|
-| `BEPLUS_ADVANCED_REVIEWS_VERSION` | Plugin version string |
-| `BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR` | Absolute path to plugin root |
-| `BEPLUS_ADVANCED_REVIEWS_PLUGIN_URL` | Plugin URL |
-| `BEPLUS_ADVANCED_REVIEWS_PLUGIN_BASENAME` | Relative path from `wp-content/plugins/` |
+| `BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION` | Plugin version string |
+| `BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR` | Absolute path to plugin root |
+| `BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_URL` | Plugin URL |
+| `BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_BASENAME` | Relative path from `wp-content/plugins/` |
 
 - Always **UPPER_SNAKE_CASE** with the plugin prefix.
 
@@ -338,28 +338,28 @@ function beplus_advanced_reviews_deactivate() {
 
 | Function | Purpose |
 |----------|---------|
-| `beplus_advanced_reviews_boot()` | Boot plugin container |
-| `beplus_advanced_reviews_init()` | Late init hook |
-| `beplus_advanced_reviews_activate()` | Activation handler |
-| `beplus_advanced_reviews_get_settings()` | Read merged settings |
-| `beplus_advanced_reviews_render_review_card()` | Render a review card |
-| `beplus_advanced_reviews_get_star_distribution()` | Get star distribution data |
+| `beplus_advanced_reviews_for_woocommerce_boot()` | Boot plugin container |
+| `beplus_advanced_reviews_for_woocommerce_init()` | Late init hook |
+| `beplus_advanced_reviews_for_woocommerce_activate()` | Activation handler |
+| `beplus_advanced_reviews_for_woocommerce_get_settings()` | Read merged settings |
+| `beplus_advanced_reviews_for_woocommerce_render_review_card()` | Render a review card |
+| `beplus_advanced_reviews_for_woocommerce_get_star_distribution()` | Get star distribution data |
 
 **Rules:**
 
-- Prefix is always `beplus_advanced_reviews_`.
+- Prefix is always `beplus_advanced_reviews_for_woocommerce_`.
 - Use action verbs: `get_`, `render_`, `register_`, `process_`, `sanitize_`, `is_`, `has_`.
-- Include module name when needed: `beplus_advanced_reviews_rebuild_review_cache()`.
+- Include module name when needed: `beplus_advanced_reviews_for_woocommerce_rebuild_review_cache()`.
 - Every public function must have full **PHPDoc** with `@param` and `@return`.
 
 ### 6.3 Namespaced functions (`src/Functions/`)
 
 ```php
-namespace BePlusAdvancedReviews\Functions;
+namespace BeplusAdvancedReviewsForWoocommerce\Functions;
 
 function get_settings(): array {
-	return function_exists( 'beplus_advanced_reviews_get_settings' )
-		? beplus_advanced_reviews_get_settings()
+	return function_exists( 'beplus_advanced_reviews_for_woocommerce_get_settings' )
+		? beplus_advanced_reviews_for_woocommerce_get_settings()
 		: array();
 }
 ```
@@ -382,9 +382,9 @@ function get_settings(): array {
 **Namespace mapping (PSR-4):**
 
 ```
-BePlusAdvancedReviews\Core\Plugin           → src/Core/Plugin.php
-BePlusAdvancedReviews\Reviews\ReviewRepository → src/Reviews/ReviewRepository.php
-BePlusAdvancedReviews\REST\ReviewController  → src/REST/ReviewController.php
+BeplusAdvancedReviewsForWoocommerce\Core\Plugin           → src/Core/Plugin.php
+BeplusAdvancedReviewsForWoocommerce\Reviews\ReviewRepository → src/Reviews/ReviewRepository.php
+BeplusAdvancedReviewsForWoocommerce\REST\ReviewController  → src/REST/ReviewController.php
 ```
 
 ### 6.5 File naming
@@ -407,56 +407,56 @@ BePlusAdvancedReviews\REST\ReviewController  → src/REST/ReviewController.php
 // HookManager.php
 public const SERVICES           = 'beplus_advanced_reviews.services';
 public const BLOCKS             = 'beplus_advanced_reviews.blocks';
-public const REVIEW_QUERY       = 'beplus-advanced-reviews/review.query';
-public const REVIEW_RESULTS     = 'beplus-advanced-reviews/review.results';
-public const REVIEW_SUBMITTED   = 'beplus-advanced-reviews/review.submitted';
-public const MEDIA_UPLOADED     = 'beplus-advanced-reviews/media.uploaded';
+public const REVIEW_QUERY       = 'beplus-advanced-reviews-for-woocommerce/review.query';
+public const REVIEW_RESULTS     = 'beplus-advanced-reviews-for-woocommerce/review.results';
+public const REVIEW_SUBMITTED   = 'beplus-advanced-reviews-for-woocommerce/review.submitted';
+public const MEDIA_UPLOADED     = 'beplus-advanced-reviews-for-woocommerce/media.uploaded';
 ```
 
 **Legacy WordPress style (still used for compatibility hooks):**
 
 ```php
-do_action( 'beplus_advanced_reviews_before_review_list', $args );
-apply_filters( 'beplus_advanced_reviews_review_card_html', $html, $review );
+do_action( 'beplus_advanced_reviews_for_woocommerce_before_review_list', $args );
+apply_filters( 'beplus_advanced_reviews_for_woocommerce_review_card_html', $html, $review );
 ```
 
 ### 6.7 Options and transients
 
 ```php
 // Options
-'beplus_advanced_reviews_settings'        // main settings (display mode, etc.)
-'beplus_advanced_reviews_schema_version'  // schema version tracker
+'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings'        // main settings (display mode, etc.)
+'beplus_advanced_reviews_for_woocommerce_for_woocommerce_schema_version'  // schema version tracker
 
 // Transients
-'beplus_advanced_reviews_review_counts'
-'beplus_advanced_reviews_media_cache'
+'beplus_advanced_reviews_for_woocommerce_review_counts'
+'beplus_advanced_reviews_for_woocommerce_media_cache'
 ```
 
 ### 6.8 Database tables
 
 ```php
 // Prefix: {wpdb->prefix}bpar_
-$wpdb->prefix . 'bpar_review_media'
+$wpdb->prefix . 'bparfw_review_media'
 ```
 
-- Short table prefix `bpar_` (BePlus Advanced Reviews).
+- Short table prefix `bparfw_` (Beplus Advanced Reviews For Woocommerce).
 - Create / migrate tables in `activate()` or via `SchemaManager`.
 
 ### 6.9 Script and style handles
 
 ```php
-'beplus-advanced-reviews-admin'
-'beplus-advanced-reviews-frontend'
-'beplus-advanced-reviews-block-advanced-review'
+'beplus-advanced-reviews-for-woocommerce-admin'
+'beplus-advanced-reviews-for-woocommerce-frontend'
+'beplus-advanced-reviews-for-woocommerce-block-advanced-review'
 ```
 
 ### 6.10 CSS class prefix
 
 ```html
-<div class="beplus-advanced-reviews beplus-advanced-reviews__review-card">
+<div class="beplus-advanced-reviews-for-woocommerce beplus-advanced-reviews-for-woocommerce__review-card">
 ```
 
-- BEM blocks: `beplus-advanced-reviews__element--modifier`.
+- BEM blocks: `beplus-advanced-reviews-for-woocommerce__element--modifier`.
 
 ---
 
@@ -464,7 +464,7 @@ $wpdb->prefix . 'bpar_review_media'
 
 ```sql
 -- Links uploaded images to a review (WooCommerce comment)
-CREATE TABLE {prefix}bpar_review_media (
+CREATE TABLE {prefix}bparfw_review_media (
   id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   comment_id    BIGINT UNSIGNED NOT NULL,          -- wp_comments.comment_ID
   attachment_id BIGINT UNSIGNED NOT NULL,          -- wp_posts (attachment)
@@ -487,11 +487,11 @@ CREATE TABLE {prefix}bpar_review_media (
 /**
  * Review Controller — exposes review listing and submission endpoints.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Reviews
  */
 
-namespace BePlusAdvancedReviews\Reviews;
+namespace BeplusAdvancedReviewsForWoocommerce\Reviews;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -501,7 +501,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ### 8.2 AbstractModule — base for all modules
 
 ```php
-namespace BePlusAdvancedReviews\Core;
+namespace BeplusAdvancedReviewsForWoocommerce\Core;
 
 abstract class AbstractModule {
 
@@ -512,9 +512,9 @@ abstract class AbstractModule {
 
 	public function __construct( Container $container ) {
 		$this->container  = $container;
-		$this->version    = BEPLUS_ADVANCED_REVIEWS_VERSION;
-		$this->plugin_dir = BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR;
-		$this->plugin_url = BEPLUS_ADVANCED_REVIEWS_PLUGIN_URL;
+		$this->version    = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_VERSION;
+		$this->plugin_dir = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR;
+		$this->plugin_url = BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_URL;
 	}
 
 	/**
@@ -533,7 +533,7 @@ abstract class AbstractModule {
 ### 8.3 Plugin class — boot flow
 
 ```php
-namespace BePlusAdvancedReviews\Core;
+namespace BeplusAdvancedReviewsForWoocommerce\Core;
 
 class Plugin {
 
@@ -600,11 +600,11 @@ $this->container->register( $services );
 ### 8.5 SettingsRegistry — Display Mode
 
 ```php
-namespace BePlusAdvancedReviews\Settings;
+namespace BeplusAdvancedReviewsForWoocommerce\Settings;
 
 class SettingsRegistry extends AbstractModule {
 
-	private const OPTION_KEY = 'beplus_advanced_reviews_settings';
+	private const OPTION_KEY = 'beplus_advanced_reviews_for_woocommerce_for_woocommerce_settings';
 
 	private const DEFAULTS = array(
 		'display_mode'      => 'replace',
@@ -631,12 +631,12 @@ class SettingsRegistry extends AbstractModule {
 ### 8.6 REST Controller — Reviews
 
 ```php
-namespace BePlusAdvancedReviews\REST;
+namespace BeplusAdvancedReviewsForWoocommerce\REST;
 
 class ReviewController extends \WP_REST_Controller {
 
 	public function __construct() {
-		$this->namespace = 'beplus-advanced-reviews/v1';
+		$this->namespace = 'beplus-advanced-reviews-for-woocommerce/v1';
 		$this->rest_base = 'reviews';
 	}
 
@@ -685,7 +685,7 @@ class ReviewController extends \WP_REST_Controller {
 ### 8.7 MediaHandler — Upload & Paste Support
 
 ```php
-namespace BePlusAdvancedReviews\Media;
+namespace BeplusAdvancedReviewsForWoocommerce\Media;
 
 class MediaHandler extends AbstractModule {
 
@@ -738,9 +738,9 @@ blocks/advanced-review/
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "beplus-advanced-reviews/advanced-review",
+	"name": "beplus-advanced-reviews-for-woocommerce/advanced-review",
 	"title": "Advanced Reviews",
-	"category": "beplus-advanced-reviews",
+	"category": "beplus-advanced-reviews-for-woocommerce",
 	"icon": "star-filled",
 	"description": "Modern WooCommerce product reviews with images, star distribution, filtering, and load more.",
 	"attributes": {
@@ -753,7 +753,7 @@ blocks/advanced-review/
 		"enableLazyLoad":   { "type": "boolean", "default": true }
 	},
 	"render": "file:./render.php",
-	"editorScript": "beplus-advanced-reviews-block-advanced-review",
+	"editorScript": "beplus-advanced-reviews-for-woocommerce-block-advanced-review",
 	"viewScript": "file:./view.ts",
 	"style": "file:./style.css"
 }
@@ -800,7 +800,7 @@ User submits review
 
 ## 11. REST API
 
-- **Namespace:** `beplus-advanced-reviews/v1`
+- **Namespace:** `beplus-advanced-reviews-for-woocommerce/v1`
 
 | Method | Route | Auth | Description |
 |--------|-------|------|-------------|
@@ -811,7 +811,7 @@ User submits review
 | `GET` | `/settings` | `manage_options` | Retrieve plugin settings |
 | `POST` | `/settings` | `manage_options` | Save plugin settings |
 
-- Localize REST URL + nonce via `wp_localize_script` (`bparData` object).
+- Localize REST URL + nonce via `wp_localize_script` (`bparfwData` object).
 
 ---
 
@@ -827,19 +827,19 @@ User submits review
 
 ```php
 wp_localize_script(
-	'beplus-advanced-reviews-frontend',
-	'bparData',
+	'beplus-advanced-reviews-for-woocommerce-frontend',
+	'bparfwData',
 	array(
-		'restUrl'         => rest_url( 'beplus-advanced-reviews/v1/' ),
+		'restUrl'         => rest_url( 'beplus-advanced-reviews-for-woocommerce/v1/' ),
 		'nonce'           => wp_create_nonce( 'wp_rest' ),
 		'maxUploadSize'   => wp_max_upload_size(),
 		'allowedTypes'    => array( 'image/jpeg', 'image/png', 'image/webp' ),
 		'pasteEnabled'    => true,
 		'i18n'            => array(
-			'noReviews'        => __( 'No reviews yet.', 'beplus-advanced-reviews' ),
-			'loadMore'         => __( 'Load More', 'beplus-advanced-reviews' ),
-			'submitSuccess'    => __( 'Review submitted!', 'beplus-advanced-reviews' ),
-			'submitError'      => __( 'Something went wrong.', 'beplus-advanced-reviews' ),
+			'noReviews'        => __( 'No reviews yet.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'loadMore'         => __( 'Load More', 'beplus-advanced-reviews-for-woocommerce' ),
+			'submitSuccess'    => __( 'Review submitted!', 'beplus-advanced-reviews-for-woocommerce' ),
+			'submitError'      => __( 'Something went wrong.', 'beplus-advanced-reviews-for-woocommerce' ),
 		),
 	)
 );
@@ -875,19 +875,19 @@ templates/
 **Load template:**
 
 ```php
-function beplus_advanced_reviews_get_template( $template_name, $args = array() ) {
+function beplus_advanced_reviews_for_woocommerce_get_template( $template_name, $args = array() ) {
 	$paths = apply_filters(
-		'beplus_advanced_reviews_template_paths',
+		'beplus_advanced_reviews_for_woocommerce_template_paths',
 		array(
-			get_stylesheet_directory() . '/beplus-advanced-reviews/',
-			BEPLUS_ADVANCED_REVIEWS_PLUGIN_DIR . 'templates/',
+			get_stylesheet_directory() . '/beplus-advanced-reviews-for-woocommerce/',
+			BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'templates/',
 		)
 	);
 	// locate + load_template()
 }
 ```
 
-Theme override: copy a template to `{theme}/beplus-advanced-reviews/review-card.php`.
+Theme override: copy a template to `{theme}/beplus-advanced-reviews-for-woocommerce/review-card.php`.
 
 ---
 
@@ -895,13 +895,13 @@ Theme override: copy a template to `{theme}/beplus-advanced-reviews/review-card.
 
 ```json
 {
-	"name": "beplus/beplus-advanced-reviews",
+	"name": "beplus/beplus-advanced-reviews-for-woocommerce",
 	"description": "Modern WooCommerce product reviews with image support, AJAX filtering, and load more.",
 	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"autoload": {
 		"psr-4": {
-			"BePlusAdvancedReviews\\": "src/"
+			"BeplusAdvancedReviewsForWoocommerce\\": "src/"
 		}
 	},
 	"require": {
@@ -929,25 +929,25 @@ Every file must follow:
 | Capability | `current_user_can( 'manage_options' )` for admin |
 | REST | explicit `permission_callback`; do not use `__return_true` for write endpoints |
 | SQL | `$wpdb->prepare()` |
-| i18n | `__( 'Text', 'beplus-advanced-reviews' )`, `_e()`, `esc_html__()` |
+| i18n | `__( 'Text', 'beplus-advanced-reviews-for-woocommerce' )`, `_e()`, `esc_html__()` |
 
 ---
 
 ## 16. Internationalization (i18n)
 
-- Text domain: `beplus-advanced-reviews`
+- Text domain: `beplus-advanced-reviews-for-woocommerce`
 - Domain Path: `/languages`
 - Load in `Plugin::load_textdomain()`:
 
 ```php
 load_plugin_textdomain(
-	'beplus-advanced-reviews',
+	'beplus-advanced-reviews-for-woocommerce',
 	false,
-	dirname( BEPLUS_ADVANCED_REVIEWS_PLUGIN_BASENAME ) . '/languages'
+	dirname( BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_BASENAME ) . '/languages'
 );
 ```
 
-- Generate POT: `wp i18n make-pot . languages/beplus-advanced-reviews.pot`
+- Generate POT: `wp i18n make-pot . languages/beplus-advanced-reviews-for-woocommerce.pot`
 
 ---
 
@@ -955,7 +955,7 @@ load_plugin_textdomain(
 
 Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submission form, star distribution chart, lightbox, and settings screens.
 
-- **i18n:** All visible and assistive copy uses the `beplus-advanced-reviews` text domain.
+- **i18n:** All visible and assistive copy uses the `beplus-advanced-reviews-for-woocommerce` text domain.
 - **Icon-only controls:** Add `aria-label`; mark decorative SVGs `aria-hidden="true"`.
 - **Focus:** Never remove outlines without a visible `:focus-visible` replacement. Use real buttons, links, headings, lists, and form controls.
 - **Reduced motion:** Respect `prefers-reduced-motion: reduce` for transitions, lightboxes, and load-more animations.
@@ -971,20 +971,20 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 |------|------|---------|
 | `beplus_advanced_reviews.services` | filter | Register container services |
 | `beplus_advanced_reviews.blocks` | filter | Register third-party blocks |
-| `beplus-advanced-reviews/review.query` | filter | Modify review query args |
-| `beplus-advanced-reviews/review.results` | filter | Modify review result set |
-| `beplus-advanced-reviews/review.submitted` | action | Fires after a review is saved |
-| `beplus-advanced-reviews/media.uploaded` | action | Fires after review image is attached |
-| `beplus_advanced_reviews_template_paths` | filter | Override template paths |
+| `beplus-advanced-reviews-for-woocommerce/review.query` | filter | Modify review query args |
+| `beplus-advanced-reviews-for-woocommerce/review.results` | filter | Modify review result set |
+| `beplus-advanced-reviews-for-woocommerce/review.submitted` | action | Fires after a review is saved |
+| `beplus-advanced-reviews-for-woocommerce/media.uploaded` | action | Fires after review image is attached |
+| `beplus_advanced_reviews_for_woocommerce_template_paths` | filter | Override template paths |
 
 ---
 
 ## 19. New Plugin Build Checklist
 
 ### Phase 1 — Scaffold
-- [ ] Create `beplus-advanced-reviews/` directory
-- [ ] Write `beplus-advanced-reviews.php` with plugin header
-- [ ] Define `BEPLUS_ADVANCED_REVIEWS_*` constants
+- [ ] Create `beplus-advanced-reviews-for-woocommerce/` directory
+- [ ] Write `beplus-advanced-reviews-for-woocommerce.php` with plugin header
+- [ ] Define `BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_*` constants
 - [ ] Set up `composer.json` + PSR-4 autoload
 - [ ] Create `src/Core/Plugin.php`, `Container.php`, `AbstractModule.php`
 - [ ] Create `readme.txt`
@@ -1002,7 +1002,7 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 - [ ] `ReviewFormatter` — shape review data for API responses
 - [ ] `ReviewSubmission` — validate + insert reviews
 - [ ] `MediaHandler` — upload validation, paste handler, attachment linking
-- [ ] `SchemaManager` — `bpar_review_media` table
+- [ ] `SchemaManager` — `bparfw_review_media` table
 - [ ] REST: `ReviewController`, `SettingsController`
 
 ### Phase 4 — UI
@@ -1031,8 +1031,8 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 
 | Class | Path | Role |
 |-------|------|------|
-| `BePlusAdvancedReviews\Core\Plugin` | `src/Core/Plugin.php` | Boot, activate, deactivate |
-| `BePlusAdvancedReviews\Core\Placement` | `src/Core/Placement.php` | Display mode logic |
+| `BeplusAdvancedReviewsForWoocommerce\Core\Plugin` | `src/Core/Plugin.php` | Boot, activate, deactivate |
+| `BeplusAdvancedReviewsForWoocommerce\Core\Placement` | `src/Core/Placement.php` | Display mode logic |
 | `ReviewController` | `src/REST/ReviewController.php` | Review REST API |
 | `SettingsController` | `src/REST/SettingsController.php` | Settings REST API |
 | `SettingsRegistry` | `src/Settings/SettingsRegistry.php` | Options + defaults |
@@ -1042,7 +1042,7 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 | `ReviewRepository` | `src/Reviews/ReviewRepository.php` | Review data access |
 | `ReviewFormatter` | `src/Reviews/ReviewFormatter.php` | API response formatting |
 | `ReviewSubmission` | `src/Reviews/ReviewSubmission.php` | Review creation logic |
-| REST namespace | `beplus-advanced-reviews/v1` | Public API |
+| REST namespace | `beplus-advanced-reviews-for-woocommerce/v1` | Public API |
 | Primary block | `blocks/advanced-review/` | Advanced Review block |
 
 ---

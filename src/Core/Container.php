@@ -2,11 +2,11 @@
 /**
  * Container — simple DI container with lazy singleton resolution.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Core
  */
 
-namespace BePlusAdvancedReviews\Core;
+namespace BeplusAdvancedReviewsForWoocommerce\Core;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

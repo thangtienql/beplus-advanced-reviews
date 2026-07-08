@@ -1,13 +1,13 @@
 ---
 name: bpss-rest
-description: Use when creating or editing REST API controllers, routes, endpoints, or API responses under src/REST/. Covers namespace, permissions, sanitization, and response shapes for the beplus-advanced-reviews/v1 API.
+description: Use when creating or editing REST API controllers, routes, endpoints, or API responses under src/REST/. Covers namespace, permissions, sanitization, and response shapes for the beplus-advanced-reviews-for-woocommerce/v1 API.
 ---
 
-# BePlus Advanced Reviews — REST API
+# Beplus Advanced Reviews For Woocommerce — REST API
 
 ## Namespace
 
-- Base: `beplus-advanced-reviews/v1`
+- Base: `beplus-advanced-reviews-for-woocommerce/v1`
 - Controllers live under `src/REST/` and extend `WP_REST_Controller` when appropriate.
 
 ## Route conventions
@@ -28,7 +28,7 @@ Register routes on `rest_api_init` inside the plugin boot flow or a dedicated mo
 class ReviewController extends \WP_REST_Controller {
 
 	public function __construct() {
-		$this->namespace = 'beplus-advanced-reviews/v1';
+		$this->namespace = 'beplus-advanced-reviews-for-woocommerce/v1';
 		$this->rest_base = 'reviews';
 	}
 

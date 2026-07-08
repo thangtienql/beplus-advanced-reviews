@@ -2,18 +2,18 @@
 /**
  * ReviewController — REST API for review listing, submission, and distribution.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage REST
  */
 
-namespace BePlusAdvancedReviews\REST;
+namespace BeplusAdvancedReviewsForWoocommerce\REST;
 
-use BePlusAdvancedReviews\Reviews\ReviewRepository;
-use BePlusAdvancedReviews\Reviews\ReviewFormatter;
-use BePlusAdvancedReviews\Reviews\ReviewQuery;
-use BePlusAdvancedReviews\Reviews\ReviewSubmission;
-use BePlusAdvancedReviews\Media\MediaHandler;
-use BePlusAdvancedReviews\Core\HookManager;
+use BeplusAdvancedReviewsForWoocommerce\Reviews\ReviewRepository;
+use BeplusAdvancedReviewsForWoocommerce\Reviews\ReviewFormatter;
+use BeplusAdvancedReviewsForWoocommerce\Reviews\ReviewQuery;
+use BeplusAdvancedReviewsForWoocommerce\Reviews\ReviewSubmission;
+use BeplusAdvancedReviewsForWoocommerce\Media\MediaHandler;
+use BeplusAdvancedReviewsForWoocommerce\Core\HookManager;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,10 +28,10 @@ class ReviewController extends \WP_REST_Controller {
 	private MediaHandler $media_handler;
 
 	public function __construct() {
-		$this->namespace  = 'beplus-advanced-reviews/v1';
+		$this->namespace  = 'beplus-advanced-reviews-for-woocommerce/v1';
 		$this->rest_base  = 'reviews';
 
-		$this->media_handler = new MediaHandler( new \BePlusAdvancedReviews\Core\Container() );
+		$this->media_handler = new MediaHandler( new \BeplusAdvancedReviewsForWoocommerce\Core\Container() );
 		$this->repository    = new ReviewRepository();
 		$this->formatter     = new ReviewFormatter( $this->media_handler );
 		$this->review_query  = new ReviewQuery();
@@ -109,7 +109,7 @@ class ReviewController extends \WP_REST_Controller {
 		if ( $product_id < 1 ) {
 			return new \WP_Error(
 				'missing_product_id',
-				__( 'Product ID is required.', 'beplus-advanced-reviews' ),
+				__( 'Product ID is required.', 'beplus-advanced-reviews-for-woocommerce' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -199,12 +199,12 @@ class ReviewController extends \WP_REST_Controller {
 			
 			return rest_ensure_response( array(
 				'success'   => true,
-				'message'   => __( 'Review submitted successfully!', 'beplus-advanced-reviews' ),
+				'message'   => __( 'Review submitted successfully!', 'beplus-advanced-reviews-for-woocommerce' ),
 				'review'    => $data,
 			) );
 		} catch ( \Throwable $e ) {
 			ob_end_clean();
-			error_log( 'BePlus Advanced Reviews Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString() );
+			error_log( 'Beplus Advanced Reviews For Woocommerce Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString() );
 			return new \WP_Error( 'internal_error', $e->getMessage(), array( 'status' => 500 ) );
 		}
 	}
@@ -225,14 +225,14 @@ class ReviewController extends \WP_REST_Controller {
 		if ( ! $deleted ) {
 			return new \WP_Error(
 				'delete_failed',
-				__( 'Failed to delete review.', 'beplus-advanced-reviews' ),
+				__( 'Failed to delete review.', 'beplus-advanced-reviews-for-woocommerce' ),
 				array( 'status' => 500 )
 			);
 		}
 
 		return rest_ensure_response( array(
 			'success' => true,
-			'message' => __( 'Review deleted.', 'beplus-advanced-reviews' ),
+			'message' => __( 'Review deleted.', 'beplus-advanced-reviews-for-woocommerce' ),
 		) );
 	}
 
@@ -288,37 +288,37 @@ class ReviewController extends \WP_REST_Controller {
 	public function get_collection_params(): array {
 		return array(
 			'product_id' => array(
-				'description'       => __( 'Product ID.', 'beplus-advanced-reviews' ),
+				'description'       => __( 'Product ID.', 'beplus-advanced-reviews-for-woocommerce' ),
 				'type'              => 'integer',
 				'required'          => true,
 				'sanitize_callback' => 'absint',
 			),
 			'page'       => array(
-				'description'       => __( 'Page number.', 'beplus-advanced-reviews' ),
+				'description'       => __( 'Page number.', 'beplus-advanced-reviews-for-woocommerce' ),
 				'type'              => 'integer',
 				'default'           => 1,
 				'sanitize_callback' => 'absint',
 			),
 			'per_page'   => array(
-				'description'       => __( 'Items per page.', 'beplus-advanced-reviews' ),
+				'description'       => __( 'Items per page.', 'beplus-advanced-reviews-for-woocommerce' ),
 				'type'              => 'integer',
 				'default'           => 10,
 				'maximum'           => 50,
 				'sanitize_callback' => 'absint',
 			),
 			'rating'     => array(
-				'description'       => __( 'Filter by star rating (1-5).', 'beplus-advanced-reviews' ),
+				'description'       => __( 'Filter by star rating (1-5).', 'beplus-advanced-reviews-for-woocommerce' ),
 				'type'              => 'integer',
 				'default'           => 0,
 				'sanitize_callback' => 'absint',
 			),
 			'has_images' => array(
-				'description'       => __( 'Show only reviews with images.', 'beplus-advanced-reviews' ),
+				'description'       => __( 'Show only reviews with images.', 'beplus-advanced-reviews-for-woocommerce' ),
 				'type'              => 'boolean',
 				'default'           => false,
 			),
 			'sort'       => array(
-				'description'       => __( 'Sort order: newest, oldest, highest, lowest.', 'beplus-advanced-reviews' ),
+				'description'       => __( 'Sort order: newest, oldest, highest, lowest.', 'beplus-advanced-reviews-for-woocommerce' ),
 				'type'              => 'string',
 				'default'           => 'newest',
 				'enum'              => array( 'newest', 'oldest', 'highest', 'lowest' ),

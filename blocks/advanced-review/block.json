@@ -3,10 +3,10 @@
 	"apiVersion": 3,
 	"name": "beplus-advanced-reviews/advanced-review",
 	"title": "Advanced Reviews",
-	"category": "beplus-advanced-reviews",
+	"category": "beplus-advanced-reviews-for-woocommerce",
 	"icon": "star-filled",
 	"description": "Modern WooCommerce product reviews with images, star distribution, filtering, and load more.",
-	"textdomain": "beplus-advanced-reviews",
+	"textdomain": "beplus-advanced-reviews-for-woocommerce",
 	"attributes": {
 		"showDistribution": { "type": "boolean", "default": true },
 		"showFilterBar":    { "type": "boolean", "default": true },

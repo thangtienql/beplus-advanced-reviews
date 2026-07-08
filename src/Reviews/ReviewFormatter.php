@@ -2,13 +2,13 @@
 /**
  * ReviewFormatter — shapes review data for API responses.
  *
- * @package BePlusAdvancedReviews
+ * @package BeplusAdvancedReviewsForWoocommerce
  * @subpackage Reviews
  */
 
-namespace BePlusAdvancedReviews\Reviews;
+namespace BeplusAdvancedReviewsForWoocommerce\Reviews;
 
-use BePlusAdvancedReviews\Media\MediaHandler;
+use BeplusAdvancedReviewsForWoocommerce\Media\MediaHandler;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,7 +45,7 @@ class ReviewFormatter {
 			'created_at'  => $review->comment_date ?? '',
 			'date_human'  => sprintf(
 				/* translators: %s: human-readable time difference */
-				__( '%s ago', 'beplus-advanced-reviews' ),
+				__( '%s ago', 'beplus-advanced-reviews-for-woocommerce' ),
 				human_time_diff( strtotime( $review->comment_date ?? '' ) )
 			),
 		);
