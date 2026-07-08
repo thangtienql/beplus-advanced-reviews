@@ -15,4 +15,18 @@
 	--bpar-border: #{v.$border};
 	--bpar-bg: #{v.$bg};
 	--bpar-radius: #{v.$radius};
+	--bpar-radius-sm: #{v.$radius-sm};
+	--bpar-radius-pill: #{v.$radius-pill};
+	--bpar-date-muted: #{v.$date-muted};
+	--bpar-star-empty: #{v.$star-empty};
+	--bpar-card-shadow: #{v.$card-shadow};
+	--bpar-card-shadow-hover: #{v.$card-shadow-hover};
+	--bpar-gap-sm: 8px;
+	--bpar-gap-md: 16px;
+	--bpar-gap-lg: 24px;
+	--bpar-font-size-sm: 12px;
+	--bpar-font-size-md: 14px;
+	--bpar-font-size-lg: 16px;
+	--bpar-font-size-xl: 22px;
+	--bpar-font-size-2xl: 48px;
 }

@@ -114,13 +114,17 @@ class ReviewController extends \WP_REST_Controller {
 			);
 		}
 
+		$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
+		$rating_threshold = absint( $settings['rating_threshold'] ?? 0 );
+
 		$params = array(
-			'product_id'  => $product_id,
-			'page'        => $request->get_param( 'page' ),
-			'per_page'    => $request->get_param( 'per_page' ),
-			'rating'      => $request->get_param( 'rating' ),
-			'has_images'  => $request->get_param( 'has_images' ),
-			'sort'        => $request->get_param( 'sort' ),
+			'product_id'       => $product_id,
+			'page'             => $request->get_param( 'page' ),
+			'per_page'         => $request->get_param( 'per_page' ),
+			'rating'           => $request->get_param( 'rating' ),
+			'has_images'       => $request->get_param( 'has_images' ),
+			'sort'             => $request->get_param( 'sort' ),
+			'rating_threshold' => $rating_threshold,
 		);
 
 		$args    = $this->review_query->build_args( $params );

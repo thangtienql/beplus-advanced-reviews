@@ -26,6 +26,9 @@
       loadDistribution();
       function loadInitialReviews() {
         currentPage = 1;
+        if (listContainer) {
+          showSkeletonCards();
+        }
         fetchReviews().then(function(data) {
           if (data && listContainer) {
             listContainer.innerHTML = buildReviewList(data.reviews);
@@ -36,6 +39,22 @@
         });
         block.classList.remove("beplus-advanced-reviews-for-woocommerce--loading");
         block.classList.add("beplus-advanced-reviews-for-woocommerce--ready");
+      }
+      function showSkeletonCards() {
+        var perPage = parseInt(block.dataset.perPage, 10) || 5;
+        var skeletonCount = Math.min(perPage, 3);
+        var html = '<div class="beplus-advanced-reviews-for-woocommerce__skeleton">';
+        for (var i = 0; i < skeletonCount; i++) {
+          html += '<div class="beplus-advanced-reviews-for-woocommerce__skeleton-card">';
+          html += '<div class="beplus-advanced-reviews-for-woocommerce__skeleton-avatar"></div>';
+          html += '<div class="beplus-advanced-reviews-for-woocommerce__skeleton-body">';
+          html += '<div class="beplus-advanced-reviews-for-woocommerce__skeleton-line beplus-advanced-reviews-for-woocommerce__skeleton-line--short"></div>';
+          html += '<div class="beplus-advanced-reviews-for-woocommerce__skeleton-line beplus-advanced-reviews-for-woocommerce__skeleton-line--medium"></div>';
+          html += '<div class="beplus-advanced-reviews-for-woocommerce__skeleton-line beplus-advanced-reviews-for-woocommerce__skeleton-line--long"></div>';
+          html += "</div></div>";
+        }
+        html += "</div>";
+        listContainer.innerHTML = html;
       }
       function loadDistribution() {
         const url = new URL(bparfwData.restUrl + "reviews/distribution");
@@ -52,8 +71,10 @@
       }
       function fetchReviews() {
         var url = new URL(bparfwData.restUrl + "reviews");
+        var perPage = parseInt(block.dataset.perPage, 10) || 10;
         url.searchParams.set("product_id", productId);
         url.searchParams.set("page", currentPage);
+        url.searchParams.set("per_page", perPage);
         url.searchParams.set("sort", currentSort);
         if (currentRating > 0) {
           url.searchParams.set("rating", currentRating);
@@ -442,13 +463,15 @@
         showFormMessage(block, bparfwData.i18n.submitError, "error");
       });
     }
+    var starSvgIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
     function renderStars(rating, size) {
       rating = Math.max(1, Math.min(5, rating || 0));
       size = size || 1;
+      var pxSize = 16 * size;
       var stars = "";
       for (var i = 1; i <= 5; i++) {
         var filled = i <= rating ? " beplus-advanced-reviews-for-woocommerce__star--filled" : " beplus-advanced-reviews-for-woocommerce__star--empty";
-        stars += '<span class="beplus-advanced-reviews-for-woocommerce__star' + filled + '" aria-hidden="true" style="font-size:' + size + 'em;">&#9733;</span>';
+        stars += '<span class="beplus-advanced-reviews-for-woocommerce__star' + filled + '" aria-hidden="true" style="width:' + size + "em;height:" + size + 'em;"><svg width="' + pxSize + '" height="' + pxSize + '" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span>';
       }
       return '<span class="beplus-advanced-reviews-for-woocommerce__stars" aria-label="' + rating + ' out of 5 stars">' + stars + "</span>";
     }
@@ -467,7 +490,7 @@
         var count = data.stars[s.toString()] || 0;
         var percent = data.total > 0 ? count / data.total * 100 : 0;
         html += '<div class="beplus-advanced-reviews-for-woocommerce__distribution-bar-row">';
-        html += '<span class="beplus-advanced-reviews-for-woocommerce__distribution-bar-label">' + s + " \u2605</span>";
+        html += '<span class="beplus-advanced-reviews-for-woocommerce__distribution-bar-label">' + s + " " + starSvgIcon + "</span>";
         html += '<div class="beplus-advanced-reviews-for-woocommerce__distribution-bar-track">';
         html += '<div class="beplus-advanced-reviews-for-woocommerce__distribution-bar-fill" style="width:' + percent + '%" role="progressbar" aria-valuenow="' + count + '" aria-valuemin="0" aria-valuemax="' + data.total + '"></div>';
         html += "</div>";
@@ -644,7 +667,7 @@
           prevBtn.type = "button";
           prevBtn.className = "beplus-advanced-reviews-for-woocommerce__lightbox-nav beplus-advanced-reviews-for-woocommerce__lightbox-prev";
           prevBtn.setAttribute("aria-label", "Previous");
-          prevBtn.innerHTML = "&#8249;";
+          prevBtn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
           prevBtn.addEventListener("click", function() {
             navigate(-1);
           });
@@ -652,7 +675,7 @@
           nextBtn.type = "button";
           nextBtn.className = "beplus-advanced-reviews-for-woocommerce__lightbox-nav beplus-advanced-reviews-for-woocommerce__lightbox-next";
           nextBtn.setAttribute("aria-label", "Next");
-          nextBtn.innerHTML = "&#8250;";
+          nextBtn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
           nextBtn.addEventListener("click", function() {
             navigate(1);
           });

@@ -39,6 +39,10 @@ class ReviewQuery {
 			$args['has_images'] = filter_var( $params['has_images'], FILTER_VALIDATE_BOOLEAN );
 		}
 
+		if ( isset( $params['rating_threshold'] ) ) {
+			$args['rating_threshold'] = absint( $params['rating_threshold'] );
+		}
+
 		if ( isset( $params['sort'] ) ) {
 			$allowed_sorts = array( 'newest', 'oldest', 'highest', 'lowest' );
 			$sort          = sanitize_text_field( $params['sort'] );

@@ -45,7 +45,7 @@ if ( ! $data['total'] ) {
 			$percent = $data['total'] > 0 ? ( $count / $data['total'] * 100 ) : 0;
 			?>
 			<div class="beplus-advanced-reviews-for-woocommerce__distribution-bar-row">
-				<span class="beplus-advanced-reviews-for-woocommerce__distribution-bar-label"><?php echo esc_html( (string) $s ); ?>★</span>
+				<span class="beplus-advanced-reviews-for-woocommerce__distribution-bar-label"><?php echo esc_html( (string) $s ); ?> <?php echo beplus_advanced_reviews_for_woocommerce_star_icon(); // phpcs:ignore ?></span>
 				<div class="beplus-advanced-reviews-for-woocommerce__distribution-bar-track">
 					<div
 						class="beplus-advanced-reviews-for-woocommerce__distribution-bar-fill"

@@ -25,18 +25,20 @@ class ReviewRepository {
 		global $wpdb;
 
 		$defaults = array(
-			'page'       => 1,
-			'per_page'   => 10,
-			'rating'     => 0,
-			'has_images' => false,
-			'sort'       => 'newest',
+			'page'             => 1,
+			'per_page'         => 10,
+			'rating'           => 0,
+			'has_images'       => false,
+			'sort'             => 'newest',
+			'rating_threshold' => 0,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$page     = max( 1, absint( $args['page'] ) );
-		$per_page = max( 1, min( 50, absint( $args['per_page'] ) ) );
-		$offset   = ( $page - 1 ) * $per_page;
+		$page             = max( 1, absint( $args['page'] ) );
+		$per_page         = max( 1, min( 50, absint( $args['per_page'] ) ) );
+		$offset           = ( $page - 1 ) * $per_page;
+		$rating_threshold = max( 0, min( 5, absint( $args['rating_threshold'] ) ) );
 
 		$where  = "c.comment_type = 'review' AND c.comment_approved = '1' AND c.comment_post_ID = %d";
 		$params = array( $product_id );
@@ -45,6 +47,11 @@ class ReviewRepository {
 			$where   .= ' AND cm.meta_key = %s AND cm.meta_value = %d';
 			$params[] = 'rating';
 			$params[] = absint( $args['rating'] );
+		}
+
+		if ( $rating_threshold > 0 ) {
+			$where   .= ' AND CAST(COALESCE(cm_rating.meta_value, 0) AS UNSIGNED) >= %d';
+			$params[] = $rating_threshold;
 		}
 
 		if ( $args['has_images'] ) {

@@ -84,6 +84,26 @@ function beplus_advanced_reviews_for_woocommerce_is_paste_enabled(): bool {
 }
 
 /**
+ * Check if the filter bar is enabled.
+ *
+ * @return bool
+ */
+function beplus_advanced_reviews_for_woocommerce_is_filter_enabled(): bool {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
+	return ! empty( $settings['enable_filter'] );
+}
+
+/**
+ * Check if sort controls are enabled.
+ *
+ * @return bool
+ */
+function beplus_advanced_reviews_for_woocommerce_is_sort_enabled(): bool {
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
+	return ! empty( $settings['enable_sort'] );
+}
+
+/**
  * Get max image size in bytes from plugin setting.
  *
  * @return int

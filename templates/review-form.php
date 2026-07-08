@@ -42,23 +42,25 @@ $user = wp_get_current_user();
 					/* translators: %d: Number of stars */
 					printf( esc_attr__( '%d stars', 'beplus-advanced-reviews-for-woocommerce' ), $i );
 					?>"
-				>&#9733;</label>
+				><?php echo beplus_advanced_reviews_for_woocommerce_star_icon(); // phpcs:ignore ?></label>
 			<?php endfor; ?>
 		</div>
 
 		<?php if ( ! $user->exists() ) : ?>
+			<label for="bpar-author"><?php esc_html_e( 'Your name *', 'beplus-advanced-reviews-for-woocommerce' ); ?></label>
 			<input
+				id="bpar-author"
 				type="text"
 				name="author"
-				placeholder="<?php esc_attr_e( 'Your name *', 'beplus-advanced-reviews-for-woocommerce' ); ?>"
+				placeholder="<?php esc_attr_e( 'Enter your name', 'beplus-advanced-reviews-for-woocommerce' ); ?>"
 				required
-				aria-label="<?php esc_attr_e( 'Your name', 'beplus-advanced-reviews-for-woocommerce' ); ?>"
 			>
+			<label for="bpar-email"><?php esc_html_e( 'Your email', 'beplus-advanced-reviews-for-woocommerce' ); ?></label>
 			<input
+				id="bpar-email"
 				type="email"
 				name="email"
-				placeholder="<?php esc_attr_e( 'Your email', 'beplus-advanced-reviews-for-woocommerce' ); ?>"
-				aria-label="<?php esc_attr_e( 'Your email', 'beplus-advanced-reviews-for-woocommerce' ); ?>"
+				placeholder="<?php esc_attr_e( 'Enter your email', 'beplus-advanced-reviews-for-woocommerce' ); ?>"
 			>
 		<?php endif; ?>
 

@@ -73,8 +73,18 @@ class AssetLoader extends AbstractModule {
 	}
 
 	public function enqueue_admin( string $hook_suffix ): void {
-		$settings_hook = 'settings_page_beplus-advanced-reviews-for-woocommerce';
-		if ( false === strpos( $hook_suffix, $settings_hook ) ) {
+		$hooks = array(
+			'settings_page_beplus-advanced-reviews-for-woocommerce',
+			'woocommerce_page_beplus-advanced-reviews-for-woocommerce',
+		);
+		$found = false;
+		foreach ( $hooks as $h ) {
+			if ( false !== strpos( $hook_suffix, $h ) ) {
+				$found = true;
+				break;
+			}
+		}
+		if ( ! $found ) {
 			return;
 		}
 

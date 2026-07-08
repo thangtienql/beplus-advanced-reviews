@@ -1,29 +1,35 @@
 @use 'variables' as v;
+@use 'sass:color';
 
 $prefix: beplus-advanced-reviews-for-woocommerce;
 
 .#{$prefix}__load-more {
 	&-wrapper {
 		text-align: center;
-		padding: 20px 0;
+		padding: 24px 0 4px;
 	}
 
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
-	padding: 10px 28px;
+	padding: 11px 32px;
 	border: 1px solid v.$green;
-	border-radius: v.$radius;
+	border-radius: v.$radius-sm;
 	background: v.$green;
 	color: #fff;
 	cursor: pointer;
 	font-size: 14px;
 	font-weight: 500;
-	transition: opacity 0.2s;
+	transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 
 	&:hover {
-		opacity: 0.9;
+		background: color.adjust( v.$green, $lightness: 4% );
+		box-shadow: 0 2px 8px rgba( v.$green, 0.25 );
+	}
+
+	&:active {
+		transform: scale(0.98);
 	}
 
 	&:focus-visible {
@@ -34,6 +40,11 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	&:disabled {
 		opacity: 0.5;
 		cursor: not-allowed;
+		box-shadow: none;
+
+		&:active {
+			transform: none;
+		}
 	}
 
 	&--loading &-spinner {

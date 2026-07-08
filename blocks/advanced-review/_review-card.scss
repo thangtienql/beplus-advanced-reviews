@@ -4,12 +4,21 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 
 .#{$prefix}__review-card {
 	display: flex;
-	gap: 12px;
-	padding: 16px 0;
-	border-bottom: 1px solid v.$border;
+	gap: 14px;
+	padding: 18px;
+	border: 1px solid v.$border;
+	border-radius: v.$radius;
+	background: v.$bg;
+	box-shadow: v.$card-shadow;
+	margin-bottom: 12px;
+	transition: box-shadow 0.2s ease;
 
 	&:last-child {
-		border-bottom: none;
+		margin-bottom: 0;
+	}
+
+	&:hover {
+		box-shadow: v.$card-shadow-hover;
 	}
 }
 
@@ -18,8 +27,8 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 
 	img {
 		border-radius: 50%;
-		width: 40px;
-		height: 40px;
+		width: 44px;
+		height: 44px;
 		object-fit: cover;
 	}
 
@@ -27,12 +36,12 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 40px;
-		height: 40px;
+		width: 44px;
+		height: 44px;
 		border-radius: 50%;
 		background: v.$green;
 		color: #fff;
-		font-size: 16px;
+		font-size: 17px;
 		font-weight: 600;
 		text-transform: uppercase;
 	}
@@ -48,13 +57,13 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
-	margin-bottom: 4px;
+	margin-bottom: 6px;
 }
 
 .#{$prefix}__review-author {
 	font-size: 14px;
-	font-weight: 500;
-	color: v.$green;
+	font-weight: 600;
+	color: v.$text;
 }
 
 .#{$prefix}__review-rating {
@@ -64,48 +73,23 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 
 .#{$prefix}__review-content {
 	font-size: 14px;
-	line-height: 1.45;
+	line-height: 1.5;
 	color: v.$text;
-	margin-bottom: 8px;
+	margin-bottom: 10px;
 	word-break: break-word;
 }
 
 .#{$prefix}__review-date {
-	font-size: 12px;
+	font-size: 13px;
 	color: v.$date-muted;
 }
 
 .#{$prefix}__review-images {
 	display: flex;
-	gap: 6px;
+	gap: 8px;
 	flex-wrap: wrap;
 	align-items: flex-start;
-	margin-bottom: 8px;
-}
-
-.#{$prefix}__review-image {
-	&-link {
-		display: block;
-		border-radius: v.$radius-sm;
-		overflow: hidden;
-		border: 1px solid v.$border;
-
-		&:focus-visible {
-			outline: 2px solid v.$green;
-			outline-offset: 2px;
-		}
-	}
-
-	&-thumb {
-		display: block;
-		border-radius: v.$radius-sm;
-		object-fit: cover;
-		transition: transform 0.2s ease;
-
-		&:hover {
-			transform: scale(1.05);
-		}
-	}
+	margin-bottom: 10px;
 }
 
 .#{$prefix}__review-media-btn {
@@ -117,14 +101,19 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	background: none;
 	cursor: pointer;
 	line-height: 0;
+	transition: transform 0.15s ease;
 
 	&:focus-visible {
 		outline: 2px solid v.$green;
 		outline-offset: 2px;
 	}
 
+	&:active {
+		transform: scale(0.96);
+	}
+
 	&:hover .#{$prefix}__review-image-thumb {
-		transform: scale(1.05);
+		transform: scale(1.06);
 	}
 
 	img {
@@ -270,13 +259,17 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		border-radius: 50%;
 		background: rgba( 255, 255, 255, 0.15 );
 		color: #fff;
-		font-size: 28px;
-		line-height: 1;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		transition: background 0.2s ease;
+
+		svg {
+			width: 22px;
+			height: 22px;
+			flex-shrink: 0;
+		}
 
 		&:hover,
 		&:focus-visible {
@@ -323,6 +316,8 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	}
 
 	.#{$prefix}__review-media-btn {
+		transition: none;
+
 		img {
 			transition: none;
 		}
