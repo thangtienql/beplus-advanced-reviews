@@ -10,6 +10,7 @@
  * Domain Path: /languages
  * Requires at least: 6.0
  * Requires PHP: 7.4
+ * Requires Plugins: woocommerce
  * License:     GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -52,12 +53,25 @@ require_once BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'includes/comm
 require_once BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'includes/hooks.php';
 
 /**
+ * Check if WooCommerce is active.
+ *
+ * @return bool
+ */
+function beplus_advanced_reviews_for_woocommerce_is_woocommerce_active() {
+	return class_exists( 'WooCommerce' );
+}
+
+/**
  * Boot plugin.
  *
- * @return \BeplusAdvancedReviewsForWoocommerce\Core\Plugin
+ * @return \BeplusAdvancedReviewsForWoocommerce\Core\Plugin|null
  */
 function beplus_advanced_reviews_for_woocommerce_boot() {
 	static $plugin = null;
+
+	if ( ! beplus_advanced_reviews_for_woocommerce_is_woocommerce_active() ) {
+		return null;
+	}
 
 	if ( null === $plugin ) {
 		$plugin = new \BeplusAdvancedReviewsForWoocommerce\Core\Plugin();
@@ -78,6 +92,24 @@ function beplus_advanced_reviews_for_woocommerce_init() {
 	beplus_advanced_reviews_for_woocommerce_boot();
 }
 
+add_action( 'admin_notices', 'beplus_advanced_reviews_for_woocommerce_missing_wc_notice' );
+
+/**
+ * Show admin notice when WooCommerce is not active.
+ *
+ * @return void
+ */
+function beplus_advanced_reviews_for_woocommerce_missing_wc_notice() {
+	if ( beplus_advanced_reviews_for_woocommerce_is_woocommerce_active() ) {
+		return;
+	}
+
+	printf(
+		'<div class="notice notice-error"><p>%s</p></div>',
+		esc_html__( 'Beplus Advanced Reviews For Woocommerce requires WooCommerce to be installed and active.', 'beplus-advanced-reviews-for-woocommerce' )
+	);
+}
+
 register_activation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_activate' );
 register_deactivation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_deactivate' );
 
@@ -91,6 +123,15 @@ function beplus_advanced_reviews_for_woocommerce_activate() {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		wp_die(
 			esc_html__( 'Beplus Advanced Reviews For Woocommerce requires PHP 7.4 or higher.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'Plugin Activation Error',
+			array( 'back_link' => true )
+		);
+	}
+
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		wp_die(
+			esc_html__( 'Beplus Advanced Reviews For Woocommerce requires WooCommerce to be installed and active.', 'beplus-advanced-reviews-for-woocommerce' ),
 			'Plugin Activation Error',
 			array( 'back_link' => true )
 		);

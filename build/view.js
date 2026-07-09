@@ -19,7 +19,7 @@
       const listContainer = block.querySelector(".beplus-advanced-reviews-for-woocommerce__list");
       const loadMoreBtn = block.querySelector(".beplus-advanced-reviews-for-woocommerce__load-more");
       const loadMoreWrapper = block.querySelector(".beplus-advanced-reviews-for-woocommerce__load-more-wrapper");
-      const filterStars = block.querySelectorAll(".beplus-advanced-reviews-for-woocommerce__filter-star");
+      const filterRatingSelect = block.querySelector(".beplus-advanced-reviews-for-woocommerce__filter-rating-select");
       const filterImagesCheckbox = block.querySelector(".beplus-advanced-reviews-for-woocommerce__filter-images-input");
       const sortSelect = block.querySelector(".beplus-advanced-reviews-for-woocommerce__sort-select");
       const distributionArea = block.querySelector(".beplus-advanced-reviews-for-woocommerce__distribution");
@@ -181,24 +181,12 @@
       if (loadMoreBtn) {
         loadMoreBtn.addEventListener("click", loadMore);
       }
-      filterStars.forEach(function(btn) {
-        btn.addEventListener("click", function() {
-          var rating = parseInt(btn.dataset.rating, 10);
-          var isActive = btn.getAttribute("aria-pressed") === "true";
-          filterStars.forEach(function(b) {
-            b.setAttribute("aria-pressed", "false");
-            b.classList.remove("beplus-advanced-reviews-for-woocommerce__filter-star--active");
-          });
-          if (isActive) {
-            currentRating = 0;
-          } else {
-            currentRating = rating;
-            btn.setAttribute("aria-pressed", "true");
-            btn.classList.add("beplus-advanced-reviews-for-woocommerce__filter-star--active");
-          }
+      if (filterRatingSelect) {
+        filterRatingSelect.addEventListener("change", function() {
+          currentRating = parseInt(filterRatingSelect.value, 10);
           applyFilter();
         });
-      });
+      }
       if (filterImagesCheckbox) {
         filterImagesCheckbox.addEventListener("change", function() {
           currentHasImages = filterImagesCheckbox.checked;

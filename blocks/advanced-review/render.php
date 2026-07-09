@@ -23,13 +23,16 @@ if ( ! $product_id ) {
 	return;
 }
 
+\BeplusAdvancedReviewsForWoocommerce\Core\Placement::mark_rendered();
 $show_distribution = ! empty( $attributes['showDistribution'] );
 $show_filter_bar   = ! empty( $attributes['showFilterBar'] ) && beplus_advanced_reviews_for_woocommerce_is_filter_enabled();
 $show_submit_form  = ! empty( $attributes['showSubmitForm'] );
 $show_images       = ! empty( $attributes['showImages'] );
 $show_avatar       = ! empty( $attributes['showAvatar'] );
 $show_sort         = beplus_advanced_reviews_for_woocommerce_is_sort_enabled();
-$reviews_per_load  = beplus_advanced_reviews_for_woocommerce_get_load_more_count();
+$reviews_per_load  = isset( $attributes['reviewsPerLoad'] ) && $attributes['reviewsPerLoad'] > 0
+	? absint( $attributes['reviewsPerLoad'] )
+	: beplus_advanced_reviews_for_woocommerce_get_load_more_count();
 $enable_lazy_load  = ! empty( $attributes['enableLazyLoad'] );
 
 $wrapper_attrs = get_block_wrapper_attributes(
@@ -67,35 +70,27 @@ $wrapper_attrs = get_block_wrapper_attributes(
 		</div>
 
 		<div class="beplus-advanced-reviews-for-woocommerce__layout-main">
+			<div class="beplus-advanced-reviews-for-woocommerce__filter-controls">
+			<div class="beplus-advanced-reviews-for-woocommerce__filter-controls-left">
 			<?php if ( $show_filter_bar ) : ?>
-				<div class="beplus-advanced-reviews-for-woocommerce__filter-bar">
-					<div class="beplus-advanced-reviews-for-woocommerce__filter-stars">
-						<span class="beplus-advanced-reviews-for-woocommerce__filter-label"><?php esc_html_e( 'Filter by rating:', 'beplus-advanced-reviews-for-woocommerce' ); ?></span>
-						<?php for ( $i = 5; $i >= 1; $i-- ) : ?>
-							<button type="button"
-								class="beplus-advanced-reviews-for-woocommerce__filter-star"
-								data-rating="<?php echo esc_attr( (string) $i ); ?>"
-								aria-label="<?php 
-								/* translators: %d: Number of stars to filter by */
-								echo esc_attr( sprintf( __( 'Filter by %d stars', 'beplus-advanced-reviews-for-woocommerce' ), $i ) ); 
-								?>"
-								aria-pressed="false">
-								<?php echo esc_html( (string) $i ); ?> <?php echo beplus_advanced_reviews_for_woocommerce_star_icon(); // phpcs:ignore ?>
-							</button>
-						<?php endfor; ?>
+				<div class="beplus-advanced-reviews-for-woocommerce__filter-stars">
+					<label for="bpar-filter-rating-select" class="beplus-advanced-reviews-for-woocommerce__filter-label"><?php esc_html_e( 'Filter by rating:', 'beplus-advanced-reviews-for-woocommerce' ); ?></label>
+					<div class="beplus-advanced-reviews-for-woocommerce__sort-wrapper">
+						<select id="bpar-filter-rating-select" class="beplus-advanced-reviews-for-woocommerce__filter-rating-select" aria-label="<?php esc_attr_e( 'Filter reviews by star rating', 'beplus-advanced-reviews-for-woocommerce' ); ?>">
+							<option value="0"><?php esc_html_e( 'All ratings', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
+							<?php for ( $i = 5; $i >= 1; $i-- ) : ?>
+								<option value="<?php echo esc_attr( (string) $i ); ?>">
+									<?php
+									/* translators: %d: Number of stars */
+									printf( esc_html__( '%d stars', 'beplus-advanced-reviews-for-woocommerce' ), $i );
+									?>
+								</option>
+							<?php endfor; ?>
+						</select>
+						<span class="beplus-advanced-reviews-for-woocommerce__sort-icon">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+						</span>
 					</div>
-
-					<?php if ( $show_images ) : ?>
-						<div class="beplus-advanced-reviews-for-woocommerce__filter-images">
-							<label class="beplus-advanced-reviews-for-woocommerce__filter-toggle">
-								<span class="beplus-advanced-reviews-for-woocommerce__filter-toggle-text"><?php esc_html_e( 'With images only', 'beplus-advanced-reviews-for-woocommerce' ); ?></span>
-								<div class="beplus-advanced-reviews-for-woocommerce__filter-toggle-switch">
-									<input type="checkbox" class="beplus-advanced-reviews-for-woocommerce__filter-images-input" aria-label="<?php esc_attr_e( 'Show only reviews with images', 'beplus-advanced-reviews-for-woocommerce' ); ?>">
-									<span class="beplus-advanced-reviews-for-woocommerce__filter-toggle-slider"></span>
-								</div>
-							</label>
-						</div>
-					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 
@@ -117,10 +112,24 @@ $wrapper_attrs = get_block_wrapper_attributes(
 					</div>
 				</div>
 			<?php endif; ?>
+			</div>
+
+			<?php if ( $show_filter_bar && $show_images ) : ?>
+				<div class="beplus-advanced-reviews-for-woocommerce__filter-images">
+					<label class="beplus-advanced-reviews-for-woocommerce__filter-toggle">
+						<span class="beplus-advanced-reviews-for-woocommerce__filter-toggle-text"><?php esc_html_e( 'With images only', 'beplus-advanced-reviews-for-woocommerce' ); ?></span>
+						<div class="beplus-advanced-reviews-for-woocommerce__filter-toggle-switch">
+							<input type="checkbox" class="beplus-advanced-reviews-for-woocommerce__filter-images-input" aria-label="<?php esc_attr_e( 'Show only reviews with images', 'beplus-advanced-reviews-for-woocommerce' ); ?>">
+							<span class="beplus-advanced-reviews-for-woocommerce__filter-toggle-slider"></span>
+						</div>
+					</label>
+				</div>
+			<?php endif; ?>
+			</div>
 
 			<div class="beplus-advanced-reviews-for-woocommerce__list-container" aria-live="polite">
 				<div class="beplus-advanced-reviews-for-woocommerce__list">
-					<?php beplus_advanced_reviews_for_woocommerce_get_template( 'review-list.php', array( 'product_id' => $product_id, 'show_avatar' => $show_avatar, 'show_images' => $show_images ) ); ?>
+					<?php beplus_advanced_reviews_for_woocommerce_get_template( 'review-list.php', array( 'product_id' => $product_id, 'show_avatar' => $show_avatar, 'show_images' => $show_images, 'per_page' => $reviews_per_load ) ); ?>
 				</div>
 
 				<div class="beplus-advanced-reviews-for-woocommerce__load-more-wrapper">

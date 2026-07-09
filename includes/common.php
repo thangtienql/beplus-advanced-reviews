@@ -145,7 +145,19 @@ function beplus_advanced_reviews_for_woocommerce_get_block_instance(): ?string {
 		return null;
 	}
 
-	$block_content = '<!-- wp:beplus-advanced-reviews/advanced-review /-->';
+	$settings = beplus_advanced_reviews_for_woocommerce_get_settings();
+
+	$attrs = wp_json_encode( array(
+		'reviewsPerLoad' => absint( $settings['load_more_count'] ?? 10 ),
+		'showFilterBar'  => ! empty( $settings['enable_filter'] ),
+		'showImages'     => ! empty( $settings['enable_images'] ),
+	) );
+
+	$block_content = sprintf(
+		'<!-- wp:beplus-advanced-reviews/advanced-review %s /-->',
+		$attrs
+	);
+
 	return do_blocks( $block_content );
 }
 

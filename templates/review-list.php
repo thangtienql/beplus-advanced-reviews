@@ -18,7 +18,8 @@ if ( ! $product_id ) {
 }
 
 $repository = new \BeplusAdvancedReviewsForWoocommerce\Reviews\ReviewRepository();
-$result     = $repository->get_reviews( $product_id, array( 'per_page' => beplus_advanced_reviews_for_woocommerce_get_load_more_count() ) );
+$per_page   = ! empty( $args['per_page'] ) ? absint( $args['per_page'] ) : beplus_advanced_reviews_for_woocommerce_get_load_more_count();
+$result     = $repository->get_reviews( $product_id, array( 'per_page' => $per_page ) );
 $reviews    = $result['reviews'] ?? array();
 
 if ( empty( $reviews ) ) {

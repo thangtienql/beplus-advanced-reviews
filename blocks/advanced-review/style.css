@@ -605,16 +605,23 @@
     transition: none;
   }
 }
-.beplus-advanced-reviews-for-woocommerce__filter-bar {
-  width: 100%;
-  justify-content: space-between;
+.beplus-advanced-reviews-for-woocommerce__filter-controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
   padding: 0 0 14px;
   border-bottom: 1px solid #E2EBE4;
   margin-bottom: 20px;
+  width: 100%;
+}
+
+.beplus-advanced-reviews-for-woocommerce__filter-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .beplus-advanced-reviews-for-woocommerce__filter-label {
@@ -633,7 +640,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
 }
 
 .beplus-advanced-reviews-for-woocommerce__filter-divider {
@@ -643,61 +650,27 @@
   flex-shrink: 0;
 }
 
-.beplus-advanced-reviews-for-woocommerce__filter-star {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 5px 12px;
+.beplus-advanced-reviews-for-woocommerce__filter-rating-select {
+  appearance: none;
+  padding: 8px 36px 8px 14px;
   border: 1px solid #E2EBE4;
-  border-radius: 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
   background: #fff;
+  color: #101010;
   cursor: pointer;
-  font-size: 13px;
-  color: #666;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  line-height: 1.4;
 }
-@media (max-width: 768px) {
-  .beplus-advanced-reviews-for-woocommerce__filter-star {
-    padding: 5px 8px;
-  }
-}
-.beplus-advanced-reviews-for-woocommerce__filter-star svg {
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
-}
-.beplus-advanced-reviews-for-woocommerce__filter-star:hover {
+.beplus-advanced-reviews-for-woocommerce__filter-rating-select:hover {
   border-color: #21652F;
-  color: #21652F;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
-.beplus-advanced-reviews-for-woocommerce__filter-star:active {
-  transform: scale(0.96);
-}
-.beplus-advanced-reviews-for-woocommerce__filter-star--active {
-  background: #21652F;
-  border-color: #21652F;
-  color: #fff;
-}
-.beplus-advanced-reviews-for-woocommerce__filter-star--active:hover {
-  color: #fff;
-}
-.beplus-advanced-reviews-for-woocommerce__filter-star:focus-visible {
+.beplus-advanced-reviews-for-woocommerce__filter-rating-select:focus-visible {
   outline: 2px solid #21652F;
-  outline-offset: 2px;
-}
-.beplus-advanced-reviews-for-woocommerce__filter-star-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  border-radius: 9px;
-  background: rgba(0, 0, 0, 0.08);
-  font-size: 11px;
-  font-weight: 600;
-  color: #666;
-  line-height: 1;
+  outline-offset: 1px;
 }
 
 .beplus-advanced-reviews-for-woocommerce__filter-images {
@@ -778,12 +751,6 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: auto;
-}
-@media (max-width: 768px) {
-  .beplus-advanced-reviews-for-woocommerce__filter-sort {
-    margin-left: 0;
-  }
 }
 
 .beplus-advanced-reviews-for-woocommerce__sort-wrapper {

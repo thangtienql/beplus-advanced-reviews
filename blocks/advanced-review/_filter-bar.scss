@@ -2,16 +2,23 @@
 @use 'sass:color';
 $prefix: beplus-advanced-reviews-for-woocommerce;
 
-.#{$prefix}__filter-bar {
-	width: 100%;
-	justify-content: space-between;
+.#{$prefix}__filter-controls {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 12px;
 	flex-wrap: wrap;
 	padding: 0 0 14px;
 	border-bottom: 1px solid v.$border;
 	margin-bottom: 20px;
+	width: 100%;
+}
+
+.#{$prefix}__filter-controls-left {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	flex-wrap: wrap;
 }
 
 .#{$prefix}__filter-label {
@@ -29,7 +36,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 4px;
+	gap: 8px;
 }
 
 .#{$prefix}__filter-divider {
@@ -39,66 +46,28 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	flex-shrink: 0;
 }
 
-.#{$prefix}__filter-star {
-	display: inline-flex;
-	align-items: center;
-	gap: 3px;
-	padding: 5px 12px;
+.#{$prefix}__filter-rating-select {
+	appearance: none;
+	padding: 8px 36px 8px 14px;
 	border: 1px solid v.$border;
-	border-radius: v.$radius-pill;
+	border-radius: v.$radius;
+	font-size: 14px;
+	font-weight: 500;
 	background: v.$bg;
+	color: v.$text;
 	cursor: pointer;
-	font-size: 13px;
-	color: v.$muted;
-	transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
-
-	@media (max-width: 768px) {
-		padding: 5px 8px;
-	}
-
-	svg {
-		width: 13px;
-		height: 13px;
-		flex-shrink: 0;
-	}
+	transition: all 0.2s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+	line-height: 1.4;
 
 	&:hover {
 		border-color: v.$green;
-		color: v.$green;
-	}
-
-	&:active {
-		transform: scale(0.96);
-	}
-
-	&--active {
-		background: v.$green;
-		border-color: v.$green;
-		color: #fff;
-
-		&:hover {
-			color: #fff;
-		}
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 	}
 
 	&:focus-visible {
 		outline: 2px solid v.$green;
-		outline-offset: 2px;
-	}
-
-	&-count {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-width: 18px;
-		height: 18px;
-		padding: 0 4px;
-		border-radius: 9px;
-		background: rgba(0, 0, 0, 0.08);
-		font-size: 11px;
-		font-weight: 600;
-		color: v.$muted;
-		line-height: 1;
+		outline-offset: 1px;
 	}
 }
 
@@ -183,11 +152,6 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	margin-left: auto;
-
-	@media (max-width: 768px) {
-		margin-left: 0;
-	}
 }
 
 .#{$prefix}__sort-wrapper {
