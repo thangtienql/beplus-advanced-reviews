@@ -41,11 +41,11 @@ A drag-and-drop Gutenberg block that renders the full review experience. **Autom
 | **Total review count** | Total number of approved reviews |
 | **Star distribution chart** | Bar chart showing count per star rating (1★–5★) |
 | **Review list** | Paginated list of review cards |
-| **Review card** | Avatar, reviewer name, rating score, content, date, images |
-| **Review images** | Uploaded or copy/pasted images attached to a review |
-| **Review submission form** | Inline form to write and submit a review with rating and images |
+| **Review card** | Avatar, reviewer name, rating score, content, date, media (images & video) |
+| **Review media** | Uploaded media (images/videos) or copy/pasted images attached to a review, displayed via lightbox |
+| **Review submission form** | Inline form to write and submit a review with rating and media, including video preview |
 | **Load More button** | AJAX "Load More" to fetch the next page of reviews |
-| **Filter & Sort** | Filter by star rating, show only reviews with images, sort by date/rating |
+| **Filter & Sort** | Filter by star rating, show only reviews with media, sort by date/rating. Also supports hiding reviews below a minimum `rating_threshold`. |
 
 ### 2.3 Review Card
 
@@ -58,12 +58,13 @@ Each review card displays:
 - **Review date**
 - **Images** (clickable thumbnails, opens lightbox)
 
-### 2.4 Image Support
+### 2.4 Media Support
 
-- Upload via file input (multi-select)
-- **Copy/paste from clipboard** into the review form
-- Uses WordPress Media Library for storage
+- Upload images and videos via file input (multi-select)
+- **Copy/paste from clipboard** into the review form (images only)
+- Uses a swappable `MediaStorageInterface` (backed by standard WordPress Media Library by default) for storage
 - Linked via `{wpdb->prefix}bparfw_review_media` table
+- Lightbox functionality to view both images and videos on the frontend
 
 ### 2.5 Plugin Settings — Display Mode
 
@@ -163,11 +164,6 @@ beplus-advanced-reviews-for-woocommerce/
 │       └── admin.scss
 │
 ├── assets/                       # Source assets (before build)
-│   ├── js/
-│   │   ├── review-list.ts        # Review list, load more, lazy load
-│   │   ├── review-form.ts        # Submission form, image paste handler
-│   │   ├── review-filter.ts      # Filter bar & sort logic
-│   │   └── star-distribution.ts  # Star distribution chart
 │   └── css/
 │       ├── reviews.scss
 │       └── components/
@@ -273,10 +269,10 @@ function beplus_advanced_reviews_for_woocommerce_boot() {
 	return $plugin;
 }
 
-add_action( 'plugins_loaded', 'beplus_advanced_reviews_for_woocommerce_init' );
+add_action( 'init', 'beplus_advanced_reviews_for_woocommerce_init' );
 
 /**
- * Init on plugins_loaded.
+ * Init.
  *
  * @return void
  */
@@ -411,6 +407,7 @@ public const REVIEW_QUERY       = 'beplus-advanced-reviews-for-woocommerce/revie
 public const REVIEW_RESULTS     = 'beplus-advanced-reviews-for-woocommerce/review.results';
 public const REVIEW_SUBMITTED   = 'beplus-advanced-reviews-for-woocommerce/review.submitted';
 public const MEDIA_UPLOADED     = 'beplus-advanced-reviews-for-woocommerce/media.uploaded';
+public const MEDIA_DELETED      = 'beplus-advanced-reviews-for-woocommerce/media.deleted';
 ```
 
 **Legacy WordPress style (still used for compatibility hooks):**
@@ -446,7 +443,7 @@ $wpdb->prefix . 'bparfw_review_media'
 
 ```php
 'beplus-advanced-reviews-for-woocommerce-admin'
-'beplus-advanced-reviews-for-woocommerce-frontend'
+'beplus-advanced-reviews-for-woocommerce-data'       // Localizes bparfwData
 'beplus-advanced-reviews-for-woocommerce-block-advanced-review'
 ```
 
@@ -474,7 +471,7 @@ CREATE TABLE {prefix}bparfw_review_media (
 );
 ```
 
-`SchemaManager::create_tables()` is called on plugin activation and on `plugins_loaded` when the stored schema version is outdated.
+`SchemaManager::create_tables()` is called on plugin activation and on `init` when the stored schema version is outdated.
 
 ---
 
@@ -552,21 +549,13 @@ class Plugin {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 
-		// Apply display mode (keep / replace / custom hook)
-		add_action( 'init', array( $this, 'apply_display_mode' ) );
+		// (Note: Display mode logic is registered directly in the Placement module's register() method,
+		// calling the global helper beplus_advanced_reviews_for_woocommerce_get_display_mode() 
+		// rather than retrieving it through the container in Plugin::boot)
 	}
 
 	public function on_init(): void {
 		$this->init_rest_controllers();
-	}
-
-	public function apply_display_mode(): void {
-		$mode = $this->container->get( SettingsRegistry::class )->get_display_mode();
-
-		if ( 'replace' === $mode ) {
-			// Remove default WooCommerce reviews tab
-			add_filter( 'woocommerce_product_tabs', array( Core\Placement::class, 'replace_reviews_tab' ) );
-		}
 	}
 
 	public function activate(): void {
@@ -607,13 +596,14 @@ class SettingsRegistry extends AbstractModule {
 	private const OPTION_KEY = 'beplus_advanced_reviews_for_woocommerce_settings';
 
 	private const DEFAULTS = array(
-		'display_mode'      => 'replace',
-		'enable_images'     => true,
-		'enable_paste'      => true,        // clipboard paste support
+		'display_mode'      => 'keep',
+		'load_more_count'   => 10,
+		'rating_threshold'  => 0,
 		'enable_filter'     => true,
 		'enable_sort'       => true,
-		'load_more_count'   => 10,          // reviews per "load more"
-		'rating_threshold'  => 0,           // minimum rating to display (0 = show all)
+		'enable_images'     => true,
+		'enable_paste'      => true,
+		'max_image_size_mb' => 2,
 	);
 
 	public function register(): void {
@@ -682,12 +672,22 @@ class ReviewController extends \WP_REST_Controller {
 }
 ```
 
-### 8.7 MediaHandler — Upload & Paste Support
+### 8.7 MediaHandler & MediaStorage
 
 ```php
 namespace BeplusAdvancedReviewsForWoocommerce\Media;
 
+interface MediaStorageInterface {
+	public function store( array $file ): int;
+	public function delete( int $attachment_id ): bool;
+	public function get_url( int $attachment_id ): string;
+	public function get_thumbnail_url( int $attachment_id ): string;
+	public function get_mime_type( int $attachment_id ): string;
+	public function generate_metadata( int $attachment_id ): void;
+}
+
 class MediaHandler extends AbstractModule {
+	public function __construct( Container $container, MediaStorageInterface $storage ) { ... }
 
 	/**
 	 * Handle uploaded files from form $_FILES.
@@ -753,7 +753,7 @@ blocks/advanced-review/
 		"enableLazyLoad":   { "type": "boolean", "default": true }
 	},
 	"render": "file:./render.php",
-	"editorScript": "beplus-advanced-reviews-for-woocommerce-block-advanced-review",
+	"editorScript": "file:./index.js",
 	"viewScript": "file:./view.ts",
 	"style": "file:./style.css"
 }

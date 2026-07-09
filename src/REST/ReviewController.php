@@ -124,6 +124,7 @@ class ReviewController extends \WP_REST_Controller {
 			'rating'           => $request->get_param( 'rating' ),
 			'has_images'       => $request->get_param( 'has_images' ),
 			'sort'             => $request->get_param( 'sort' ),
+			'exclude'          => $request->get_param( 'exclude' ),
 			'rating_threshold' => $rating_threshold,
 		);
 

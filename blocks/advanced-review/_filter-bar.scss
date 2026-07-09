@@ -1,8 +1,10 @@
 @use 'variables' as v;
-
+@use 'sass:color';
 $prefix: beplus-advanced-reviews-for-woocommerce;
 
 .#{$prefix}__filter-bar {
+	width: 100%;
+	justify-content: space-between;
 	display: flex;
 	align-items: center;
 	gap: 12px;
@@ -17,11 +19,16 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	font-weight: 500;
 	color: v.$muted;
 	margin-bottom: 0 !important;
+
+	@media (max-width: 768px) {
+		font-size: 14px;
+	}
 }
 
 .#{$prefix}__filter-stars {
 	display: flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: 4px;
 }
 
@@ -44,6 +51,10 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	font-size: 13px;
 	color: v.$muted;
 	transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+
+	@media (max-width: 768px) {
+		padding: 5px 8px;
+	}
 
 	svg {
 		width: 13px;
@@ -83,7 +94,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		height: 18px;
 		padding: 0 4px;
 		border-radius: 9px;
-		background: rgba( 0, 0, 0, 0.08 );
+		background: rgba(0, 0, 0, 0.08);
 		font-size: 11px;
 		font-weight: 600;
 		color: v.$muted;
@@ -97,44 +108,130 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 }
 
 .#{$prefix}__filter-toggle {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	font-size: 16px;
+	gap: 10px;
 	cursor: pointer;
-	color: v.$muted;
 	margin-bottom: 0 !important;
 
-	&:hover {
-		color: v.$green;
+	&:hover .#{$prefix}__filter-toggle-text {
+		color: v.$text;
 	}
+}
+
+.#{$prefix}__filter-toggle-text {
+	font-size: 14px;
+	font-weight: 500;
+	color: v.$muted;
+	transition: color 0.2s ease;
+}
+
+.#{$prefix}__filter-toggle-switch {
+	position: relative;
+	width: 36px;
+	height: 20px;
+	display: inline-block;
+	flex-shrink: 0;
+
+	input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+		position: absolute;
+	}
+}
+
+.#{$prefix}__filter-toggle-slider {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: color.adjust(v.$border, $lightness: -5%);
+	transition: 0.3s;
+	border-radius: 20px;
+	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+
+	&:before {
+		position: absolute;
+		content: "";
+		height: 14px;
+		width: 14px;
+		left: 3px;
+		bottom: 3px;
+		background-color: #fff;
+		transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		border-radius: 50%;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+	}
+}
+
+.#{$prefix}__filter-images-input:checked+.#{$prefix}__filter-toggle-slider {
+	background-color: v.$green;
+}
+
+.#{$prefix}__filter-images-input:checked+.#{$prefix}__filter-toggle-slider:before {
+	transform: translateX(16px);
+}
+
+.#{$prefix}__filter-images-input:focus-visible+.#{$prefix}__filter-toggle-slider {
+	outline: 2px solid v.$green;
+	outline-offset: 2px;
 }
 
 .#{$prefix}__filter-sort {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 8px;
 	margin-left: auto;
+
+	@media (max-width: 768px) {
+		margin-left: 0;
+	}
+}
+
+.#{$prefix}__sort-wrapper {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
 }
 
 .#{$prefix}__sort-select {
-	padding: 5px 10px;
+	appearance: none;
+	padding: 8px 36px 8px 14px;
 	border: 1px solid v.$border;
-	border-radius: v.$radius-sm;
-	font-size: 13px;
+	border-radius: v.$radius;
+	font-size: 14px;
+	font-weight: 500;
 	background: v.$bg;
-	color: v.$muted;
+	color: v.$text;
 	cursor: pointer;
-	transition: border-color 0.2s ease;
+	transition: all 0.2s ease;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+	line-height: 1.4;
 
 	&:hover {
 		border-color: v.$green;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 	}
 
 	&:focus-visible {
 		outline: 2px solid v.$green;
-		outline-offset: 2px;
+		outline-offset: 1px;
 	}
+}
+
+.#{$prefix}__sort-icon {
+	position: absolute;
+	right: 12px;
+	pointer-events: none;
+	color: v.$muted;
+	display: flex;
+	transition: color 0.2s ease;
+}
+
+.#{$prefix}__sort-select:hover+.#{$prefix}__sort-icon {
+	color: v.$green;
 }
 
 .#{$prefix}__filter-clear {

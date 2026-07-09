@@ -71,15 +71,21 @@ $user = wp_get_current_user();
 			aria-label="<?php esc_attr_e( 'Review content', 'beplus-advanced-reviews-for-woocommerce' ); ?>"
 		></textarea>
 
-		<?php if ( $show_images && $images_enabled ) : ?>
+		<?php if ( $show_images && ( $images_enabled || $videos_enabled ) ) : ?>
 			<div class="beplus-advanced-reviews-for-woocommerce__media-preview" style="display:none;"></div>
 
 			<?php
 			$max_image_mb = beplus_advanced_reviews_for_woocommerce_get_settings()['max_image_size_mb'] ?? 2;
 			$max_video_mb = beplus_advanced_reviews_for_woocommerce_get_settings()['max_video_size_mb'] ?? 20;
-			$accept_types = $videos_enabled
-				? 'image/jpeg,image/png,image/webp,video/mp4,video/webm,video/ogg'
-				: 'image/jpeg,image/png,image/webp';
+			
+			$accept_array = array();
+			if ( $images_enabled ) {
+				$accept_array[] = 'image/jpeg,image/png,image/webp';
+			}
+			if ( $videos_enabled ) {
+				$accept_array[] = 'video/mp4,video/webm,video/ogg';
+			}
+			$accept_types = implode( ',', $accept_array );
 			?>
 
 			<div class="beplus-advanced-reviews-for-woocommerce__upload-zone" tabindex="0"
@@ -97,12 +103,14 @@ $user = wp_get_current_user();
 					</p>
 					<p class="beplus-advanced-reviews-for-woocommerce__upload-zone-hint">
 						<?php
-						/* translators: %s: max image size in MB */
-						echo esc_html( sprintf( __( 'Images: JPEG, PNG, WebP (max %s MB)', 'beplus-advanced-reviews-for-woocommerce' ), $max_image_mb ) );
-						if ( $videos_enabled ) {
-							/* translators: %s: max video size in MB */
-							echo ' — ' . esc_html( sprintf( __( 'Videos: MP4, WebM, OGG (max %s MB)', 'beplus-advanced-reviews-for-woocommerce' ), $max_video_mb ) );
+						$hints = array();
+						if ( $images_enabled ) {
+							$hints[] = sprintf( __( 'Images: JPEG, PNG, WebP (max %s MB)', 'beplus-advanced-reviews-for-woocommerce' ), $max_image_mb );
 						}
+						if ( $videos_enabled ) {
+							$hints[] = sprintf( __( 'Videos: MP4, WebM, OGG (max %s MB)', 'beplus-advanced-reviews-for-woocommerce' ), $max_video_mb );
+						}
+						echo esc_html( implode( ' — ', $hints ) );
 						?>
 					</p>
 				</div>

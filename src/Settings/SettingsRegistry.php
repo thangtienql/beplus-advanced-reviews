@@ -309,7 +309,7 @@ class SettingsRegistry extends AbstractModule {
 
 		$allowed_modes = array( 'keep', 'replace' );
 		if ( ! in_array( $clean['display_mode'], $allowed_modes, true ) ) {
-			$clean['display_mode'] = 'replace';
+			$clean['display_mode'] = 'keep';
 		}
 
 		$clean['enable_images'] = ! empty( $input['enable_images'] );
@@ -360,7 +360,7 @@ class SettingsRegistry extends AbstractModule {
 
 	public function get_display_mode(): string {
 		$settings = $this->get_all();
-		return $settings['display_mode'] ?? 'replace';
+		return $settings['display_mode'] ?? 'keep';
 	}
 
 	/**
@@ -380,7 +380,7 @@ class SettingsRegistry extends AbstractModule {
 	 */
 	private function get_defaults(): array {
 		return array(
-			'display_mode'      => 'replace',
+			'display_mode'      => 'keep',
 			'enable_images'     => true,
 			'enable_paste'      => true,
 			'enable_filter'     => true,

@@ -39,6 +39,14 @@ class ReviewQuery {
 			$args['has_images'] = filter_var( $params['has_images'], FILTER_VALIDATE_BOOLEAN );
 		}
 
+		if ( ! empty( $params['exclude'] ) ) {
+			$exclude = array_map( 'absint', explode( ',', $params['exclude'] ) );
+			$exclude = array_filter( $exclude );
+			if ( ! empty( $exclude ) ) {
+				$args['exclude'] = $exclude;
+			}
+		}
+
 		if ( isset( $params['rating_threshold'] ) ) {
 			$args['rating_threshold'] = absint( $params['rating_threshold'] );
 		}

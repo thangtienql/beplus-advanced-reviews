@@ -58,6 +58,12 @@ class ReviewRepository {
 			$where .= ' AND EXISTS (SELECT 1 FROM ' . $wpdb->prefix . 'bparfw_review_media rm WHERE rm.comment_id = c.comment_ID)';
 		}
 
+		if ( ! empty( $args['exclude'] ) && is_array( $args['exclude'] ) ) {
+			$placeholders = implode( ',', array_fill( 0, count( $args['exclude'] ), '%d' ) );
+			$where .= " AND c.comment_ID NOT IN ({$placeholders})";
+			$params = array_merge( $params, $args['exclude'] );
+		}
+
 		switch ( $args['sort'] ) {
 			case 'oldest':
 				$orderby = 'c.comment_date ASC';

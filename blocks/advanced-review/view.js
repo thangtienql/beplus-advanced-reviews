@@ -28,6 +28,7 @@
 		let currentHasImages = false;
 		let currentSort = 'newest';
 		let totalPages = 1;
+		block._bparExcludeIds = [];
 
 		const listContainer = block.querySelector( '.beplus-advanced-reviews-for-woocommerce__list' );
 		const loadMoreBtn = block.querySelector( '.beplus-advanced-reviews-for-woocommerce__load-more' );
@@ -45,6 +46,7 @@
 		 */
 		function loadInitialReviews() {
 			currentPage = 1;
+			block._bparExcludeIds = [];
 
 			if ( listContainer ) {
 				showSkeletonCards();
@@ -121,6 +123,10 @@
 
 			if ( currentHasImages ) {
 				url.searchParams.set( 'has_images', '1' );
+			}
+
+			if ( block._bparExcludeIds && block._bparExcludeIds.length > 0 ) {
+				url.searchParams.set( 'exclude', block._bparExcludeIds.join( ',' ) );
 			}
 
 			url.searchParams.set( '_t', Date.now() );
@@ -227,7 +233,9 @@
 			currentPage++;
 			fetchReviews().then( function ( data ) {
 				if ( data && listContainer ) {
-					listContainer.innerHTML += buildReviewList( data.reviews );
+					if ( data.reviews && data.reviews.length > 0 ) {
+						listContainer.insertAdjacentHTML( 'beforeend', buildReviewList( data.reviews ) );
+					}
 					totalPages = data.pages;
 					block.dataset.totalPages = data.pages;
 					updateLoadMoreButton();
@@ -240,6 +248,7 @@
 		 */
 		function applyFilter() {
 			currentPage = 1;
+			block._bparExcludeIds = [];
 			fetchReviews().then( function ( data ) {
 				if ( data && listContainer ) {
 					listContainer.innerHTML = buildReviewList( data.reviews );
@@ -368,6 +377,17 @@
 					var file = fileInput.files[ i ];
 					var isImage = file.type && file.type.indexOf( 'image/' ) === 0;
 					var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
+					
+					if ( isImage && ! bparfwData.imagesEnabled ) {
+						showFormMessage( block, bparfwData.i18n.imageNotAllowed || 'Image uploads are disabled.', 'error' );
+						continue;
+					}
+
+					if ( isVideo && ! bparfwData.videosEnabled ) {
+						showFormMessage( block, bparfwData.i18n.videoNotAllowed || 'Video uploads are disabled.', 'error' );
+						continue;
+					}
+
 					if ( isImage || isVideo ) {
 						mediaFiles.push( { file: file, removed: false } );
 					}
@@ -409,6 +429,17 @@
 					var file = files[ i ];
 					var isImage = file.type && file.type.indexOf( 'image/' ) === 0;
 					var isVideo = file.type && file.type.indexOf( 'video/' ) === 0;
+
+					if ( isImage && ! bparfwData.imagesEnabled ) {
+						showFormMessage( block, bparfwData.i18n.imageNotAllowed || 'Image uploads are disabled.', 'error' );
+						continue;
+					}
+
+					if ( isVideo && ! bparfwData.videosEnabled ) {
+						showFormMessage( block, bparfwData.i18n.videoNotAllowed || 'Video uploads are disabled.', 'error' );
+						continue;
+					}
+
 					if ( isImage || isVideo ) {
 						mediaFiles.push( { file: file, removed: false } );
 					}
@@ -570,6 +601,10 @@
 								noReviewsEl.remove();
 							}
 							list.insertAdjacentHTML( 'afterbegin', buildReviewCard( result.review, block ) );
+							if ( result.review.id ) {
+								if ( ! block._bparExcludeIds ) block._bparExcludeIds = [];
+								block._bparExcludeIds.push( result.review.id );
+							}
 						}
 
 						var productId = parseInt( block.dataset.productId, 10 );
@@ -583,16 +618,6 @@
 									var distArea = block.querySelector( '.beplus-advanced-reviews-for-woocommerce__distribution' );
 									if ( distArea ) {
 										distArea.innerHTML = buildDistribution( data );
-									}
-
-									var perPage = parseInt( block.dataset.perPage, 10 ) || 10;
-									var total = data.total || 0;
-									var pages = Math.ceil( total / perPage );
-									block.dataset.totalPages = pages;
-
-									var loadMoreWrapper = block.querySelector( '.beplus-advanced-reviews-for-woocommerce__load-more-wrapper' );
-									if ( loadMoreWrapper ) {
-										loadMoreWrapper.style.display = pages > 1 ? '' : 'none';
 									}
 								} )
 								.catch( function () {} );

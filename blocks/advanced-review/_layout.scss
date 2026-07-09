@@ -60,6 +60,8 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		&-main {
 			flex: 1;
 			min-width: 0;
+			display: flex;
+			flex-wrap: wrap;
 		}
 	}
 
@@ -79,7 +81,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		transition: background 0.2s ease, transform 0.1s ease;
 
 		&:hover {
-			background: color.adjust( v.$green, $lightness: 4% );
+			background: color.adjust(v.$green, $lightness: 4%);
 		}
 
 		&:active {
@@ -100,7 +102,8 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	}
 
 	&__list-container {
-		margin-top: 0;
+		margin-top: 32px;
+		width: 100%;
 	}
 
 	&--editor-preview {
@@ -187,9 +190,12 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 }
 
 @keyframes bpar-skeleton-pulse {
-	0%, 100% {
+
+	0%,
+	100% {
 		opacity: 0.4;
 	}
+
 	50% {
 		opacity: 0.7;
 	}
@@ -210,5 +216,6 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	.#{$prefix}__layout-sidebar {
 		flex: auto;
 		min-width: 0;
+		width: 100%;
 	}
 }

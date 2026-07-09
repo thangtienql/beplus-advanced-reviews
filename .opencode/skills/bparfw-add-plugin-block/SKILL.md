@@ -1,5 +1,5 @@
 ---
-name: bpss-add-plugin-block
+name: bparfw-add-plugin-block
 description: Adds or extends a Beplus Advanced Reviews For Woocommerce Gutenberg block under blocks/ using block.json, TypeScript, esbuild, render.php. Use when creating blocks, editing BlockRegistry, block.json, render.php, index.tsx, edit.tsx, view.ts, or build scripts for beplus-advanced-reviews.
 ---
 

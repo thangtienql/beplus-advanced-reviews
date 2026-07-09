@@ -1,5 +1,5 @@
 ---
-name: bpss-frontend
+name: bparfw-frontend
 description: Use when editing JavaScript, TypeScript, or CSS assets under admin/js/, blocks/ (view scripts), or assets/. Covers build workflow, localization, REST integration, CSS scoping, and front-end accessibility for Beplus Advanced Reviews For Woocommerce.
 ---
 

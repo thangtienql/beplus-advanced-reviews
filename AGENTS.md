@@ -6,12 +6,12 @@ Use this file when changing code under `wp-content/plugins/beplus-advanced-revie
 
 - **Always-on context:** This file (`AGENTS.md`) and [`Document Plugin.md`](./Document Plugin.md) are loaded as project instructions.
 - **opencode skills:** [`.opencode/skills/`](./.opencode/skills/) — domain-specific skills triggered by keyword match:
-  - `bpss-php` — PHP code under `src/`, `includes/`
-  - `bpss-rest` — REST API controllers under `src/REST/`
-  - `bpss-blocks` — Gutenberg blocks under `blocks/`
-  - `bpss-frontend` — JS/CSS under `admin/js/`, `blocks/`, `assets/`
-  - `bpss-add-plugin-block` — workflow for creating new plugin blocks
-  - `bpss-add-review-provider` — workflow for adding review data providers
+  - `bparfw-php` — PHP code under `src/`, `includes/`
+  - `bparfw-rest` — REST API controllers under `src/REST/`
+  - `bparfw-blocks` — Gutenberg blocks under `blocks/`
+  - `bparfw-frontend` — JS/CSS under `admin/js/`, `blocks/`, `assets/`
+  - `bparfw-add-plugin-block` — workflow for creating new plugin blocks
+  - `bparfw-add-review-provider` — workflow for adding review data providers
 
 Long-form context stays in this file and in `Document Plugin.md`; avoid duplicating large sections into skills.
 
@@ -46,12 +46,12 @@ Long-form context stays in this file and in `Document Plugin.md`; avoid duplicat
 - **Review list** — paginated list of review cards rendered via a Gutenberg block.
 - **Review card** — avatar, reviewer name, rating score, content, date, and images.
 
-### 2. Reviews with Image Attachments
-- Customers can upload **images** alongside their written review.
-- **Copy/paste from clipboard** into the review form is supported.
-- Accepted image formats: JPEG, PNG, WebP.
-- Images are stored in the standard WordPress media library, linked to the review via a custom meta table (`{wpdb->prefix}bparfw_review_media`).
-- A lightbox renders images within the review card on the front end.
+### 2. Reviews with Media (Image & Video) Attachments
+- Customers can upload **images and videos** alongside their written review.
+- **Copy/paste from clipboard** into the review form is supported for images.
+- Accepted formats: JPEG, PNG, WebP for images; MP4, WebM, OGG for videos.
+- Media files are stored in the standard WordPress media library via a swappable `MediaStorageInterface`, and linked to the review via a custom meta table (`{wpdb->prefix}bparfw_review_media`).
+- A lightbox renders both images and videos within the review card on the front end, with live preview during upload.
 
 ### 3. Review Submission Form
 - Inline form to write and submit a review with a star rating and optional images.
@@ -66,10 +66,15 @@ Long-form context stays in this file and in `Document Plugin.md`; avoid duplicat
   - Sort by date (newest/oldest) or rating (highest/lowest)
 - Filtering is handled client-side via the block's TypeScript view script; for large datasets a REST endpoint supports server-side pagination with filter params.
 
-### 5. Plugin Settings — Display Mode
-- **Keep default** — WooCommerce's built-in reviews remain as-is; the block can be placed manually.
-- **Replace default** — completely replaces the standard WooCommerce reviews tab/area with the Advanced Reviews block.
-- Display mode logic lives in `src/Core/Placement.php`.
+### 5. Plugin Settings (Advanced Reviews)
+Accessible via WooCommerce > Advanced Reviews. Contains two main tabs:
+- **General:**
+  - **Display Mode:** Keep default (manual block placement) vs Replace default (automatically overrides WooCommerce reviews). Logic lives in `src/Core/Placement.php`.
+  - **Reviews per load:** Number of reviews shown before the "Load More" button appears.
+  - **Review Behavior:** Minimum rating to display, toggle filter bar, and toggle sort controls.
+- **Media:**
+  - Toggle image uploads (`enable_images`), allow clipboard paste, and set max image size (MB).
+  - Toggle video uploads (`enable_videos`), set max video size (`max_video_size_mb`).
 
 ## Files you usually touch
 
@@ -115,7 +120,8 @@ beplus-advanced-reviews-for-woocommerce.php
 | `SettingsRegistry` | `src/Settings/SettingsRegistry.php` | Options, defaults, display mode |
 | `BlockRegistry` | `src/Blocks/BlockRegistry.php` | Auto-discover `blocks/*/block.json` |
 | `ReviewController` | `src/REST/ReviewController.php` | Public reviews REST (list, submit, filter) |
-| `MediaHandler` | `src/Media/MediaHandler.php` | Upload validation, paste support, storage, retrieval |
+| `MediaHandler` | `src/Media/MediaHandler.php` | Upload validation, paste support, retrieval, handles `deleted_comment` to clean up media |
+| `LocalMediaStorage` | `src/Media/LocalMediaStorage.php` | Implements `MediaStorageInterface` (`store()`, `delete()`, `get_url()`, etc.) designed for swappable backends (e.g. S3/R2 later) |
 | `SettingsController` | `src/REST/SettingsController.php` | Admin settings REST |
 | `SchemaManager` | `src/DB/SchemaManager.php` | Create / migrate custom DB tables on activation |
 | `Placement` | `src/Core/Placement.php` | Display mode logic (keep/replace/custom hook) |
@@ -134,7 +140,7 @@ CREATE TABLE {prefix}bparfw_review_media (
 );
 ```
 
-`SchemaManager::create_tables()` is called on plugin activation and on `plugins_loaded` when the stored schema version is outdated.
+`SchemaManager::create_tables()` is called on plugin activation and on `init` when the stored schema version is outdated.
 
 ## Gutenberg blocks (`blocks/`)
 
@@ -155,7 +161,7 @@ Page load
   │
   └── view.ts hydrates the block DOM:
         ├── Renders star distribution bar chart
-        ├── Renders review list cards
+        ├── Renders review list cards with **image lightboxes**
         └── Binds filter bar + sort controls
 
 User applies filter (star / images-only)
@@ -178,7 +184,7 @@ User submits review
 | `GET` | `/reviews` | public | List reviews; supports `product_id`, `rating`, `has_images`, `page`, `per_page`, `sort` |
 | `GET` | `/reviews/distribution` | public | Star distribution counts for a product |
 | `POST` | `/reviews` | logged-in or nonce | Submit a new review with rating and optional images |
-| `DELETE` | `/reviews/{id}` | `manage_woocommerce` | Remove a review |
+| `DELETE` | `/reviews/(?P<id>\d+)` | `manage_woocommerce` | Remove a review |
 | `GET` | `/settings` | `manage_options` | Retrieve plugin settings |
 | `POST` | `/settings` | `manage_options` | Save plugin settings |
 
@@ -196,7 +202,8 @@ Document all hooks in `src/Core/HookManager.php`:
 | `beplus-advanced-reviews-for-woocommerce/review.query` | filter | Modify review query args |
 | `beplus-advanced-reviews-for-woocommerce/review.results` | filter | Modify review result set |
 | `beplus-advanced-reviews-for-woocommerce/review.submitted` | action | Fires after a review is saved |
-| `beplus-advanced-reviews-for-woocommerce/media.uploaded` | action | Fires after review image is attached |
+| `beplus-advanced-reviews-for-woocommerce/media.uploaded` | action | Fires after review media is attached |
+| `beplus-advanced-reviews-for-woocommerce/media.deleted` | action | Fires after review media is deleted |
 | `beplus_advanced_reviews_for_woocommerce_template_paths` | filter | Override template paths |
 
 ## Quality checks (from plugin root)

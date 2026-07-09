@@ -32,7 +32,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		letter-spacing: -0.02em;
 	}
 
-	> div {
+	>div {
 		padding-top: 4px;
 	}
 
@@ -49,6 +49,8 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	color: v.$date-muted;
 	line-height: 1;
 	margin-top: 2px;
+	width: 100%;
+	text-align: center;
 }
 
 .#{$prefix}__distribution-bars {

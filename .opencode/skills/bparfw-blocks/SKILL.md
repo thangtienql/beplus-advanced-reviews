@@ -1,5 +1,5 @@
 ---
-name: bpss-blocks
+name: bparfw-blocks
 description: Use when creating or editing Gutenberg blocks under blocks/, including block.json, render.php, edit.tsx, view.ts, style.css, and BlockRegistry. Covers registration, attributes, render callbacks, accessibility, and build workflow for beplus-advanced-reviews-for-woocommerce blocks.
 ---
 

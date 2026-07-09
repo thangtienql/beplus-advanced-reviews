@@ -43,7 +43,7 @@ class MediaHandler extends AbstractModule {
 	 * @return array<int, int> Attachment IDs.
 	 */
 	public function upload_files( int $comment_id, array $files ): array {
-		if ( ! beplus_advanced_reviews_for_woocommerce_is_images_enabled() ) {
+		if ( ! beplus_advanced_reviews_for_woocommerce_is_images_enabled() && ! beplus_advanced_reviews_for_woocommerce_is_videos_enabled() ) {
 			return array();
 		}
 

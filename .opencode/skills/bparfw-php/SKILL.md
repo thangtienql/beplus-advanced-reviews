@@ -1,5 +1,5 @@
 ---
-name: bpss-php
+name: bparfw-php
 description: Use when writing or editing PHP code under src/, includes/, or the bootstrap file beplus-advanced-reviews-for-woocommerce.php. Covers PSR-4 namespaces, modules, helpers, security, naming, and coding standards for Beplus Advanced Reviews For Woocommerce.
 ---
 

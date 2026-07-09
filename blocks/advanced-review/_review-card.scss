@@ -118,9 +118,16 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 
 	img {
 		display: block;
+		width: 80px;
+		height: 80px;
 		border-radius: v.$radius-sm;
 		object-fit: cover;
 		transition: transform 0.2s ease;
+
+		@media (max-width: 768px) {
+			width: 60px;
+			height: 60px;
+		}
 	}
 
 	video {
@@ -129,6 +136,11 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		height: 80px;
 		object-fit: cover;
 		border-radius: v.$radius-sm;
+
+		@media (max-width: 768px) {
+			width: 60px;
+			height: 60px;
+		}
 	}
 
 	&--video {
@@ -138,7 +150,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 			content: '';
 			position: absolute;
 			inset: 0;
-			background: rgba( 0, 0, 0, 0.25 );
+			background: rgba(0, 0, 0, 0.25);
 			border-radius: v.$radius-sm;
 			transition: background 0.2s ease;
 		}
@@ -154,17 +166,17 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 			border-style: solid;
 			border-width: 10px 0 10px 18px;
 			border-color: transparent transparent transparent #fff;
-			filter: drop-shadow( 0 1px 3px rgba( 0, 0, 0, 0.4 ) );
+			filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 			transition: transform 0.2s ease;
 			pointer-events: none;
 		}
 
 		&:hover::after {
-			background: rgba( 0, 0, 0, 0.15 );
+			background: rgba(0, 0, 0, 0.15);
 		}
 
 		&:hover::before {
-			transform: scale( 1.1 );
+			transform: scale(1.1);
 		}
 	}
 }
@@ -192,7 +204,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 	&-overlay {
 		position: absolute;
 		inset: 0;
-		background: rgba( 0, 0, 0, 0.92 );
+		background: rgba(0, 0, 0, 0.92);
 		cursor: pointer;
 	}
 
@@ -205,7 +217,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		height: 40px;
 		border: none;
 		border-radius: 50%;
-		background: rgba( 255, 255, 255, 0.15 );
+		background: rgba(255, 255, 255, 0.15);
 		color: #fff;
 		font-size: 20px;
 		line-height: 1;
@@ -217,7 +229,7 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 
 		&:hover,
 		&:focus-visible {
-			background: rgba( 255, 255, 255, 0.3 );
+			background: rgba(255, 255, 255, 0.3);
 			outline: none;
 		}
 	}
@@ -237,12 +249,12 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		max-height: 85vh;
 		object-fit: contain;
 		border-radius: v.$radius-sm;
-		box-shadow: 0 4px 40px rgba( 0, 0, 0, 0.4 );
+		box-shadow: 0 4px 40px rgba(0, 0, 0, 0.4);
 
 		&--video {
 			max-width: none;
 			max-height: none;
-			width: min( 90vw, 1280px );
+			width: min(90vw, 1280px);
 			height: auto;
 			border-radius: v.$radius;
 		}
@@ -252,12 +264,12 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		position: absolute;
 		top: 50%;
 		z-index: 2;
-		transform: translateY( -50% );
+		transform: translateY(-50%);
 		width: 44px;
 		height: 44px;
 		border: none;
 		border-radius: 50%;
-		background: rgba( 255, 255, 255, 0.15 );
+		background: rgba(255, 255, 255, 0.15);
 		color: #fff;
 		cursor: pointer;
 		display: flex;
@@ -273,12 +285,12 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 
 		&:hover,
 		&:focus-visible {
-			background: rgba( 255, 255, 255, 0.3 );
+			background: rgba(255, 255, 255, 0.3);
 			outline: none;
 		}
 
 		&:active {
-			transform: translateY( -50% ) scale( 0.95 );
+			transform: translateY(-50%) scale(0.95);
 		}
 	}
 
@@ -295,10 +307,10 @@ $prefix: beplus-advanced-reviews-for-woocommerce;
 		bottom: 24px;
 		left: 50%;
 		z-index: 2;
-		transform: translateX( -50% );
+		transform: translateX(-50%);
 		padding: 6px 16px;
 		border-radius: v.$radius-pill;
-		background: rgba( 0, 0, 0, 0.6 );
+		background: rgba(0, 0, 0, 0.6);
 		color: #fff;
 		font-size: 13px;
 		line-height: 1.5;

@@ -88,8 +88,11 @@ $wrapper_attrs = get_block_wrapper_attributes(
 					<?php if ( $show_images ) : ?>
 						<div class="beplus-advanced-reviews-for-woocommerce__filter-images">
 							<label class="beplus-advanced-reviews-for-woocommerce__filter-toggle">
-								<input type="checkbox" class="beplus-advanced-reviews-for-woocommerce__filter-images-input" aria-label="<?php esc_attr_e( 'Show only reviews with images', 'beplus-advanced-reviews-for-woocommerce' ); ?>">
-								<?php esc_html_e( 'With images only', 'beplus-advanced-reviews-for-woocommerce' ); ?>
+								<span class="beplus-advanced-reviews-for-woocommerce__filter-toggle-text"><?php esc_html_e( 'With images only', 'beplus-advanced-reviews-for-woocommerce' ); ?></span>
+								<div class="beplus-advanced-reviews-for-woocommerce__filter-toggle-switch">
+									<input type="checkbox" class="beplus-advanced-reviews-for-woocommerce__filter-images-input" aria-label="<?php esc_attr_e( 'Show only reviews with images', 'beplus-advanced-reviews-for-woocommerce' ); ?>">
+									<span class="beplus-advanced-reviews-for-woocommerce__filter-toggle-slider"></span>
+								</div>
 							</label>
 						</div>
 					<?php endif; ?>
@@ -101,12 +104,17 @@ $wrapper_attrs = get_block_wrapper_attributes(
 					<label for="bpar-sort-select" class="beplus-advanced-reviews-for-woocommerce__filter-label">
 						<?php esc_html_e( 'Sort by:', 'beplus-advanced-reviews-for-woocommerce' ); ?>
 					</label>
-					<select id="bpar-sort-select" class="beplus-advanced-reviews-for-woocommerce__sort-select" aria-label="<?php esc_attr_e( 'Sort reviews', 'beplus-advanced-reviews-for-woocommerce' ); ?>">
-						<option value="newest"><?php esc_html_e( 'Newest', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
-						<option value="oldest"><?php esc_html_e( 'Oldest', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
-						<option value="highest"><?php esc_html_e( 'Highest rated', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
-						<option value="lowest"><?php esc_html_e( 'Lowest rated', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
-					</select>
+					<div class="beplus-advanced-reviews-for-woocommerce__sort-wrapper">
+						<select id="bpar-sort-select" class="beplus-advanced-reviews-for-woocommerce__sort-select" aria-label="<?php esc_attr_e( 'Sort reviews', 'beplus-advanced-reviews-for-woocommerce' ); ?>">
+							<option value="newest"><?php esc_html_e( 'Newest', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
+							<option value="oldest"><?php esc_html_e( 'Oldest', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
+							<option value="highest"><?php esc_html_e( 'Highest rated', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
+							<option value="lowest"><?php esc_html_e( 'Lowest rated', 'beplus-advanced-reviews-for-woocommerce' ); ?></option>
+						</select>
+						<span class="beplus-advanced-reviews-for-woocommerce__sort-icon">
+							<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+						</span>
+					</div>
 				</div>
 			<?php endif; ?>
 

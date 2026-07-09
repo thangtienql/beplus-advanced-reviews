@@ -22,7 +22,7 @@ function beplus_advanced_reviews_for_woocommerce_get_settings(): array {
 	}
 
 	$defaults = array(
-		'display_mode'     => 'replace',
+		'display_mode'     => 'keep',
 		'enable_images'    => true,
 		'enable_paste'     => true,
 		'enable_filter'    => true,

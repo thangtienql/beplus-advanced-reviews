@@ -1,5 +1,5 @@
 ---
-name: bpss-rest
+name: bparfw-rest
 description: Use when creating or editing REST API controllers, routes, endpoints, or API responses under src/REST/. Covers namespace, permissions, sanitization, and response shapes for the beplus-advanced-reviews-for-woocommerce/v1 API.
 ---
 

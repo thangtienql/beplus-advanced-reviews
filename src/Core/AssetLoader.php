@@ -46,7 +46,8 @@ class AssetLoader extends AbstractModule {
 			'maxUploadSize'   => beplus_advanced_reviews_for_woocommerce_get_max_image_size(),
 			'maxUploadSizeMb' => $settings['max_image_size_mb'] ?? 2,
 			'allowedTypes'    => array( 'image/jpeg', 'image/png', 'image/webp' ),
-			'pasteEnabled'    => true,
+			'pasteEnabled'    => ! empty( $settings['enable_paste'] ) && ! empty( $settings['enable_images'] ),
+			'imagesEnabled'   => ! empty( $settings['enable_images'] ),
 			'videosEnabled'   => ! empty( $settings['enable_videos'] ),
 			'maxVideoSize'    => beplus_advanced_reviews_for_woocommerce_get_max_video_size(),
 			'maxVideoSizeMb'  => $settings['max_video_size_mb'] ?? 20,
@@ -68,6 +69,8 @@ class AssetLoader extends AbstractModule {
 					__( 'Video must be smaller than %s MB.', 'beplus-advanced-reviews-for-woocommerce' ),
 					( $settings['max_video_size_mb'] ?? 20 )
 				),
+				'imageNotAllowed' => __( 'Image uploads are not allowed.', 'beplus-advanced-reviews-for-woocommerce' ),
+				'videoNotAllowed' => __( 'Video uploads are not allowed.', 'beplus-advanced-reviews-for-woocommerce' ),
 			),
 		);
 	}
