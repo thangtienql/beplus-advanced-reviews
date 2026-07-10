@@ -123,8 +123,7 @@ beplus-advanced-reviews-for-woocommerce/
 │   │   ├── AbstractModule.php    # Base module
 │   │   ├── AssetLoader.php       # Enqueue scripts/styles
 │   │   ├── HookManager.php       # Constants for hooks/filters
-│   │   ├── Placement.php         # Display mode logic (keep/replace/hook)
-│   │   └── Compat.php            # Backward compatibility helpers
+│   │   └── Placement.php         # Display mode logic (keep/replace)
 │   │
 │   ├── Reviews/                  # Domain: review storage / formatting
 │   │   ├── ReviewRepository.php
@@ -133,7 +132,9 @@ beplus-advanced-reviews-for-woocommerce/
 │   │   └── ReviewSubmission.php
 │   │
 │   ├── Media/
-│   │   └── MediaHandler.php
+│   │   ├── MediaHandler.php
+│   │   ├── MediaStorageInterface.php
+│   │   └── LocalMediaStorage.php
 │   │
 │   ├── Settings/
 │   │   └── SettingsRegistry.php  # Options + defaults (display mode, etc.)
@@ -151,36 +152,39 @@ beplus-advanced-reviews-for-woocommerce/
 │   └── Functions/
 │       └── helpers.php
 │
-├── includes/                     # Procedural / legacy (if backward compat is needed)
+├── includes/                     # Procedural / legacy helpers
 │   ├── common.php                # Global helper functions
 │   ├── hooks.php                 # Centralized add_action/add_filter
 │   └── install.php               # DB tables, default options
 │
-├── admin/                        # Admin UI (PHP views + TypeScript source)
+├── admin/                        # Admin UI (PHP views + JS)
 │   ├── js/
-│   │   ├── settings.ts           # Admin settings UI
-│   │   └── components/
+│   │   ├── settings.js           # Admin settings UI (hand-authored)
 │   └── css/
 │       └── admin.scss
-│
-├── assets/                       # Source assets (before build)
-│   └── css/
-│       ├── reviews.scss
-│       └── components/
-│
-├── build/                        # esbuild output (DO NOT edit by hand)
-│   ├── admin.js
-│   ├── admin.asset.php
-│   └── blocks/
 │
 ├── blocks/                       # Gutenberg blocks
 │   ├── advanced-review/
 │   │   ├── block.json
 │   │   ├── edit.tsx
-│   │   ├── view.ts
+│   │   ├── view.js               # Front-end JS (hand-authored)
+│   │   ├── view.asset.php
+│   │   ├── index.js              # Block entry (compiled)
+│   │   ├── index.asset.php
 │   │   ├── render.php
-│   │   └── style.css
-│   └── index.js                  # Blocks build entry
+│   │   ├── style.scss            # Frontend + editor styles (source)
+│   │   ├── style.css             # Compiled styles
+│   │   ├── _variables.scss
+│   │   ├── _stars.scss
+│   │   ├── _review-card.scss
+│   │   ├── _load-more.scss
+│   │   ├── _layout.scss
+│   │   ├── _form.scss
+│   │   ├── _filter-bar.scss
+│   │   └── _distribution.scss
+│   │
+│   └── build/                    # esbuild output (view.js bundle)
+│       └── view.js
 │
 ├── templates/                    # Frontend PHP templates
 │   ├── review-card.php
@@ -206,7 +210,7 @@ beplus-advanced-reviews-for-woocommerce/
 <?php
 /**
  * Plugin Name: Beplus Advanced Reviews For Woocommerce
- * Plugin URI:  https://beplusthemes.com/
+ * Plugin URI:  https://github.com/thangtienql/beplus-advanced-reviews-for-woocommerce
  * Description: Modern WooCommerce product reviews with image support, star distribution, AJAX filtering, and load more.
  * Version:     1.0.0
  * Author:      Beplus
@@ -215,6 +219,7 @@ beplus-advanced-reviews-for-woocommerce/
  * Domain Path: /languages
  * Requires at least: 6.0
  * Requires PHP: 7.4
+ * Requires Plugins: woocommerce
  * License:     GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -253,13 +258,29 @@ if ( file_exists( $autoload ) ) {
 	);
 }
 
+require_once BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'includes/common.php';
+require_once BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'includes/hooks.php';
+
+/**
+ * Check if WooCommerce is active.
+ *
+ * @return bool
+ */
+function beplus_advanced_reviews_for_woocommerce_is_woocommerce_active() {
+	return class_exists( 'WooCommerce' );
+}
+
 /**
  * Boot plugin.
  *
- * @return \BeplusAdvancedReviewsForWoocommerce\Core\Plugin
+ * @return \BeplusAdvancedReviewsForWoocommerce\Core\Plugin|null
  */
 function beplus_advanced_reviews_for_woocommerce_boot() {
 	static $plugin = null;
+
+	if ( ! beplus_advanced_reviews_for_woocommerce_is_woocommerce_active() ) {
+		return null;
+	}
 
 	if ( null === $plugin ) {
 		$plugin = new \BeplusAdvancedReviewsForWoocommerce\Core\Plugin();
@@ -269,15 +290,33 @@ function beplus_advanced_reviews_for_woocommerce_boot() {
 	return $plugin;
 }
 
-add_action( 'init', 'beplus_advanced_reviews_for_woocommerce_init' );
+add_action( 'plugins_loaded', 'beplus_advanced_reviews_for_woocommerce_init' );
 
 /**
- * Init.
+ * Init on plugins_loaded.
  *
  * @return void
  */
 function beplus_advanced_reviews_for_woocommerce_init() {
 	beplus_advanced_reviews_for_woocommerce_boot();
+}
+
+add_action( 'admin_notices', 'beplus_advanced_reviews_for_woocommerce_missing_wc_notice' );
+
+/**
+ * Show admin notice when WooCommerce is not active.
+ *
+ * @return void
+ */
+function beplus_advanced_reviews_for_woocommerce_missing_wc_notice() {
+	if ( beplus_advanced_reviews_for_woocommerce_is_woocommerce_active() ) {
+		return;
+	}
+
+	printf(
+		'<div class="notice notice-error"><p>%s</p></div>',
+		esc_html__( 'Beplus Advanced Reviews For Woocommerce requires WooCommerce to be installed and active.', 'beplus-advanced-reviews-for-woocommerce' )
+	);
 }
 
 register_activation_hook( __FILE__, 'beplus_advanced_reviews_for_woocommerce_activate' );
@@ -293,6 +332,15 @@ function beplus_advanced_reviews_for_woocommerce_activate() {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		wp_die(
 			esc_html__( 'Beplus Advanced Reviews For Woocommerce requires PHP 7.4 or higher.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'Plugin Activation Error',
+			array( 'back_link' => true )
+		);
+	}
+
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		wp_die(
+			esc_html__( 'Beplus Advanced Reviews For Woocommerce requires WooCommerce to be installed and active.', 'beplus-advanced-reviews-for-woocommerce' ),
 			'Plugin Activation Error',
 			array( 'back_link' => true )
 		);
@@ -432,7 +480,7 @@ apply_filters( 'beplus_advanced_reviews_for_woocommerce_review_card_html', $html
 ### 6.8 Database tables
 
 ```php
-// Prefix: {wpdb->prefix}bpar_
+// Prefix: {wpdb->prefix}bparfw_
 $wpdb->prefix . 'bparfw_review_media'
 ```
 
@@ -532,6 +580,15 @@ abstract class AbstractModule {
 ```php
 namespace BeplusAdvancedReviewsForWoocommerce\Core;
 
+use BeplusAdvancedReviewsForWoocommerce\Settings\SettingsRegistry;
+use BeplusAdvancedReviewsForWoocommerce\DB\SchemaManager;
+use BeplusAdvancedReviewsForWoocommerce\Blocks\BlockRegistry;
+use BeplusAdvancedReviewsForWoocommerce\REST\ReviewController;
+use BeplusAdvancedReviewsForWoocommerce\REST\SettingsController;
+use BeplusAdvancedReviewsForWoocommerce\Media\MediaHandler;
+use BeplusAdvancedReviewsForWoocommerce\Media\LocalMediaStorage;
+use BeplusAdvancedReviewsForWoocommerce\Media\MediaStorageInterface;
+
 class Plugin {
 
 	private Container $container;
@@ -545,26 +602,26 @@ class Plugin {
 		$this->register_services_from_filter();
 		$this->boot_registered_modules();
 
-		add_action( 'init', array( $this, 'on_init' ) );
+		add_action( 'rest_api_init', array( $this, 'init_rest_controllers' ) );
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
-
-		// (Note: Display mode logic is registered directly in the Placement module's register() method,
-		// calling the global helper beplus_advanced_reviews_for_woocommerce_get_display_mode() 
-		// rather than retrieving it through the container in Plugin::boot)
 	}
 
-	public function on_init(): void {
-		$this->init_rest_controllers();
+	public function init_rest_controllers(): void {
+		$review_controller = new ReviewController();
+		$review_controller->register_routes();
+
+		$settings_controller = new SettingsController();
+		$settings_controller->register_routes();
 	}
 
 	public function activate(): void {
-		// Create tables, default options, flush rewrite rules.
+		$schema = new SchemaManager( $this->container );
+		$schema->create_tables();
 		flush_rewrite_rules();
 	}
 
 	public function deactivate(): void {
-		// Clear cron, flush rewrite rules.
 		flush_rewrite_rules();
 	}
 }
@@ -604,12 +661,13 @@ class SettingsRegistry extends AbstractModule {
 		'enable_images'     => true,
 		'enable_paste'      => true,
 		'max_image_size_mb' => 2,
+		'enable_videos'     => false,
+		'max_video_size_mb' => 20,
 	);
 
 	public function register(): void {
 		add_action( 'admin_menu', array( $this, 'add_settings_page' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
-		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 	}
 
 	public function get_all(): array { /* merge defaults + stored */ }
@@ -678,16 +736,16 @@ class ReviewController extends \WP_REST_Controller {
 namespace BeplusAdvancedReviewsForWoocommerce\Media;
 
 interface MediaStorageInterface {
-	public function store( array $file ): int;
-	public function delete( int $attachment_id ): bool;
-	public function get_url( int $attachment_id ): string;
-	public function get_thumbnail_url( int $attachment_id ): string;
-	public function get_mime_type( int $attachment_id ): string;
-	public function generate_metadata( int $attachment_id ): void;
+	public function store( string $file_path, string $filename );
+	public function delete( $storage_id ): bool;
+	public function get_url( $storage_id ): ?string;
+	public function get_thumbnail_url( $storage_id, string $size = 'thumbnail' ): ?string;
+	public function get_mime_type( $storage_id ): ?string;
+	public function generate_metadata( $storage_id, string $file_path ): void;
 }
 
 class MediaHandler extends AbstractModule {
-	public function __construct( Container $container, MediaStorageInterface $storage ) { ... }
+	public function __construct( Container $container, MediaStorageInterface $storage = null ) { ... }
 
 	/**
 	 * Handle uploaded files from form $_FILES.
@@ -727,9 +785,10 @@ Block structure:
 blocks/advanced-review/
 ├── block.json      # metadata, attributes, render callback
 ├── edit.tsx        # editor UI (placeholder preview)
-├── view.ts         # front-end enhancements (AJAX, load more, filter, paste)
+├── view.js         # front-end enhancements (AJAX, load more, filter, paste)
 ├── render.php      # server-side render
-└── style.css       # frontend + editor styles
+├── style.scss      # frontend + editor styles (source)
+└── style.css       # compiled styles
 ```
 
 **Sample block.json:**
@@ -743,6 +802,7 @@ blocks/advanced-review/
 	"category": "beplus-advanced-reviews-for-woocommerce",
 	"icon": "star-filled",
 	"description": "Modern WooCommerce product reviews with images, star distribution, filtering, and load more.",
+	"textdomain": "beplus-advanced-reviews-for-woocommerce",
 	"attributes": {
 		"showDistribution": { "type": "boolean", "default": true },
 		"showFilterBar":    { "type": "boolean", "default": true },
@@ -752,9 +812,13 @@ blocks/advanced-review/
 		"reviewsPerLoad":   { "type": "number",  "default": 10 },
 		"enableLazyLoad":   { "type": "boolean", "default": true }
 	},
+	"supports": {
+		"html": false,
+		"align": ["wide", "full"]
+	},
 	"render": "file:./render.php",
 	"editorScript": "file:./index.js",
-	"viewScript": "file:./view.ts",
+	"viewScript": "file:./view.js",
 	"style": "file:./style.css"
 }
 ```
@@ -777,7 +841,7 @@ Page load
   ├── REST GET /reviews/distribution?product_id=… → ReviewController::get_star_distribution()
   │     Returns initial review page + star distribution
   │
-  └── view.ts hydrates the block:
+  └── view.js hydrates the block:
         ├── Renders star distribution bar chart
         ├── Renders review list cards
         └── Binds filter bar + sort controls
@@ -819,27 +883,35 @@ User submits review
 
 **AssetLoader** pattern:
 
-- Admin: `admin/js/settings.ts` → compiled assets
-- Frontend: `assets/js/review-list.ts`, `review-form.ts`, `review-filter.ts`, `star-distribution.ts`
-- Blocks: `enqueue_block_assets` hook or block metadata asset handles
+- Admin: `admin/js/settings.ts` → compiled via esbuild
+- Blocks: localized data script handles are registered in block metadata or via `wp_enqueue_scripts`
+- `bparfwData` object is localized on a standalone data script (`beplus-advanced-reviews-for-woocommerce-data`) enqueued on every front-end page
 
 **Localized data:**
 
 ```php
 wp_localize_script(
-	'beplus-advanced-reviews-for-woocommerce-frontend',
+	'beplus-advanced-reviews-for-woocommerce-data',
 	'bparfwData',
 	array(
 		'restUrl'         => rest_url( 'beplus-advanced-reviews-for-woocommerce/v1/' ),
 		'nonce'           => wp_create_nonce( 'wp_rest' ),
-		'maxUploadSize'   => wp_max_upload_size(),
+		'maxUploadSize'   => beplus_advanced_reviews_for_woocommerce_get_max_image_size(),
 		'allowedTypes'    => array( 'image/jpeg', 'image/png', 'image/webp' ),
 		'pasteEnabled'    => true,
+		'imagesEnabled'   => true,
+		'videosEnabled'   => false,
+		'maxVideoSize'    => 20971520,
+		'videoTypes'      => array( 'video/mp4', 'video/webm', 'video/ogg' ),
 		'i18n'            => array(
-			'noReviews'        => __( 'No reviews yet.', 'beplus-advanced-reviews-for-woocommerce' ),
-			'loadMore'         => __( 'Load More', 'beplus-advanced-reviews-for-woocommerce' ),
-			'submitSuccess'    => __( 'Review submitted!', 'beplus-advanced-reviews-for-woocommerce' ),
-			'submitError'      => __( 'Something went wrong.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'noReviews'       => __( 'No reviews yet.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'loadMore'        => __( 'Load More', 'beplus-advanced-reviews-for-woocommerce' ),
+			'submitSuccess'   => __( 'Review submitted!', 'beplus-advanced-reviews-for-woocommerce' ),
+			'submitError'     => __( 'Something went wrong.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'ratingRequired'  => __( 'Please select a rating.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'contentRequired' => __( 'Please write a review.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'imageTooLarge'   => __( 'Image must be smaller than %s MB.', 'beplus-advanced-reviews-for-woocommerce' ),
+			'videoTooLarge'   => __( 'Video must be smaller than %s MB.', 'beplus-advanced-reviews-for-woocommerce' ),
 		),
 	)
 );
@@ -850,10 +922,9 @@ wp_localize_script(
 ```json
 {
 	"scripts": {
-		"build": "esbuild",
-		"watch": "esbuild --watch",
-		"lint:js": "eslint .",
-		"lint:css": "stylelint \"**/*.css\""
+		"build:css": "sass --no-source-map --style=compressed blocks/advanced-review/style.scss:blocks/advanced-review/style.css admin/css/admin.scss:admin/css/admin.css",
+		"build": "npm run build:css && node esbuild.config.mjs",
+		"watch": "node esbuild.config.mjs --watch"
 	}
 }
 ```
@@ -883,7 +954,7 @@ function beplus_advanced_reviews_for_woocommerce_get_template( $template_name, $
 			BEPLUS_ADVANCED_REVIEWS_FOR_WOOCOMMERCE_PLUGIN_DIR . 'templates/',
 		)
 	);
-	// locate + load_template()
+	// locate + load_template() — extracts $args, includes file
 }
 ```
 
@@ -974,7 +1045,8 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 | `beplus-advanced-reviews-for-woocommerce/review.query` | filter | Modify review query args |
 | `beplus-advanced-reviews-for-woocommerce/review.results` | filter | Modify review result set |
 | `beplus-advanced-reviews-for-woocommerce/review.submitted` | action | Fires after a review is saved |
-| `beplus-advanced-reviews-for-woocommerce/media.uploaded` | action | Fires after review image is attached |
+| `beplus-advanced-reviews-for-woocommerce/media.uploaded` | action | Fires after review media is attached |
+| `beplus-advanced-reviews-for-woocommerce/media.deleted` | action | Fires after review media is deleted |
 | `beplus_advanced_reviews_for_woocommerce_template_paths` | filter | Override template paths |
 
 ---
@@ -993,7 +1065,7 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 - [ ] `AssetLoader` — enqueue admin + frontend
 - [ ] `SettingsRegistry` — options + defaults (display mode)
 - [ ] `HookManager` — document all hooks
-- [ ] `Placement` — display mode logic (keep/replace/custom hook)
+- [ ] `Placement` — display mode logic (keep/replace)
 - [ ] `includes/common.php` — global helpers
 - [ ] `includes/hooks.php` — wire custom actions
 
@@ -1007,7 +1079,7 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 
 ### Phase 4 — UI
 - [ ] Admin settings page (TypeScript + REST)
-- [ ] Block `advanced-review` (block.json, render.php, edit.tsx, view.ts)
+- [ ] Block `advanced-review` (block.json, render.php, edit.tsx, view.js)
 - [ ] Review list template + Load More
 - [ ] Review card template (avatar, name, rating, content, date, images)
 - [ ] Star distribution chart (bar chart)
@@ -1037,6 +1109,8 @@ Target **WCAG 2.1 AA** for all plugin-owned UI: review list, filter bar, submiss
 | `SettingsController` | `src/REST/SettingsController.php` | Settings REST API |
 | `SettingsRegistry` | `src/Settings/SettingsRegistry.php` | Options + defaults |
 | `MediaHandler` | `src/Media/MediaHandler.php` | Image uploads, paste, validation |
+| `MediaStorageInterface` | `src/Media/MediaStorageInterface.php` | Storage backend contract |
+| `LocalMediaStorage` | `src/Media/LocalMediaStorage.php` | WP Media Library backend |
 | `SchemaManager` | `src/DB/SchemaManager.php` | Database schema |
 | `BlockRegistry` | `src/Blocks/BlockRegistry.php` | Auto-discover blocks |
 | `ReviewRepository` | `src/Reviews/ReviewRepository.php` | Review data access |
