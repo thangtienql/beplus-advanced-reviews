@@ -23,7 +23,7 @@ class MediaHandler extends AbstractModule {
 
 	private MediaStorageInterface $storage;
 
-	public function __construct( Container $container, MediaStorageInterface $storage = null ) {
+	public function __construct( Container $container, ?MediaStorageInterface $storage = null ) {
 		parent::__construct( $container );
 		$this->storage = $storage ?? new LocalMediaStorage();
 	}

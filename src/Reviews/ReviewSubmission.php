@@ -47,11 +47,16 @@ class ReviewSubmission {
 			'comment_author_email' => $user_id ? $current_user->user_email : sanitize_email( $data['email'] ?? '' ),
 			'comment_content'      => $content,
 			'comment_type'         => 'review',
-			'comment_approved'     => 1,
 			'user_id'              => $user_id,
 		);
 
-		$comment_id = wp_insert_comment( $comment_data );
+		// wp_new_comment automatically handles moderation (wp_allow_comment),
+		// email notifications, and expects slashed data.
+		$comment_id = wp_new_comment( wp_slash( $comment_data ), true );
+
+		if ( is_wp_error( $comment_id ) ) {
+			return $comment_id;
+		}
 
 		if ( ! $comment_id ) {
 			return new \WP_Error(
